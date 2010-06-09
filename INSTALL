@@ -1,0 +1,47 @@
+################################################################################
+
+Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+
+This file is part of the OdimH5 software.
+
+OdimH5 is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OdimH5 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
+
+################################################################################
+
+
+Installation of OdimH5 software is performed by calling specified target within
+ant script. Typicall installation procedure is realized by issuing the following
+command:
+
+ant install
+
+In this case the software will be installed in the default directory /opt. 
+In order to override installation in default directory, you can provide 
+a paramater for the ant installation script:
+
+ant -Dprefix=/my/install/dir install
+
+The prefix denotes target installation directory.
+
+Dependencies: OdimH5 requires some libraries from the HDF Java Object Package.
+The set of files includes the following shared libraries: 
+
+- libjhdf.so
+- libjhdf5.so
+
+These libraries must be placed in the folder listed on your java.library.path 
+system variable.
+
+
+ 
