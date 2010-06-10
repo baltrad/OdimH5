@@ -109,8 +109,8 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 		<copy todir="${prefix}/${app.name}/lib" flatten="false">
 			<fileset dir="${lib.dir}" />
 		</copy>
-		<!--copy tofile="${prefix}/${app.name}/${options.file}" 
-			file="${etc.dir}/${options.file.init}" flatten="true" /-->
+		<copy tofile="${prefix}/${app.name}/${options.file}" 
+			file="${etc.dir}/${options.file.init}" flatten="true" />
 	</target>
 	
 </project>
