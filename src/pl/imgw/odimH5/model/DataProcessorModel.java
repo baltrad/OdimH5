@@ -470,30 +470,18 @@ public class DataProcessorModel {
             status = H5Awrite_wrap(attribute_id, dataset_id, attr_buf, verbose);
         }
         if (attr_class.equals("string")) {
-            
-            byte[] attr_buf_temp = attr_value.getBytes();
-            size = attr_buf_temp.length + 1;
-            
+			byte[] t_attr_buf = attr_value.getBytes();    
+			size = t_attr_buf.length + 1;
+			byte[] attr_buf = new byte[ size ]; 
+			for( int i = 0; i < t_attr_buf.length; i++ ) {
+				attr_buf[ i ] = t_attr_buf[ i ];
+			}
+			attr_buf[ size - 1 ] = 0;
             int dataset_id = H5Tcopy_wrap(HDF5Constants.H5T_C_S1, verbose);
-
             H5Tset_size_wrap(dataset_id, size, verbose);
-            attribute_id = H5Acreate_string_wrap(group_id, attr_name,
+			attribute_id = H5Acreate_string_wrap(group_id, attr_name,
                     dataset_id, dataspace_id, HDF5Constants.H5P_DEFAULT,
                     verbose);
-            
-            
-            byte[] attr_buf = new byte[size];
-            
-            for (int i = 0; i < attr_buf_temp.length; i++) {
-                    attr_buf[i] = attr_buf_temp[i];
-            }
-            
-            System.out.println("tutaj: " + attr_value);
-            System.out.println("value: " + attr_value.length());
-            System.out.println("buf_temp: " + attr_buf_temp.length);
-            System.out.println("buf: " + attr_buf.length);
-            
-            attr_buf[attr_buf.length - 1] = 0;
             status = H5Awrite_wrap(attribute_id, dataset_id, attr_buf, verbose);
         }
         status = H5Aclose_wrap(attribute_id, verbose);
