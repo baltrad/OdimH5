@@ -19,6 +19,8 @@ import pl.imgw.odimH5.model.rainbow.ModelImage;
 import pl.imgw.odimH5.model.rainbow.ModelPVOL;
 import pl.imgw.odimH5.model.rainbow.ModelRHI;
 import pl.imgw.odimH5.model.rainbow.ModelVP;
+import pl.imgw.odimH5.util.BaltradFrame;
+import pl.imgw.odimH5.util.BaltradFrameHandler;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.MessageLogger;
 import pl.imgw.odimH5.util.BaltradFeeder;
@@ -140,11 +142,11 @@ public class DataProcessorController {
 
             // Other platforms will come here at a later time...
             msgl.showMessage("Descriptor preparation completed.", verbose);
-            
+
         } else if (cmd.hasArgument(cmd.CONTINOUOS_OPTION)) {
 
             msgl.showMessage("Baltrad feeder mode selected", verbose);
-            
+
             Document doc = OptionsHandler.loadOptions(msgl, verbose);
             if (doc == null) {
                 OptionsHandler.exampleOptionXML();
@@ -152,12 +154,37 @@ public class DataProcessorController {
                         + OptionsHandler.OPTION_XML_FILE);
 
             } else {
-                
+
                 BaltradFeeder worker = new BaltradFeeder(doc, rainbow, proc,
                         cmd.getArgumentValue(cmd.CONTINOUOS_OPTION), verbose);
-                
+
                 worker.start();
             }
+        } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
+                && cmd.hasArgument(cmd.ADDRESS_OPTION)
+                && cmd.hasArgument(cmd.SENDER_OPTION)
+                && cmd.hasArgument(cmd.RADAR_OPTION)) {
+
+            msgl.showMessage("Sending file to server", verbose);
+
+            BaltradFrameHandler bfh = new BaltradFrameHandler(proc
+                    .getMessageLogger(), cmd
+                    .getArgumentValue(cmd.ADDRESS_OPTION));
+
+            String a = bfh.createBFDataHdr(
+                    BaltradFrameHandler.BF_MIME_MULTIPART, cmd
+                            .getArgumentValue(cmd.SENDER_OPTION), cmd
+                            .getArgumentValue(cmd.RADAR_OPTION), cmd
+                            .getArgumentValue(cmd.INPUT_FILE_OPTION));
+
+            // System.out.println("BFDataHdr:");
+            // System.out.println(a);
+
+            BaltradFrame bf = new BaltradFrame(proc.getMessageLogger(), a, cmd
+                    .getArgumentValue(cmd.INPUT_FILE_OPTION));
+
+            bfh.handleBF(bf);
+
         }
     }
 

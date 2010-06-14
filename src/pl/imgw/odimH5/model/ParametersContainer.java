@@ -56,8 +56,9 @@ public class ParametersContainer {
     private String gain = null;
     private String offset = null;
     private String dataFileName = null;
-    private Slices[] slices = null;
+    private SliceContainer[] slices = null;
 
+    
     public String getDate() {
         return date;
     }
@@ -355,30 +356,12 @@ public class ParametersContainer {
         this.dataFileName = dataFileName;
     }
 
-    public void makeSlices(int size) {
-        slices = new Slices[size];
+    public SliceContainer[] getSlices() {
+        return slices;
     }
 
-    public Slices getSlices(int index) {
-        return slices[index];
-    }
-
-    public void setSlices(Slices slices, int index) {
-        this.slices[index] = slices;
-    }
-
-    class Slices {
-        protected String sliceTime = null;
-        protected String sliceDate = null;
-        protected String pangle = null;
-        protected String bins = null;
-        protected String srange = null;
-        protected String rstep = null;
-        protected String rays = null;
-        protected String a1gate = null;
-        protected String datatype = null;
-        protected String min = null;
-        protected String gain = null;
+    public void setSlices(SliceContainer[] slices) {
+        this.slices = slices;
     }
 
 }

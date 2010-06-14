@@ -13,7 +13,7 @@ import pl.imgw.odimH5.util.DataBufferContainer;
 
 /**
  * 
-* It contains static methods creating XML file of RHI objects descriptor
+ * It contains static methods creating XML file of RHI objects descriptor
  * 
  * 
  * @author <a href="mailto:lukasz.wojtas@imgw.pl">Lukasz Wojtas</a>
@@ -38,6 +38,10 @@ public class ModelRHI {
     public static void createDescriptor(String fileName, byte[] fileBuff,
             boolean verbose, Model rb) {
 
+        boolean isDirect = false;
+        if (fileName.endsWith(".h5"))
+            isDirect = true;
+
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.PRODUCT, verbose);
         Document inputDoc = rb.parseRAINBOWMetadataBuffer(hdrBuff, verbose);
 
@@ -60,14 +64,14 @@ public class ModelRHI {
                 nodeList, "", verbose));
         res_x = String.valueOf(Double.parseDouble(res_x) * 1000);
         res_y = String.valueOf(Double.parseDouble(res_y) * 1000);
-//        nodeList = rb.getRAINBOWNodesByName(inputDoc, "x_0", verbose);
-//        String x_0 = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
+        // nodeList = rb.getRAINBOWNodesByName(inputDoc, "x_0", verbose);
+        // String x_0 = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "x_1", verbose);
         String x_1 = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
-//        nodeList = rb.getRAINBOWNodesByName(inputDoc, "z_0", verbose);
-//        String z_0 = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
-//        nodeList = rb.getRAINBOWNodesByName(inputDoc, "z_1", verbose);
-//        String z_1 = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
+        // nodeList = rb.getRAINBOWNodesByName(inputDoc, "z_0", verbose);
+        // String z_0 = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
+        // nodeList = rb.getRAINBOWNodesByName(inputDoc, "z_1", verbose);
+        // String z_1 = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "ele", verbose);
         String ele = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "azi", verbose);
@@ -82,7 +86,7 @@ public class ModelRHI {
         cont.setDate(rb.parseRAINBOWDate(date, verbose));
         cont.setTime(rb.parseRAINBOWTime(time, verbose));
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
-        
+
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
         if (source.matches("BRZ")) {
@@ -159,7 +163,7 @@ public class ModelRHI {
         cont.setStarttime(time);
         cont.setGain(gain);
         cont.setOffset(min);
-        
+
         // prepare actual dataset
         int width = Integer.parseInt(xsize);
         int height = Integer.parseInt(ysize);
@@ -186,20 +190,28 @@ public class ModelRHI {
         infDataBuff = rb.createRAINBOWMask(infDataBuff, width, height,
                 infMaskBuff, flagDepth, verbose);
 
-        // Save data buffer to file
-        String dataDir = rb.proc.createDirectory("data", verbose);
-        String dataFileName = dataDir + File.separator + rb.H5_DATA_N + ".dat";
-        
-        cont.setDataFileName(dataFileName);
+        if (isDirect) {
 
-        Document od = ModelRHI_XML.createDescriptor(cont, rb, verbose);
-        
-        rb.writeRAINBOWData(infDataBuff, dataFileName, verbose);
+            ModelRHI_H5.createDescriptor(cont, rb, fileName, infDataBuff,
+                    verbose);
 
-        // Save XML document in file
-        rb.proc.saveXMLFile(od, fileName, verbose);
+        } else {
 
-        
+            // Save data buffer to file
+            String dataDir = rb.proc.createDirectory("data", verbose);
+            String dataFileName = dataDir + File.separator + rb.H5_DATA_N
+                    + ".dat";
+
+            cont.setDataFileName(dataFileName);
+
+            Document od = ModelRHI_XML.createDescriptor(cont, rb, verbose);
+
+            rb.writeRAINBOWData(infDataBuff, dataFileName, verbose);
+
+            // Save XML document in file
+            rb.proc.saveXMLFile(od, fileName, verbose);
+
+        }
     }
 
 }

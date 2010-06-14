@@ -49,8 +49,8 @@ public class ModelImageXML {
         Element what = od.createElement(rb.H5_GROUP);
         what.setAttribute(rb.H5_OBJECT_NAME, rb.H5_WHAT);
 
-        what.appendChild(rb.makeAttr("object", "IMAGE", od, rb.H5_STRING));
-        what.appendChild(rb.makeAttr("version", "H5rad 2.0", od, rb.H5_STRING));
+        what.appendChild(rb.makeAttr("object", rb.IMAGE, od, rb.H5_STRING));
+        what.appendChild(rb.makeAttr("version", rb.VERSION, od, rb.H5_STRING));
         what.appendChild(rb.makeAttr("date", cont.getDate(), od, rb.H5_STRING));
         what.appendChild(rb.makeAttr("time", cont.getTime(), od, rb.H5_STRING));
         what.appendChild(rb.makeAttr("source", cont.getSource(), od,

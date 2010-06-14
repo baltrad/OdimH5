@@ -79,9 +79,9 @@ public class BaltradFeeder extends Thread {
 
             int minutes = startDate.get(Calendar.MINUTE);
 
-            endDate.set(Calendar.MINUTE, (minutes / repetitionTime - 1)
+            endDate.set(Calendar.MINUTE, (minutes / repetitionTime)
                     * repetitionTime );
-            startDate.set(Calendar.MINUTE, (minutes / repetitionTime - 2)
+            startDate.set(Calendar.MINUTE, (minutes / repetitionTime - 1)
                     * repetitionTime );
 
             while (true) {
@@ -112,7 +112,6 @@ public class BaltradFeeder extends Thread {
                                     options[i].getPassword(), options[i]
                                             .getRemoteDir(), startDate,
                                     endDate, rb, proc);
-
                         }
                         
 //                        boolean ad = false;
@@ -128,8 +127,8 @@ public class BaltradFeeder extends Thread {
                                         sender, options[i].getRadarName(),
                                         fileName.get(j));
 
-                                System.out.println("BFDataHdr:");
-                                System.out.println(a);
+//                                System.out.println("BFDataHdr:");
+//                                System.out.println(a);
 
                                 BaltradFrame bf = new BaltradFrame(proc
                                         .getMessageLogger(), a, fileName.get(j));

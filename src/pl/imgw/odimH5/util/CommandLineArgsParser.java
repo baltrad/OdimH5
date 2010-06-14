@@ -36,9 +36,13 @@ public class CommandLineArgsParser {
     public final static String VERBOSE_OPTION = "v";
     public final static String HELP_OPTION = "h";
     public final static String CONTINOUOS_OPTION = "c";
+    public final static String ADDRESS_OPTION = "a";
+    public final static String SENDER_OPTION = "s";
+    public final static String RADAR_OPTION = "r";
 
     private final static String START_COMMAND = "java -jar odimH5.jar -i <descriptor_file : "
-            + "data_file> -f <object> -p <platform> -o <output_file> [-v] [-h]";
+            + "data_file> -f <object> -p <platform> -o <output_file> -c <file_format> " 
+            + "-a <address> -s <sender> -r <radar> [-v] [-h]";
 
     private final static String FILE_OBJECT_DESCRIPTION = "ODIM_H5 file object option\n"
             + "<arg>\n PVOL: polar volume\n CVOL: carthesian volume\n SCAN polar scan\n"
@@ -59,6 +63,15 @@ public class CommandLineArgsParser {
 
     private final static String CONTINOUOS_DESCRIPTION = "Baltrad feeder continuous work mode\n"
             + "<arg>\n RVOL: rainbow volume file\n H5: hdf5 file\n";
+
+    private final static String ADDRESS_DESCRIPTION = "send file to http server\n"
+            + "<arg>\n server address\n";
+
+    private final static String SENDER_DESCRIPTION = "sender\n"
+        + "<arg>\n sender name\n";
+
+    private final static String RADAR_DESCRIPTION = "radar name\n"
+            + "<arg>\n radar name\n";
 
     private final static String VERBOSE_DESCRIPTION = "verbose mode option";
 
@@ -93,6 +106,18 @@ public class CommandLineArgsParser {
                 .withArgName("arg").hasArg().withDescription(
                         CONTINOUOS_DESCRIPTION).create(CONTINOUOS_OPTION);
 
+        Option address = OptionBuilder.withArgName(ADDRESS_OPTION).withArgName(
+                "arg").hasArg().withDescription(ADDRESS_DESCRIPTION).create(
+                ADDRESS_OPTION);
+
+        Option sender = OptionBuilder.withArgName(SENDER_OPTION).withArgName(
+        "arg").hasArg().withDescription(SENDER_DESCRIPTION).create(
+                SENDER_OPTION);
+        
+        Option radar = OptionBuilder.withArgName(RADAR_OPTION).withArgName(
+                "arg").hasArg().withDescription(RADAR_DESCRIPTION).create(
+                RADAR_OPTION);
+
         // Option descriptor = OptionBuilder.withArgName(DESCRIPTOR_OPTION)
         // .withDescription(DESCRIPTOR_DESCRIPTION).create(DESCRIPTOR_OPTION);
 
@@ -107,6 +132,9 @@ public class CommandLineArgsParser {
         options.addOption(input_file);
         options.addOption(output_file);
         options.addOption(continuous);
+        options.addOption(address);
+        options.addOption(sender);
+        options.addOption(radar);
         options.addOption(verbose);
         options.addOption(help);
     }
@@ -133,13 +161,19 @@ public class CommandLineArgsParser {
         // Descriptor file generation mode (4 arguments) or conversion mode (2
         // arguments )
         // is chosen
-        if ((!cmd.hasOption(INPUT_FILE_OPTION)
-                && !cmd.hasOption(OUTPUT_FILE_OPTION) || !cmd
-                .hasOption(INPUT_FILE_OPTION)
-                && !cmd.hasOption(FILE_OBJECT_OPTION)
-                && !cmd.hasOption(PLATFORM_OPTION)
-                && !cmd.hasOption(OUTPUT_FILE_OPTION))
-                && !cmd.hasOption(CONTINOUOS_OPTION)) {
+        if (!(cmd.hasOption(INPUT_FILE_OPTION)
+                && cmd.hasOption(OUTPUT_FILE_OPTION) ||
+
+                cmd.hasOption(INPUT_FILE_OPTION)
+                && cmd.hasOption(FILE_OBJECT_OPTION)
+                && cmd.hasOption(PLATFORM_OPTION)
+                && cmd.hasOption(OUTPUT_FILE_OPTION)
+                
+                || cmd.hasOption(CONTINOUOS_OPTION)
+
+                || cmd.hasOption(ADDRESS_OPTION)
+                && cmd.hasOption(SENDER_OPTION) &&
+                cmd.hasOption(RADAR_OPTION))) {
             printHelpAndExit(1, START_COMMAND, options);
         }
     }

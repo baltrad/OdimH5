@@ -20,7 +20,7 @@ import org.apache.commons.net.ftp.FTPFile;
 
 import pl.imgw.odimH5.model.DataProcessorModel;
 import pl.imgw.odimH5.model.rainbow.Model;
-import pl.imgw.odimH5.model.rainbow.ModelPVOLH5;
+import pl.imgw.odimH5.model.rainbow.ModelPVOL;
 
 /**
  * 
@@ -92,8 +92,13 @@ public class FTPHandler {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     baos.flush();
                     ftp.retrieveFile(files[i].getName(), baos);
-                    fileName.add(ModelPVOLH5.createDescriptor(files[i]
-                            .getName(), baos.toByteArray(), verbose, rb, proc));
+
+                    String fileNameH5 = files[i].getName().substring(0,
+                            files[i].getName().indexOf("."))
+                            + ".h5";
+                    ModelPVOL.createDescriptor(fileNameH5, baos.toByteArray(),
+                            verbose, rb);
+                    fileName.add(fileNameH5);
                     baos.close();
                 }
             }

@@ -91,6 +91,8 @@ public class Model {
     protected final String QNT_VRAD = "VRAD";
     protected final String QNT_H = "HGHT";
 
+    
+    public final String VERSION = "H5rad 2.0";
     protected final String RAINBOW_SYSTEM = "GEMA";
     protected final String RAINBOW_SOFTWARE = "RAINBOW";
     public final String IMAGE = "IMAGE";

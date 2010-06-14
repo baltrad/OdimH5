@@ -26,7 +26,7 @@ public class ModelImage {
      * Method creates descriptor file for RAINBOW software platform. This
      * descriptor is created for IMAGE objects defined by ODIM_H5 specification.
      * 
-     * @param fileName
+     * @param fileNameOut
      *            Output name of XML file
      * @param fileBuff
      *            Input file data in a byte array
@@ -36,15 +36,19 @@ public class ModelImage {
      *            Rainbow class model
      */
     @SuppressWarnings("static-access")
-    public static void createDescriptor(String fileName, byte[] fileBuff,
+    public static void createDescriptor(String fileNameOut, byte[] fileBuff,
             boolean verbose, Model rb) {
+
+        boolean isDirect = false;
+        if (fileNameOut.endsWith(".h5"))
+            isDirect = true;
 
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.PRODUCT, verbose);
         Document inputDoc = rb.parseRAINBOWMetadataBuffer(hdrBuff, verbose);
 
         NodeList nodeList = null;
         ParametersContainer cont = new ParametersContainer();
-
+        
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "data", verbose);
         String date = rb.getRAINBOWMetadataElement(nodeList, "date", verbose);
         String time = rb.getRAINBOWMetadataElement(nodeList, "time", verbose);
@@ -246,17 +250,25 @@ public class ModelImage {
         // =============================================================
         // Create XML document object
 
-        String dataDir = rb.proc.createDirectory("data", verbose);
-        String dataFileName = dataDir + File.separator + rb.H5_DATA_N + ".dat";
-        cont.setDataFileName(dataFileName);
+        if (isDirect) {
 
-        Document od = ModelImageXML.createDescriptor(cont, rb, verbose);
-        // cont prepares this class to make a condition for direct HDF creation
+            ModelImageH5.createDescriptor(cont, rb, fileNameOut, infDataBuff,
+                    verbose);
 
-        // Save XML document in file
-        rb.proc.saveXMLFile(od, fileName, verbose);
-        // Save data buffer to file
-        rb.writeRAINBOWData(infDataBuff, dataFileName, verbose);
+        } else {
+            String dataDir = rb.proc.createDirectory("data", verbose);
+            String dataFileName = dataDir + File.separator + rb.H5_DATA_N
+                    + ".dat";
+            cont.setDataFileName(dataFileName);
 
+            Document od = ModelImageXML.createDescriptor(cont, rb, verbose);
+            // cont prepares this class to make a condition for direct HDF
+            // creation
+
+            // Save XML document in file
+            rb.proc.saveXMLFile(od, fileNameOut, verbose);
+            // Save data buffer to file
+            rb.writeRAINBOWData(infDataBuff, dataFileName, verbose);
+        }
     }
 }
