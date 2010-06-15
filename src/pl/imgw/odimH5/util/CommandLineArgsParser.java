@@ -17,6 +17,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.PosixParser;
 
+import pl.imgw.odimH5.Main;
+
 /**
  * Class implementing command line arguments parser functionality.
  * 
@@ -40,8 +42,9 @@ public class CommandLineArgsParser {
     public final static String SENDER_OPTION = "s";
     public final static String RADAR_OPTION = "r";
 
-    private final static String START_COMMAND = "java -jar odimH5.jar -i <descriptor_file : "
-            + "data_file> -f <object> -p <platform> -o <output_file> -c <file_format> " 
+    private final static String START_COMMAND = 
+        "java -jar odimH5.jar -i <descriptor_file : "
+            + "data_file> -f <object> -p <platform> -o <output_file> -c <file_format> "
             + "-a <address> -s <sender> -r <radar> [-v] [-h]";
 
     private final static String FILE_OBJECT_DESCRIPTION = "ODIM_H5 file object option\n"
@@ -68,7 +71,7 @@ public class CommandLineArgsParser {
             + "<arg>\n server address\n";
 
     private final static String SENDER_DESCRIPTION = "sender\n"
-        + "<arg>\n sender name\n";
+            + "<arg>\n sender name\n";
 
     private final static String RADAR_DESCRIPTION = "radar name\n"
             + "<arg>\n radar name\n";
@@ -111,9 +114,9 @@ public class CommandLineArgsParser {
                 ADDRESS_OPTION);
 
         Option sender = OptionBuilder.withArgName(SENDER_OPTION).withArgName(
-        "arg").hasArg().withDescription(SENDER_DESCRIPTION).create(
+                "arg").hasArg().withDescription(SENDER_DESCRIPTION).create(
                 SENDER_OPTION);
-        
+
         Option radar = OptionBuilder.withArgName(RADAR_OPTION).withArgName(
                 "arg").hasArg().withDescription(RADAR_DESCRIPTION).create(
                 RADAR_OPTION);
@@ -168,12 +171,11 @@ public class CommandLineArgsParser {
                 && cmd.hasOption(FILE_OBJECT_OPTION)
                 && cmd.hasOption(PLATFORM_OPTION)
                 && cmd.hasOption(OUTPUT_FILE_OPTION)
-                
+
                 || cmd.hasOption(CONTINOUOS_OPTION)
 
-                || cmd.hasOption(ADDRESS_OPTION)
-                && cmd.hasOption(SENDER_OPTION) &&
-                cmd.hasOption(RADAR_OPTION))) {
+        || cmd.hasOption(ADDRESS_OPTION) && cmd.hasOption(SENDER_OPTION)
+                && cmd.hasOption(RADAR_OPTION))) {
             printHelpAndExit(1, START_COMMAND, options);
         }
     }
@@ -216,8 +218,10 @@ public class CommandLineArgsParser {
     public void printHelpAndExit(int exitCode, String startCommand,
             Options options) {
         // Help formatter
+        System.out.println("OdimH5 version " + Main.VERSION
+            + ". Converter software for OPERA Data Information Model\n");
         HelpFormatter helpFormatter = new HelpFormatter();
-        helpFormatter.printHelp(startCommand, options);
+            helpFormatter.printHelp(startCommand, options);
         System.exit(exitCode);
     }
 
