@@ -133,7 +133,9 @@ public class OptionsHandler {
         System.out.println("    <repetition_time>mm</repetition_time>");
         System.out.println("    <server>HTTP_address</server>");
         System.out.println("    <sender>Baltrad.IMGW.pl</sender>");
-        System.out.println("</options>");
+        System.out.println("</options>\n\n");
+        System.out.println("<address> <login> and <password> are optional for FTP handling.");
+        
 
     }
 

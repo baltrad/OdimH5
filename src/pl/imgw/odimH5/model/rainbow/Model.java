@@ -554,7 +554,7 @@ public class Model {
                         return value;
                     }
                 }
-            } else if (atrName == null && node.getNodeName().equals(elemName)) {
+            } else if (atrName == null && node.getNodeName().equals(elemName) && node.hasChildNodes()) {
                 return node.getFirstChild().getNodeValue();
 
             }
