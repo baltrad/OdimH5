@@ -27,7 +27,7 @@ public class BaltradFeeder extends Thread {
     private final static String H5 = "H5";
     private String fileFormat;
     private OptionContainer[] options;
-//    private int startingTime;
+    // private int startingTime;
     private int repetitionTime;
     private int counter;
     private Model rb;
@@ -56,7 +56,7 @@ public class BaltradFeeder extends Thread {
             DataProcessorModel proc, String fileFormat, boolean verbose) {
 
         options = OptionsHandler.getOptions(optionsDoc);
-//        startingTime = OptionsHandler.getTime(optionsDoc, "start_time");
+        // startingTime = OptionsHandler.getTime(optionsDoc, "start_time");
         repetitionTime = OptionsHandler.getTime(optionsDoc, "repetition_time");
         sender = OptionsHandler.getElementByName(optionsDoc, "sender");
         address = OptionsHandler.getElementByName(optionsDoc, "server");
@@ -80,9 +80,9 @@ public class BaltradFeeder extends Thread {
             int minutes = startDate.get(Calendar.MINUTE);
 
             endDate.set(Calendar.MINUTE, (minutes / repetitionTime)
-                    * repetitionTime );
+                    * repetitionTime);
             startDate.set(Calendar.MINUTE, (minutes / repetitionTime - 1)
-                    * repetitionTime );
+                    * repetitionTime);
 
             while (true) {
 
@@ -100,22 +100,33 @@ public class BaltradFeeder extends Thread {
 
                     for (int i = 0; i < counter; i++) {
 
-                        if (fileFormat.matches(RVOL)) {
-                            fileName = FTPHandler.getVolFiles(options[i]
+                        boolean local = false;
+
+                        if (options[i].getAddress() == null)
+                            local = true;
+
+                        if (!local && fileFormat.matches(RVOL)) {
+                            fileName = FilesHandler.getVolFilesFTP(options[i]
                                     .getAddress(), options[i].getLogin(),
                                     options[i].getPassword(), options[i]
                                             .getRemoteDir(), startDate,
                                     endDate, rb, proc, verbose);
-                        } else if (fileFormat.matches(H5)) {
-                            fileName = FTPHandler.getH5Files(options[i]
+                        } else if (!local && fileFormat.matches(H5)) {
+                            fileName = FilesHandler.getH5FilesFTP(options[i]
                                     .getAddress(), options[i].getLogin(),
                                     options[i].getPassword(), options[i]
                                             .getRemoteDir(), startDate,
                                     endDate, rb, proc);
+                        } else if (local && fileFormat.matches(RVOL)) {
+                            fileName = FilesHandler.getVolFilesLocal(options[i]
+                                    .getRemoteDir(), startDate, endDate, rb,
+                                    proc, verbose);
+                        } else if (local && fileFormat.matches(H5)) {
+                            fileName = null;
                         }
-                        
-//                        boolean ad = false;
-                        
+
+                        // boolean ad = false;
+
                         if (!fileName.isEmpty()) {
                             for (int j = 0; j < fileName.size(); j++) {
 
@@ -127,8 +138,8 @@ public class BaltradFeeder extends Thread {
                                         sender, options[i].getRadarName(),
                                         fileName.get(j));
 
-//                                System.out.println("BFDataHdr:");
-//                                System.out.println(a);
+                                // System.out.println("BFDataHdr:");
+                                // System.out.println(a);
 
                                 BaltradFrame bf = new BaltradFrame(proc
                                         .getMessageLogger(), a, fileName.get(j));

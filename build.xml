@@ -28,15 +28,15 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 	<property name="dist.dir" value="${basedir}/dist" />
 	<property name="etc.dir" value="${basedir}/etc" />
 	<property name="options.file" value="options.xml" />
-	<property name="options.file.init" value="options.xml.init" />  
+	<property name="options.file.init" value="options.xml.init" />
 
 	<property name="prefix" value="/opt" />
 
 	<!-- Library path -->
 	<path id="lib.path">
-    	<fileset dir="${lib.dir}">
-    		<include name="**/*.jar"/>
-    	</fileset>
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
 	</path>
 
 	<!-- Initialize build process -->
@@ -49,68 +49,64 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 	<!-- Delete build and dist directories -->
 	<target name="clean">
 		<delete>
-      		<fileset dir="${build.dir}">
-        		<include name="**/*~"/>
-      		</fileset>
-    	</delete>
-    	<delete>
-      		<fileset dir="${dist.dir}">
-        		<include name="**/*.jar" />
-      		</fileset>
-    	</delete>
+			<fileset dir="${build.dir}">
+				<include name="**/*~" />
+			</fileset>
+		</delete>
+		<delete>
+			<fileset dir="${dist.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</delete>
 		<delete dir="${build.classes.dir}" />
 		<delete dir="${build.dir}" />
 		<delete dir="${dist.dir}" />
 	</target>
-	
+
 	<!-- Compile source files -->
 	<target name="compile" depends="init">
-		<javac encoding="UTF-8" srcdir="${src.dir}" deprecation="on"
-            destdir="${build.classes.dir}">
-      		<include name="**/*.java"/>
-      		<classpath refid="lib.path"/>
-    	</javac>	
+		<javac encoding="UTF-8" srcdir="${src.dir}" deprecation="on" destdir="${build.classes.dir}">
+			<include name="**/*.java" />
+			<classpath refid="lib.path" />
+		</javac>
 	</target>
 
 	<!-- Creates the deliverables -->
 	<target name="dist" depends="init, compile">
-		<manifestclasspath property="mf.classpath" 
-			jarfile="${basedir}/${app.name}.jar">
-  			<classpath refid="lib.path"/>
+		<manifestclasspath property="mf.classpath" jarfile="${basedir}/${app.name}.jar">
+			<classpath refid="lib.path" />
 		</manifestclasspath>
-		<jar jarfile="${dist.dir}/${app.name}.jar" 
-			basedir="${build.classes.dir}">
+		<jar jarfile="${dist.dir}/${app.name}.jar" basedir="${build.classes.dir}">
 			<manifest>
-                <attribute name="Main-Class" value="${main.class}"/>
+				<attribute name="Main-Class" value="${main.class}" />
 				<attribute name="Class-Path" value="${mf.classpath}" />
-            </manifest>
-    	</jar>
+			</manifest>
+		</jar>
 	</target>
 
 	<!-- Runs the application -->
 	<target name="run" depends="dist">
-        <java fork="true" classname="${main.class}">
-            <classpath>
-                <path refid="project.classpath"/>
-                <path location="${dist.dir}/${app.name}.jar"/>
-            </classpath>
-        </java>
-    </target>
+		<java fork="true" classname="${main.class}">
+			<classpath>
+				<path refid="project.classpath" />
+				<path location="${dist.dir}/${app.name}.jar" />
+			</classpath>
+		</java>
+	</target>
 
 	<!-- Installs OdimH5 in default directory -->
 	<target name="install" depends="dist">
-		<mkdir dir="${prefix}/${app.name}" />		
+		<mkdir dir="${prefix}/${app.name}" />
 		<mkdir dir="${prefix}/${app.name}/lib" />
 		<copy todir="${prefix}/${app.name}" flatten="true">
-      		<fileset dir="${dist.dir}">
-        		<include name="**/*.jar" />
-      		</fileset>
-  		</copy>
+			<fileset dir="${dist.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
 		<copy todir="${prefix}/${app.name}/lib" flatten="false">
 			<fileset dir="${lib.dir}" />
 		</copy>
-		<copy tofile="${prefix}/${app.name}/${options.file}" 
-			file="${etc.dir}/${options.file.init}" flatten="true" />
+		<copy tofile="${prefix}/${app.name}/${options.file}" file="${etc.dir}/${options.file.init}" flatten="true" />
 	</target>
-	
+
 </project>

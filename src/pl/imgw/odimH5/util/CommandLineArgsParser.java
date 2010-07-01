@@ -42,8 +42,7 @@ public class CommandLineArgsParser {
     public final static String SENDER_OPTION = "s";
     public final static String RADAR_OPTION = "r";
 
-    private final static String START_COMMAND = 
-        "java -jar odimH5.jar -i <descriptor_file : "
+    private final static String START_COMMAND = "java -jar odimH5.jar -i <descriptor_file : "
             + "data_file> -f <object> -p <platform> -o <output_file> -c <file_format> "
             + "-a <address> -s <sender> -r <radar> [-v] [-h]";
 
@@ -219,9 +218,9 @@ public class CommandLineArgsParser {
             Options options) {
         // Help formatter
         System.out.println("OdimH5 version " + Main.VERSION
-            + ". Converter software for OPERA Data Information Model\n");
+                + ". Converter software for OPERA Data Information Model\n");
         HelpFormatter helpFormatter = new HelpFormatter();
-            helpFormatter.printHelp(startCommand, options);
+        helpFormatter.printHelp(startCommand, options);
         System.exit(exitCode);
     }
 
