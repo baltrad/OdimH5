@@ -20,12 +20,21 @@ import pl.imgw.odimH5.model.rainbow.Model;
 public class OptionsHandler {
 
     public final static String OPTION_XML_FILE = "options.xml";
+
+    public final static String ADDRESS = "address";
+    public final static String LOGIN = "login";
+    public final static String PASSWORD = "password";
+    public final static String DIRECTORY = "directory";
+    public final static String REPETITION = "repetition_time";
+    public final static String SERVER = "server";
+    public final static String SENDER = "sender";
+
     private String startTime;
     private String endTime;
 
     /**
      * 
-     * This method reads options from XML file and return XML document object 
+     * This method reads options from XML file and return XML document object
      * 
      * @param msgl
      * @param verbose
@@ -49,7 +58,7 @@ public class OptionsHandler {
 
     /**
      * 
-     * This method reads Baltrad Feeder options from XML document 
+     * This method reads Baltrad Feeder options from XML document
      * 
      * @param doc
      * @return
@@ -67,13 +76,13 @@ public class OptionsHandler {
             options[i].setRadarName(radarList.item(i).getAttributes()
                     .getNamedItem("name").getNodeValue());
             options[i].setAddress(Model.getValueByName(radarList.item(i),
-                    "address", null));
-            options[i].setLogin(Model.getValueByName(radarList.item(i),
-                    "login", null));
+                    ADDRESS, null));
+            options[i].setLogin(Model.getValueByName(radarList.item(i), LOGIN,
+                    null));
             options[i].setPassword(Model.getValueByName(radarList.item(i),
-                    "password", null));
-            options[i].setRemoteDir(Model.getValueByName(radarList.item(i),
-                    "remote_dir", null));
+                    PASSWORD, null));
+            options[i].setDir(Model.getValueByName(radarList.item(i),
+                    DIRECTORY, null));
         }
         return options;
     }
@@ -124,18 +133,20 @@ public class OptionsHandler {
         System.out.println("<!-- FTP options -->");
         System.out.println("<options>");
         System.out.println("    <radar name=\"NAME\">");
-        System.out.println("        <address>IP</address>");
-        System.out.println("        <login>LOGIN</login>");
-        System.out.println("        <password>PASS</password>");
-        System.out.println("        <remote_dir>DIR</remote_dir>");
+        System.out.println("        <" + ADDRESS + ">IP</ " + ADDRESS + " >");
+        System.out.println("        <" + LOGIN + ">LOGIN</" + LOGIN + ">");
+        System.out.println("        <" + PASSWORD + ">PASS</" + PASSWORD + ">");
+        System.out
+                .println("        <" + DIRECTORY + ">DIR</" + DIRECTORY + ">");
         System.out.println("    </radar>");
-//        System.out.println("    <start_time>mm</start_time>");
-        System.out.println("    <repetition_time>mm</repetition_time>");
-        System.out.println("    <server>HTTP_address</server>");
-        System.out.println("    <sender>Baltrad.IMGW.pl</sender>");
+        // System.out.println("    <start_time>mm</start_time>");
+        System.out.println("    <" + REPETITION + " >mm</" + REPETITION + ">");
+        System.out.println("    <" + SERVER + ">HTTP_address</" + SERVER + ">");
+        System.out.println("    <" + SENDER + ">Baltrad.IMGW.pl</" + SENDER
+                + ">");
         System.out.println("</options>\n\n");
-        System.out.println("<address> <login> and <password> are optional for FTP handling.");
-        
+        System.out
+                .println("<address> <login> and <password> are optional for FTP handling.");
 
     }
 

@@ -21,9 +21,9 @@ import pl.imgw.odimH5.model.rainbow.ModelRHI;
 import pl.imgw.odimH5.model.rainbow.ModelVP;
 import pl.imgw.odimH5.util.BaltradFrame;
 import pl.imgw.odimH5.util.BaltradFrameHandler;
+import pl.imgw.odimH5.util.BaltradLocalFeeder;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.MessageLogger;
-import pl.imgw.odimH5.util.BaltradFeeder;
 import pl.imgw.odimH5.util.OptionsHandler;
 
 /**
@@ -155,10 +155,23 @@ public class DataProcessorController {
 
             } else {
 
-                BaltradFeeder worker = new BaltradFeeder(doc, rainbow, proc,
-                        cmd.getArgumentValue(cmd.CONTINOUOS_OPTION), verbose);
-
+                BaltradLocalFeeder worker = new BaltradLocalFeeder(doc, rainbow, proc, verbose);
                 worker.start();
+                
+                /*
+                  OptionContainer[] options = OptionsHandler.getOptions(doc);
+                  int counter = options.length;
+                  
+                  for (int i = 0; i < counter; i++) { String server =
+                  options[i].getAddress();
+                  if (server != null) {
+                  BaltradRemoteFeeder worker = new BaltradRemoteFeeder( doc,
+                  rainbow, proc, cmd.getArgumentValue(cmd.CONTINOUOS_OPTION),
+                  verbose);
+                  
+                  worker.start(); 
+                  } else { //localFedder } }
+                 */
             }
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
                 && cmd.hasArgument(cmd.ADDRESS_OPTION)

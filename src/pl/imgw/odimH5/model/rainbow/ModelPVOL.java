@@ -41,9 +41,13 @@ public class ModelPVOL {
      *            Verbose mode
      * @param rb
      *            Rainbow class model
+     *            
+     * @return Radar name in format XXX
      */
+      
+     
     @SuppressWarnings("static-access")
-    public static void createDescriptor(String fileNameOut, byte[] fileBuff,
+    public static boolean createDescriptor(String fileNameOut, byte[] fileBuff,
             boolean verbose, Model rb) {
 
         boolean isDirect = false;
@@ -54,6 +58,8 @@ public class ModelPVOL {
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.VOLUME, verbose);
 
         Document inputDoc = rb.parseRAINBOWMetadataBuffer(hdrBuff, verbose);
+        if(inputDoc == null)
+            return false;
 
         NodeList nodeList = null;
 
@@ -221,6 +227,9 @@ public class ModelPVOL {
         } else {
             makeXML(rb, verbose, cont, fileNameOut);
         }
+        
+        return true;
+        
     }
 
     private static void makeXML(Model rb, boolean verbose,

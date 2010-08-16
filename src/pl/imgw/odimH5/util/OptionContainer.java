@@ -17,7 +17,7 @@ public class OptionContainer {
     private String address;
     private String login;
     private String password;
-    private String remoteDir;
+    private String dir;
 
     public String getRadarName() {
         return radarName;
@@ -51,12 +51,12 @@ public class OptionContainer {
         this.password = password;
     }
 
-    public String getRemoteDir() {
-        return remoteDir;
+    public String getDir() {
+        return dir;
     }
 
-    public void setRemoteDir(String remoteDir) {
-        this.remoteDir = remoteDir;
+    public void setDir(String remoteDir) {
+        this.dir = remoteDir;
     }
 
 }
