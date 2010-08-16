@@ -63,8 +63,7 @@ public class CommandLineArgsParser {
     private final static String OUTPUT_FILE_DESCRIPTION = "output file option\n"
             + "<arg>\n output file's path";
 
-    private final static String CONTINOUOS_DESCRIPTION = "Baltrad feeder continuous work mode\n"
-            + "<arg>\n RVOL: rainbow volume file\n H5: hdf5 file\n";
+    private final static String CONTINOUOS_DESCRIPTION = "Baltrad feeder continuous work mode\n";
 
     private final static String ADDRESS_DESCRIPTION = "send file to http server\n"
             + "<arg>\n server address\n";
@@ -105,8 +104,8 @@ public class CommandLineArgsParser {
                         OUTPUT_FILE_DESCRIPTION).create(OUTPUT_FILE_OPTION);
 
         Option continuous = OptionBuilder.withArgName(CONTINOUOS_OPTION)
-                .withArgName("arg").hasArg().withDescription(
-                        CONTINOUOS_DESCRIPTION).create(CONTINOUOS_OPTION);
+                .withDescription(CONTINOUOS_DESCRIPTION).create(
+                        CONTINOUOS_OPTION);
 
         Option address = OptionBuilder.withArgName(ADDRESS_OPTION).withArgName(
                 "arg").hasArg().withDescription(ADDRESS_DESCRIPTION).create(
