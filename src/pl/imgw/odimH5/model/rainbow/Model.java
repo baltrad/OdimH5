@@ -50,7 +50,7 @@ public class Model {
 
     public final int PRODUCT = 0;
     public final int VOLUME = 1;
-    
+
     // Constants
 
     protected final String H5_ROOT = "/";
@@ -91,7 +91,6 @@ public class Model {
     protected final String QNT_VRAD = "VRAD";
     protected final String QNT_H = "HGHT";
 
-    
     public final String VERSION = "H5rad 2.0";
     protected final String RAINBOW_SYSTEM = "GEMA";
     protected final String RAINBOW_SOFTWARE = "RAINBOW";
@@ -101,7 +100,7 @@ public class Model {
     public final String RHI = "RHI";
     protected final double RAINBOW_NO_DATA = 0.0;
     protected final double RAINBOW_UNDETECT = 255.0;
-    
+
     public static final String BRZ = "Brzuchania";
     public static final String GDA = "Gdańsk";
     public static final String LEG = "Legionowo";
@@ -536,7 +535,8 @@ public class Model {
      *            name of the attribute
      * @return attribute value
      */
-    public static String getValueByName(Node node, String elemName, String atrName) {
+    public static String getValueByName(Node node, String elemName,
+            String atrName) {
 
         String value = null;
         int type = node.getNodeType();
@@ -554,7 +554,8 @@ public class Model {
                         return value;
                     }
                 }
-            } else if (atrName == null && node.getNodeName().equals(elemName) && node.hasChildNodes()) {
+            } else if (atrName == null && node.getNodeName().equals(elemName)
+                    && node.hasChildNodes()) {
                 return node.getFirstChild().getNodeValue();
 
             }
@@ -862,7 +863,7 @@ public class Model {
         int[][] output_buf = new int[width][height];
         int len = width * height;
         byte[] byte_buf = new byte[len];
-        
+
         // Inflate input stream
         ZStream defStream = new ZStream();
         defStream.next_in = input_buf;
@@ -960,10 +961,13 @@ public class Model {
      *            Number of the blob in the volume file (starting with 1)
      * @param depth
      *            Number of bits used to describe one pixel.
+     * @param firstBlob
+     *            Starting blob number
+     * 
      * @return Byte array containing data section
      */
     public DataBufferContainer getRainbowDataSection(byte[] fileBuff,
-            int blobNumber, int depth, boolean verbose) {
+            int blobNumber, int depth, int firstBlob, boolean verbose) {
 
         DataBufferContainer dbc = new DataBufferContainer();
 
@@ -985,7 +989,7 @@ public class Model {
         int end_bin = 0;
         // Seek for data section
 
-        int current = -1;
+        int current = firstBlob - 1;
         try {
             while (offset < fileBuff.length) {
                 // Data section start
@@ -1124,5 +1128,12 @@ public class Model {
         d = Math.round(d);
         d = d / dex;
         return d;
+    }
+    
+    public static int getMin(int a, int b) {
+        if (a > b)
+            return b;
+        else
+            return a;
     }
 }

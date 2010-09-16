@@ -231,11 +231,13 @@ public class ModelImage {
         // prepare actual dataset
         int width = Integer.parseInt(cont.getXsize());
         int height = Integer.parseInt(cont.getYsize());
+        
+        int firstBlob = rb.getMin(flagBlobNumber, dataBlobNumber);
 
         DataBufferContainer dataBuff = rb.getRainbowDataSection(fileBuff,
-                dataBlobNumber, dataDepth, verbose);
+                dataBlobNumber, dataDepth, firstBlob, verbose);
         DataBufferContainer maskBuff = rb.getRainbowDataSection(fileBuff,
-                flagBlobNumber, flagDepth, verbose);
+                flagBlobNumber, flagDepth, firstBlob, verbose);
 
         // Inflate radar data section and mask section
         int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(dataBuff

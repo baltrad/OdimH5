@@ -161,12 +161,13 @@ public class ModelPVOLH5 {
                     sliceList.item(i), "rawdata", "blobid"));
             int raysDepth = Integer.parseInt(Model.getValueByName(sliceList
                     .item(i), "rayinfo", "depth"));
+            int firstBlob = rb.getMin(raysBlobNumber, dataBlobNumber);
             dataDepth[i] = Integer.parseInt(Model.getValueByName(sliceList
                     .item(i), "rawdata", "depth"));
             dataBuff[i] = rb.getRainbowDataSection(fileBuff, dataBlobNumber,
-                    dataDepth[i], verbose);
+                    dataDepth[i], firstBlob, verbose);
             DataBufferContainer raysBuff = rb.getRainbowDataSection(fileBuff,
-                    raysBlobNumber, raysDepth, verbose);
+                    raysBlobNumber, raysDepth, firstBlob, verbose);
             byte[] infRaysBuff = rb.inflate1DRAINBOWDataSection(raysBuff
                     .getDataBuffer(), raysBuff.getDataBufferLength(), verbose);
 

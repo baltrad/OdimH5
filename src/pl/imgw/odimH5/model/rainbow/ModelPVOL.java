@@ -41,24 +41,23 @@ public class ModelPVOL {
      *            Verbose mode
      * @param rb
      *            Rainbow class model
-     *            
+     * 
      * @return Radar name in format XXX
      */
-      
-     
+
     @SuppressWarnings("static-access")
     public static boolean createDescriptor(String fileNameOut, byte[] fileBuff,
             boolean verbose, Model rb) {
 
         boolean isDirect = false;
-        if(fileNameOut.endsWith(".h5"))
+        if (fileNameOut.endsWith(".h5"))
             isDirect = true;
-        
+
         ParametersContainer cont = new ParametersContainer();
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.VOLUME, verbose);
 
         Document inputDoc = rb.parseRAINBOWMetadataBuffer(hdrBuff, verbose);
-        if(inputDoc == null)
+        if (inputDoc == null)
             return false;
 
         NodeList nodeList = null;
@@ -69,7 +68,7 @@ public class ModelPVOL {
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "scan", verbose);
         String time = rb.getRAINBOWMetadataElement(nodeList, "time", verbose);
-
+        
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
@@ -124,6 +123,11 @@ public class ModelPVOL {
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "wavelen", verbose);
         cont.setWavelength(rb.getRAINBOWMetadataElement(nodeList, "", verbose));
+        
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, "rangestep", verbose);
+        String rangestep = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
+        
+        
 
         // ===================== datasetn group =============================
 
@@ -131,7 +135,6 @@ public class ModelPVOL {
         int datasetSize = sliceList.getLength();
 
         SliceContainer slices[] = new SliceContainer[datasetSize];
-        
 
         // String sliceTime[] = new String[datasetSize];
         // String sliceDate[] = new String[datasetSize];
@@ -144,14 +147,14 @@ public class ModelPVOL {
         // String datatype[] = new String[datasetSize];
         // String min[] = new String[datasetSize];
         // String gain[] = new String[datasetSize];
-
+        int firstBlob = -1;
 
         for (int i = 0; i < datasetSize; i++) {
 
             DataBufferContainer dataBuff = null;
             int dataDepth = 0;
             SliceContainer slice = new SliceContainer();
-            
+
             // ========== datasetn specific what group ===============
             slice.setSliceDate(rb.parseRAINBOWDate(rb.getValueByName(sliceList
                     .item(i), "slicedata", "date"), verbose));
@@ -169,8 +172,7 @@ public class ModelPVOL {
             if (slice.getSrange() == null) // default value is "0"
                 slice.setSrange("0");
 
-            slice.setRstep(rb.getValueByName(sliceList.item(i), "rangestep",
-                    null));
+            slice.setRstep(rangestep);
 
             slice.setRays(rb.getValueByName(sliceList.item(i), "rawdata",
                     "rays"));
@@ -181,14 +183,19 @@ public class ModelPVOL {
                     .item(i), "rayinfo", "blobid"));
             int dataBlobNumber = Integer.parseInt(rb.getValueByName(sliceList
                     .item(i), "rawdata", "blobid"));
+
+            if (firstBlob == -1) {
+                firstBlob = rb.getMin(raysBlobNumber, dataBlobNumber);
+            }
+
             int raysDepth = Integer.parseInt(rb.getValueByName(sliceList
                     .item(i), "rayinfo", "depth"));
             dataDepth = Integer.parseInt(rb.getValueByName(sliceList.item(i),
                     "rawdata", "depth"));
             dataBuff = rb.getRainbowDataSection(fileBuff, dataBlobNumber,
-                    dataDepth, verbose);
+                    dataDepth, firstBlob, verbose);
             DataBufferContainer raysBuff = rb.getRainbowDataSection(fileBuff,
-                    raysBlobNumber, raysDepth, verbose);
+                    raysBlobNumber, raysDepth, firstBlob, verbose);
             byte[] infRaysBuff = rb.inflate1DRAINBOWDataSection(raysBuff
                     .getDataBuffer(), raysBuff.getDataBufferLength(), verbose);
 
@@ -227,9 +234,9 @@ public class ModelPVOL {
         } else {
             makeXML(rb, verbose, cont, fileNameOut);
         }
-        
+
         return true;
-        
+
     }
 
     private static void makeXML(Model rb, boolean verbose,
@@ -372,7 +379,7 @@ public class ModelPVOL {
             ParametersContainer cnt, String fileName) {
 
         DataProcessorModel proc = rb.getDataProcessorModel();
-        
+
         int datasetSize = cnt.getSlices().length;
 
         // HDF5 file identifier
@@ -385,8 +392,8 @@ public class ModelPVOL {
 
         child_group_id = proc.H5Gcreate_wrap(file_id, "/what", 0, verbose);
 
-        proc.H5Acreate_any_wrap(child_group_id, "object", rb.H5_STRING, rb.PVOL,
-                verbose);
+        proc.H5Acreate_any_wrap(child_group_id, "object", rb.H5_STRING,
+                rb.PVOL, verbose);
         proc.H5Acreate_any_wrap(child_group_id, "version", rb.H5_STRING,
                 rb.VERSION, verbose);
         proc.H5Acreate_any_wrap(child_group_id, "date", rb.H5_STRING, cnt
@@ -551,5 +558,5 @@ public class ModelPVOL {
 
         return (int) ((high & 0xff) << 8 | (low & 0xff));
     }
-
+    
 }
