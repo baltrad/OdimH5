@@ -182,10 +182,10 @@ public class DataProcessorController {
 
             BaltradFrameHandler bfh = new BaltradFrameHandler(proc
                     .getMessageLogger(), cmd
-                    .getArgumentValue(cmd.ADDRESS_OPTION));
+                    .getArgumentValue(cmd.ADDRESS_OPTION), verbose);
 
-            String a = bfh.createBFDataHdr(
-                    BaltradFrameHandler.BF_MIME_MULTIPART, cmd
+            String a = bfh.createDataHdr(
+                    BaltradFrameHandler.MIME_MULTIPART, cmd
                             .getArgumentValue(cmd.SENDER_OPTION), cmd
                             .getArgumentValue(cmd.RADAR_OPTION), cmd
                             .getArgumentValue(cmd.INPUT_FILE_OPTION));
@@ -194,7 +194,7 @@ public class DataProcessorController {
             // System.out.println(a);
 
             BaltradFrame bf = new BaltradFrame(proc.getMessageLogger(), a, cmd
-                    .getArgumentValue(cmd.INPUT_FILE_OPTION));
+                    .getArgumentValue(cmd.INPUT_FILE_OPTION), verbose);
 
             bfh.handleBF(bf);
 

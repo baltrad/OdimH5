@@ -124,10 +124,6 @@ public class ModelPVOL {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "wavelen", verbose);
         cont.setWavelength(rb.getRAINBOWMetadataElement(nodeList, "", verbose));
         
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, "rangestep", verbose);
-        String rangestep = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
-        
-        
 
         // ===================== datasetn group =============================
 
@@ -172,10 +168,17 @@ public class ModelPVOL {
             if (slice.getSrange() == null) // default value is "0"
                 slice.setSrange("0");
 
+            
+            String rangestep = (rb.getValueByName(sliceList.item(i), "rangestep",
+            null));
+            
+            if(rangestep == null)
+                rangestep = "0";
             slice.setRstep(rangestep);
 
             slice.setRays(rb.getValueByName(sliceList.item(i), "rawdata",
-                    "rays"));
+            "rays"));
+
 
             // ===============================================================
 

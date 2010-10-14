@@ -882,7 +882,7 @@ public class Model {
             a++;
             checkErr(defStream, err, "Inflation error", verbose);
         }
-        System.out.println(a);
+//        System.out.println(a);
         err = defStream.inflateEnd();
         checkErr(defStream, err, "Inflation end error", verbose);
         // Convert byte array into integer array
@@ -968,7 +968,7 @@ public class Model {
      */
     public DataBufferContainer getRainbowDataSection(byte[] fileBuff,
             int blobNumber, int depth, int firstBlob, boolean verbose) {
-
+        
         DataBufferContainer dbc = new DataBufferContainer();
 
         // Data section tags

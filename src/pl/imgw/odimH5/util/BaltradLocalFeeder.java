@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import name.pachler.nio.file.ClosedWatchServiceException;
 import name.pachler.nio.file.FileSystems;
@@ -140,16 +138,16 @@ public class BaltradLocalFeeder extends Thread {
         }
 
         BaltradFrameHandler bfh = new BaltradFrameHandler(proc
-                .getMessageLogger(), server);
+                .getMessageLogger(), server, verbose);
 
-        String a = bfh.createBFDataHdr(BaltradFrameHandler.BF_MIME_MULTIPART,
+        String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
                 sender, radarName, fileNameH5);
 
         // System.out.println("BFDataHdr:");
         // System.out.println(a);
 
         BaltradFrame bf = new BaltradFrame(proc.getMessageLogger(), a,
-                fileNameH5);
+                fileNameH5, verbose);
 
         bfh.handleBF(bf);
 
