@@ -72,7 +72,7 @@ public class Model {
     protected final String H5_DOUBLE = "double";
     protected final String H5_SEQUENCE = "sequence";
     protected final String H5_DATA_CHUNK = "20";
-    protected final String H5_GZIP_LEVEL = "6";
+    protected final String H5_GZIP_LEVEL = "2";
 
     protected final String EARTH_RAD = "6371000";
 
@@ -101,14 +101,14 @@ public class Model {
     protected final double RAINBOW_NO_DATA = 0.0;
     protected final double RAINBOW_UNDETECT = 255.0;
 
-    public static final String BRZ = "Brzuchania";
-    public static final String GDA = "Gdańsk";
-    public static final String LEG = "Legionowo";
-    public static final String PAS = "Pastewnik";
-    public static final String POZ = "Poznań";
-    public static final String RAM = "Ramża";
-    public static final String RZE = "Rzeszów";
-    public static final String SWI = "Świdwin";
+    public static final String BRZ = "WMO:12568";
+    public static final String GDA = "WMO:12151";
+    public static final String LEG = "WMO:12374";
+    public static final String PAS = "WMO:12544";
+    public static final String POZ = "WMO:12331";
+    public static final String RAM = "WMO:12514";
+    public static final String RZE = "WMO:12579";
+    public static final String SWI = "WMO:12220";
 
     // Reference to MessageLogger object
     private MessageLogger msgl;
@@ -849,19 +849,19 @@ public class Model {
      * 
      * @param input_buf
      *            Compressed buffer
-     * @param width
+     * @param rays
      *            Output array width
-     * @param height
+     * @param bins
      *            Output array height
      * @param verbose
      *            Verbose mode toggle
      * @return Inflated data section as an array of integers
      */
-    public int[][] inflate2DRAINBOWDataSection(byte[] input_buf, int width,
-            int height, boolean verbose) {
+    public int[][] inflate2DRAINBOWDataSection(byte[] input_buf, int rays,
+            int bins, boolean verbose) {
         msgl.showMessage("Inflating RAINBOW 2D data section", verbose);
-        int[][] output_buf = new int[width][height];
-        int len = width * height;
+        int[][] output_buf = new int[rays][bins];
+        int len = rays * bins;
         byte[] byte_buf = new byte[len];
 
         // Inflate input stream
@@ -887,9 +887,9 @@ public class Model {
         checkErr(defStream, err, "Inflation end error", verbose);
         // Convert byte array into integer array
         int count = 0;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                count = y * width + x;
+        for (int x = 0; x < rays; x++) {
+            for (int y = 0; y < bins; y++) {
+                count = y * rays + x;
                 output_buf[x][y] = (int) byte_buf[count] & 0xFF;
             }
         }

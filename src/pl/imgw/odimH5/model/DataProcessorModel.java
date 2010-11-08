@@ -1061,19 +1061,46 @@ public class DataProcessorModel {
      * 
      * @param intArray
      *            Input arrary
-     * @param width
+     * @param rays
      *            orignal size
-     * @param height
+     * @param bins
      *            original size
      * @return transposed array
      */
-    public int[][] transposeArray(int[][] intArray, int width, int height) {
-        int[][] newArray = new int[height][width];
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
+    public int[][] transposeArray(int[][] intArray, int rays, int bins) {
+        
+        int[][] newArray = new int[rays][bins];
+        
+        for (int i = 0; i < bins; i++) {
+            for (int j = 0; j < rays; j++) {
+                
                 newArray[j][i] = intArray[i][j];
             }
         }
+        
+        
+        
+        return newArray;
+    }
+
+    /**
+     * Function puts in order azimuths starting from 0 degree
+     */
+    public int[][] shiftAzimuths(int[][] intArray, int rays,
+            int bins, int startingAzimuth) {
+        
+        startingAzimuth = rays - startingAzimuth;
+        int[][] newArray = new int[bins][rays];
+        int newJ = 0;
+        for (int i = 0; i < bins; i++) {
+            for (int j = 0; j < rays; j++) {
+                
+                    newJ = (j + startingAzimuth) % rays;
+               
+                newArray[i][newJ] = intArray[i][j];
+            }
+        }
+        
         return newArray;
     }
 

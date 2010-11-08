@@ -4,6 +4,7 @@
 package pl.imgw.odimH5.model.rainbow;
 
 import java.io.File;
+import java.sql.Time;
 
 import ncsa.hdf.hdf5lib.HDF5Constants;
 
@@ -68,26 +69,26 @@ public class ModelPVOL {
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "scan", verbose);
         String time = rb.getRAINBOWMetadataElement(nodeList, "time", verbose);
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
         if (source.matches("BRZ")) {
-            source = "PLC:" + Model.BRZ;
+            source = Model.BRZ;
         } else if (source.matches("GDA")) {
-            source = "PLC:" + Model.GDA;
+            source = Model.GDA;
         } else if (source.matches("LEG")) {
-            source = "PLC:" + Model.LEG;
+            source = Model.LEG;
         } else if (source.matches("PAS")) {
-            source = "PLC:" + Model.PAS;
+            source = Model.PAS;
         } else if (source.matches("POZ")) {
-            source = "PLC:" + Model.POZ;
+            source = Model.POZ;
         } else if (source.matches("RAM")) {
-            source = "PLC:" + Model.RAM;
+            source = Model.RAM;
         } else if (source.matches("RZE")) {
-            source = "PLC:" + Model.RZE;
+            source = Model.RZE;
         } else if (source.matches("SWI")) {
-            source = "PLC:" + Model.SWI;
+            source = Model.SWI;
         }
 
         cont.setSource(source);
@@ -123,7 +124,6 @@ public class ModelPVOL {
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "wavelen", verbose);
         cont.setWavelength(rb.getRAINBOWMetadataElement(nodeList, "", verbose));
-        
 
         // ===================== datasetn group =============================
 
@@ -168,17 +168,15 @@ public class ModelPVOL {
             if (slice.getSrange() == null) // default value is "0"
                 slice.setSrange("0");
 
-            
-            String rangestep = (rb.getValueByName(sliceList.item(i), "rangestep",
-            null));
-            
-            if(rangestep == null)
+            String rangestep = (rb.getValueByName(sliceList.item(i),
+                    "rangestep", null));
+
+            if (rangestep == null)
                 rangestep = "0";
             slice.setRstep(rangestep);
 
             slice.setRays(rb.getValueByName(sliceList.item(i), "rawdata",
-            "rays"));
-
+                    "rays"));
 
             // ===============================================================
 
@@ -195,13 +193,15 @@ public class ModelPVOL {
                     .item(i), "rayinfo", "depth"));
             dataDepth = Integer.parseInt(rb.getValueByName(sliceList.item(i),
                     "rawdata", "depth"));
+
             dataBuff = rb.getRainbowDataSection(fileBuff, dataBlobNumber,
                     dataDepth, firstBlob, verbose);
+
             DataBufferContainer raysBuff = rb.getRainbowDataSection(fileBuff,
                     raysBlobNumber, raysDepth, firstBlob, verbose);
+
             byte[] infRaysBuff = rb.inflate1DRAINBOWDataSection(raysBuff
                     .getDataBuffer(), raysBuff.getDataBufferLength(), verbose);
-
             // =================================================================
 
             slice.setA1gate(String.valueOf(startingAzimuthNumber(infRaysBuff,
@@ -216,7 +216,7 @@ public class ModelPVOL {
                     "type"));
 
             if (slice.getDatatype().matches(rb.DBZ))
-                slice.setDatatype("TH");
+                slice.setDatatype("DBZH");
             else if (slice.getDatatype().matches(rb.UPHIDP))
                 slice.setDatatype("PHIDP");
 
@@ -491,24 +491,32 @@ public class ModelPVOL {
 
             proc.H5Gclose_wrap(grandgrandchild_group_id, verbose);
 
-            int dim_x = Integer.parseInt(cnt.getSlices()[i].getRays());
-            int dim_y = Integer.parseInt(cnt.getSlices()[i].getBins());
+            int rays = Integer.parseInt(cnt.getSlices()[i].getRays());
+            int bins = Integer.parseInt(cnt.getSlices()[i].getBins());
 
-            int dataspace_id = proc.H5Screate_simple_wrap(2, dim_x, dim_y,
+            int dataspace_id = proc.H5Screate_simple_wrap(2, rays, bins,
                     null, verbose);
 
             grandgrandchild_group_id = proc.H5Dcreate_wrap(grandchild_group_id,
-                    "data", HDF5Constants.H5T_STD_U16BE, dataspace_id, Integer
+                    "data", HDF5Constants.H5T_STD_U8BE, dataspace_id, Integer
                             .parseInt(rb.H5_DATA_CHUNK), Integer
                             .parseInt(rb.H5_GZIP_LEVEL), verbose);
 
-            int width = Integer.parseInt(cnt.getSlices()[i].getRays());
-            int height = Integer.parseInt(cnt.getSlices()[i].getBins());
-            int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(cnt
-                    .getSlices()[i].getDataBuff().getDataBuffer(), width,
-                    height, verbose);
+            proc.H5Acreate_any_wrap(grandgrandchild_group_id, "CLASS",
+                    rb.H5_STRING, "IMAGE", verbose);
 
-            infDataBuff = proc.transposeArray(infDataBuff, dim_x, dim_y);
+            
+            int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(cnt
+                    .getSlices()[i].getDataBuff().getDataBuffer(), bins,
+                    rays, verbose);
+
+            // przesunac azymuty
+            infDataBuff = proc.shiftAzimuths(infDataBuff, rays,
+                    bins, Integer.parseInt(cnt.getSlices()[i].getA1gate()));
+            
+            infDataBuff = proc.transposeArray(infDataBuff, rays, bins);
+            
+            
 
             proc.H5Dwrite_wrap(grandgrandchild_group_id,
                     HDF5Constants.H5T_NATIVE_INT, HDF5Constants.H5S_ALL,
@@ -547,7 +555,9 @@ public class ModelPVOL {
                 counter = i;
             }
         }
-        return length - counter;
+        
+        
+        return counter;
     }
 
     /**
@@ -561,5 +571,5 @@ public class ModelPVOL {
 
         return (int) ((high & 0xff) << 8 | (low & 0xff));
     }
-    
+
 }

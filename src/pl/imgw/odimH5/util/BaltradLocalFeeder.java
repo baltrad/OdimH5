@@ -38,14 +38,16 @@ public class BaltradLocalFeeder extends Thread {
     WatchService watchService = FileSystems.getDefault().newWatchService();
     private OptionContainer[] options;
     Path[] watchedPath;
-    String path = "";
+    
+    RadarOpt radarOpt = new RadarOpt();
 
-    HashMap<WatchKey, String> pathMap = new HashMap<WatchKey, String>();
-    HashMap<String, Long> fileTimeMap = new HashMap<String, Long>();
+    HashMap<WatchKey, OptionContainer> pathMap = new HashMap<WatchKey, OptionContainer>();
+    HashMap<RadarOpt, Long> fileTimeMap = new HashMap<RadarOpt, Long>();
 
     private Model rb;
     private DataProcessorModel proc;
-    private String sender, server, radarName;
+    private String sender, server;
+    
     private boolean verbose;
 
     /**
@@ -71,8 +73,7 @@ public class BaltradLocalFeeder extends Thread {
                 OptionsHandler.SENDER);
         server = OptionsHandler.getElementByName(optionsDoc,
                 OptionsHandler.SERVER);
-        radarName = OptionsHandler.getElementByName(optionsDoc,
-                OptionsHandler.SERVER);
+       
         this.rb = rb;
         this.proc = proc;
         this.verbose = verbose;
@@ -80,15 +81,17 @@ public class BaltradLocalFeeder extends Thread {
         options = OptionsHandler.getOptions(optionsDoc);
         watchedPath = new Path[options.length];
         WatchKey key[] = new WatchKey[options.length];
+        
 
         for (int i = 0; i < options.length; i++) {
             watchedPath[i] = Paths.get(options[i].getDir());
+            
 
             try {
                 key[i] = watchedPath[i].register(watchService,
                         StandardWatchEventKind.ENTRY_CREATE,
                         StandardWatchEventKind.ENTRY_MODIFY);
-                pathMap.put(key[i], options[i].getDir());
+                pathMap.put(key[i], options[i]);
             } catch (UnsupportedOperationException uox) {
                 System.err.println("file watching not supported!");
                 // handle this error here
@@ -104,12 +107,12 @@ public class BaltradLocalFeeder extends Thread {
      * 
      * @param filePath
      */
-    private void convertAndSendFile(String filePath) {
+    private void convertAndSendFile(RadarOpt filePath) {
 
-        File file = new File(filePath);
+        File file = new File(filePath.path);
         String fileNameH5 = "";
 
-        if (filePath.endsWith(".vol")) {
+        if (filePath.path.endsWith(".vol")) {
 
             fileNameH5 = file.getName().substring(0,
                     file.getName().indexOf("."))
@@ -130,7 +133,7 @@ public class BaltradLocalFeeder extends Thread {
             if (!ModelPVOL.createDescriptor(fileNameH5, file_buf, this.verbose,
                     this.rb))
                 return;
-        } else if (filePath.endsWith(".h5")) {
+        } else if (filePath.path.endsWith(".h5")) {
             fileNameH5 = file.getName();
         } else {
             System.out.println("plik nie obslugiwany");
@@ -141,7 +144,7 @@ public class BaltradLocalFeeder extends Thread {
                 .getMessageLogger(), server, verbose);
 
         String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
-                sender, radarName, fileNameH5);
+                sender, filePath.radarName, fileNameH5);
 
         // System.out.println("BFDataHdr:");
         // System.out.println(a);
@@ -183,14 +186,15 @@ public class BaltradLocalFeeder extends Thread {
                 System.out.println("nic");
                 long time;
                 long timeNow = System.currentTimeMillis();
-                Iterator<String> itr = fileTimeMap.keySet().iterator();
+                Iterator<RadarOpt> itr = fileTimeMap.keySet().iterator();
                 while (itr.hasNext()) {
-                    String key = itr.next();
+                    RadarOpt key = itr.next();
+                    
                     time = fileTimeMap.get(key);
                     if ((timeNow - time) > 3000) {
                         fileTimeMap.remove(key);
                         itr = fileTimeMap.keySet().iterator();
-                        System.out.println(key + " download finished");
+                        System.out.println(key.path + " download finished");
                         convertAndSendFile(key);
 
                     }
@@ -212,7 +216,9 @@ public class BaltradLocalFeeder extends Thread {
 
             }
             List<WatchEvent<?>> list = signalledKey.pollEvents();
-            path = pathMap.get(signalledKey);
+           
+            radarOpt.path = pathMap.get(signalledKey).getDir() + "/";
+            radarOpt.radarName = pathMap.get(signalledKey).getRadarName();
             // VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
             // key to be reported again by the watch service
             signalledKey.reset();
@@ -222,11 +228,14 @@ public class BaltradLocalFeeder extends Thread {
             for (WatchEvent<?> e : list) {
                 if (e.kind() == StandardWatchEventKind.ENTRY_CREATE) {
                     Path context = (Path) e.context();
-                    fileTimeMap.put(path + "/" + context.toString(), System
+                    radarOpt.path += context.toString();
+                    System.out.println(radarOpt.radarName + ": " + radarOpt.path);
+                    fileTimeMap.put(radarOpt, System
                             .currentTimeMillis());
                 } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {
                     Path context = (Path) e.context();
-                    fileTimeMap.put(path + "/" + context.toString(), System
+                    radarOpt.path += context.toString();
+                    fileTimeMap.put(radarOpt, System
                             .currentTimeMillis());
                 } else if (e.kind() == StandardWatchEventKind.OVERFLOW) {
                     System.out
@@ -237,4 +246,11 @@ public class BaltradLocalFeeder extends Thread {
         }
 
     }
+    
+    class RadarOpt{
+        private String path = "";
+        private String radarName = "";
+                
+    }
+    
 }
