@@ -72,7 +72,7 @@ public class ModelPVOLH5 {
             System.out.println("Add " + source + " to options.xml");
             System.exit(0);
         } else {
-            source = radarName;
+            source = "WMO:" + radarName;
         }
 
         // ============== where group ============================

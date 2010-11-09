@@ -85,6 +85,8 @@ public class ModelPVOL {
         if(radarName.isEmpty()) {
             System.out.println("Add " + source + " to options.xml");
             System.exit(0);
+        } else {
+            source = "WMO:" + radarName;
         }
         
         cont.setSource(source);

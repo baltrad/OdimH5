@@ -61,7 +61,7 @@ public class ModelVP {
             System.out.println("Add " + source + " to options.xml");
             System.exit(0);
         } else {
-            source = radarName;
+            source = "WMO:" + radarName;
         }
         
         cont.setSource(source);
