@@ -218,12 +218,6 @@ public class ModelImage {
                 .valueOf(Double.parseDouble(rb.convertRAINBOWParam(res)) * 1000);
         cont.setYscale(res);
         cont.setXscale(res);
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, "data", verbose);
-        cont.setStartdate(rb.parseRAINBOWDate(rb.getRAINBOWMetadataElement(
-                nodeList, "date", verbose), verbose));
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, "data", verbose);
-        cont.setStarttime(rb.parseRAINBOWTime(rb.getRAINBOWMetadataElement(
-                nodeList, "time", verbose), verbose));
         cont.setGain(rb.getRAINBOWGain(cont.getOffset(), max, dataDepth));
 
         // prepare actual dataset

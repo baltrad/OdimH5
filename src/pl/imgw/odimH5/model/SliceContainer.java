@@ -15,8 +15,10 @@ import pl.imgw.odimH5.util.DataBufferContainer;
  */
 public class SliceContainer {
 
-    private String sliceTime = null;
-    private String sliceDate = null;
+    private String startTime = null;
+    private String startDate = null;
+    private String endTime = null;
+    private String endDate = null;
     private String pangle = null;
     private String bins = null;
     private String srange = null;
@@ -29,20 +31,36 @@ public class SliceContainer {
     private int dataDepth = 0;
     private DataBufferContainer dataBuff = null;
 
-    public String getSliceTime() {
-        return sliceTime;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public void setSliceTime(String sliceTime) {
-        this.sliceTime = sliceTime;
+    public void setStartTime(String sliceTime) {
+        this.startTime = sliceTime;
     }
 
-    public String getSliceDate() {
-        return sliceDate;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setSliceDate(String sliceDate) {
-        this.sliceDate = sliceDate;
+    public void setStartDate(String sliceDate) {
+        this.startDate = sliceDate;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public String getPangle() {

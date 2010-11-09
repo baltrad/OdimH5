@@ -51,8 +51,7 @@ public class ParametersContainer {
     private String prodpar = null;
     private String xscale = null;
     private String yscale = null;
-    private String startdate = null;
-    private String starttime = null;
+
     private String gain = null;
     private String offset = null;
     private String dataFileName = null;
@@ -324,21 +323,6 @@ public class ParametersContainer {
         this.yscale = yscale;
     }
 
-    public String getStartdate() {
-        return startdate;
-    }
-
-    public void setStartdate(String startdate) {
-        this.startdate = startdate;
-    }
-
-    public String getStarttime() {
-        return starttime;
-    }
-
-    public void setStarttime(String starttime) {
-        this.starttime = starttime;
-    }
 
     public String getGain() {
         return gain;

@@ -102,9 +102,9 @@ public class ModelRHI_H5 {
         proc.H5Acreate_any_wrap(grandchild_group_id, "quantity", rb.H5_STRING,
                 cnt.getQuantity(), verbose);
         proc.H5Acreate_any_wrap(grandchild_group_id, "startdate", rb.H5_STRING,
-                cnt.getStarttime(), verbose);
+                cnt.getDate(), verbose);
         proc.H5Acreate_any_wrap(grandchild_group_id, "starttime", rb.H5_STRING,
-                cnt.getStarttime(), verbose);
+                cnt.getTime(), verbose);
         proc.H5Acreate_any_wrap(grandchild_group_id, "gain", rb.H5_DOUBLE, cnt
                 .getGain(), verbose);
         proc.H5Acreate_any_wrap(grandchild_group_id, "offset", rb.H5_DOUBLE,

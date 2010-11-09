@@ -129,9 +129,9 @@ public class ModelImageXML {
         }
         dataset_what.appendChild(rb.makeAttr("quantity", cont.getQuantity(),
                 od, rb.H5_STRING));
-        dataset_what.appendChild(rb.makeAttr("startdate", cont.getStartdate(),
+        dataset_what.appendChild(rb.makeAttr("startdate", cont.getDate(),
                 od, rb.H5_STRING));
-        dataset_what.appendChild(rb.makeAttr("starttime", cont.getStarttime(),
+        dataset_what.appendChild(rb.makeAttr("starttime", cont.getTime(),
                 od, rb.H5_STRING));
         dataset_what.appendChild(rb.makeAttr("gain", cont.getGain(), od,
                 rb.H5_DOUBLE));

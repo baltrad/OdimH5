@@ -122,6 +122,11 @@ public class ModelPVOL {
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "wavelen", verbose);
         cont.setWavelength(rb.getRAINBOWMetadataElement(nodeList, "", verbose));
+        
+        
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, "antspeed", verbose);
+        int antSpeed = Integer.parseInt(rb.getRAINBOWMetadataElement(nodeList, "", verbose));
+        int shift = (int)(360.0/antSpeed);
 
         // ===================== datasetn group =============================
 
@@ -150,11 +155,13 @@ public class ModelPVOL {
             SliceContainer slice = new SliceContainer();
 
             // ========== datasetn specific what group ===============
-            slice.setSliceDate(rb.parseRAINBOWDate(rb.getValueByName(sliceList
+            slice.setStartDate(rb.parseRAINBOWDate(rb.getValueByName(sliceList
                     .item(i), "slicedata", "date"), verbose));
-            slice.setSliceTime(rb.parseRAINBOWTime(rb.getValueByName(sliceList
+            slice.setStartTime(rb.parseRAINBOWTime(rb.getValueByName(sliceList
                     .item(i), "slicedata", "time"), verbose));
-
+            slice.setEndDate(slice.getStartDate());
+            
+            slice.setEndTime(rb.parseRAINBOWTime(slice.getStartTime(), shift, verbose));
             // ============= datasetn specific where group ============
 
             slice.setPangle(rb.getValueByName(sliceList.item(i), "posangle",
@@ -302,9 +309,13 @@ public class ModelPVOL {
             dataset_what.appendChild(rb.makeAttr("product", "SCAN", od,
                     rb.H5_STRING));
             dataset_what.appendChild(rb.makeAttr("startdate",
-                    cnt.getSlices()[i].getSliceDate(), od, rb.H5_STRING));
+                    cnt.getSlices()[i].getStartDate(), od, rb.H5_STRING));
             dataset_what.appendChild(rb.makeAttr("starttime",
-                    cnt.getSlices()[i].getSliceTime(), od, rb.H5_STRING));
+                    cnt.getSlices()[i].getStartTime(), od, rb.H5_STRING));
+            dataset_what.appendChild(rb.makeAttr("enddate",
+                    cnt.getSlices()[i].getEndDate(), od, rb.H5_STRING));
+            dataset_what.appendChild(rb.makeAttr("endtime",
+                    cnt.getSlices()[i].getEndTime(), od, rb.H5_STRING));
             dataset.appendChild(dataset_what);
 
             Element dataset_where = od.createElement(rb.H5_GROUP);
@@ -445,9 +456,13 @@ public class ModelPVOL {
             proc.H5Acreate_any_wrap(grandchild_group_id, "product",
                     rb.H5_STRING, "SCAN", verbose);
             proc.H5Acreate_any_wrap(grandchild_group_id, "startdate",
-                    rb.H5_STRING, cnt.getSlices()[i].getSliceDate(), verbose);
+                    rb.H5_STRING, cnt.getSlices()[i].getStartDate(), verbose);
             proc.H5Acreate_any_wrap(grandchild_group_id, "starttime",
-                    rb.H5_STRING, cnt.getSlices()[i].getSliceTime(), verbose);
+                    rb.H5_STRING, cnt.getSlices()[i].getStartTime(), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, "enddate",
+                    rb.H5_STRING, cnt.getSlices()[i].getEndDate(), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, "endtime",
+                    rb.H5_STRING, cnt.getSlices()[i].getEndTime(), verbose);
 
             proc.H5Gclose_wrap(grandchild_group_id, verbose);
 

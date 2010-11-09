@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
@@ -101,14 +102,14 @@ public class Model {
     protected final double RAINBOW_NO_DATA = 255.0;
     protected final double RAINBOW_UNDETECT = 0.0;
 
-//    public static final String BRZ = "WMO:12568";
-//    public static final String GDA = "WMO:12151";
-//    public static final String LEG = "WMO:12374";
-//    public static final String PAS = "WMO:12544";
-//    public static final String POZ = "WMO:12331";
-//    public static final String RAM = "WMO:12514";
-//    public static final String RZE = "WMO:12579";
-//    public static final String SWI = "WMO:12220";
+    // public static final String BRZ = "WMO:12568";
+    // public static final String GDA = "WMO:12151";
+    // public static final String LEG = "WMO:12374";
+    // public static final String PAS = "WMO:12544";
+    // public static final String POZ = "WMO:12331";
+    // public static final String RAM = "WMO:12514";
+    // public static final String RZE = "WMO:12579";
+    // public static final String SWI = "WMO:12220";
 
     // Reference to MessageLogger object
     private MessageLogger msgl;
@@ -603,6 +604,35 @@ public class Model {
     }
 
     /**
+     * Method add shift number of second to rainbow time.
+     * 
+     * @param rainbowTime
+     *            Input time string
+     * @param shift
+     *            Number of seconds to shift
+     * @param verbose
+     *            Verbose mode toggle
+     * @return Time string in ODIM_H5 format
+     */
+    public String parseRAINBOWTime(String rainbowTime, int shift,
+            boolean verbose) {
+        String h5Time = null;
+        try {
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+            Format in_out = new SimpleDateFormat("HHmmss");
+            Date date = (Date) in_out.parseObject(rainbowTime);
+            cal.setTime(date);
+            cal.add(Calendar.SECOND, shift);
+            date = cal.getTime();
+            h5Time = in_out.format(date);
+        } catch (ParseException e) {
+            msgl.showMessage("Error while parsing date: " + e.getMessage(),
+                    verbose);
+        }
+        return h5Time;
+    }
+
+    /**
      * Method parses RAINBOW time and converts is to ODIM_H5 standard time.
      * 
      * @param rainbowTime
@@ -882,7 +912,7 @@ public class Model {
             a++;
             checkErr(defStream, err, "Inflation error", verbose);
         }
-//        System.out.println(a);
+        // System.out.println(a);
         err = defStream.inflateEnd();
         checkErr(defStream, err, "Inflation end error", verbose);
         // Convert byte array into integer array
@@ -968,7 +998,7 @@ public class Model {
      */
     public DataBufferContainer getRainbowDataSection(byte[] fileBuff,
             int blobNumber, int depth, int firstBlob, boolean verbose) {
-        
+
         DataBufferContainer dbc = new DataBufferContainer();
 
         // Data section tags
@@ -1129,7 +1159,7 @@ public class Model {
         d = d / dex;
         return d;
     }
-    
+
     public static int getMin(int a, int b) {
         if (a > b)
             return b;

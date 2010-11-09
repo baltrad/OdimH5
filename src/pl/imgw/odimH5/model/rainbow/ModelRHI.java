@@ -158,8 +158,6 @@ public class ModelRHI {
 
         cont.setProduct(product);
         cont.setQuantity(datatype);
-        cont.setStartdate(date);
-        cont.setStarttime(time);
         cont.setGain(gain);
         cont.setOffset(min);
 
