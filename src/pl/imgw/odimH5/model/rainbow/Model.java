@@ -98,8 +98,8 @@ public class Model {
     public final String PVOL = "PVOL";
     public final String VP = "VP";
     public final String RHI = "RHI";
-    protected final double RAINBOW_NO_DATA = 0.0;
-    protected final double RAINBOW_UNDETECT = 255.0;
+    protected final double RAINBOW_NO_DATA = 255.0;
+    protected final double RAINBOW_UNDETECT = 0.0;
 
 //    public static final String BRZ = "WMO:12568";
 //    public static final String GDA = "WMO:12151";
