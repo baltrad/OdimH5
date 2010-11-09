@@ -134,15 +134,15 @@ public class OptionsHandler {
         System.out.println("<!-- FTP options -->");
         System.out.println("<options>");
         System.out.println("    <radar name=\"NAME\">");
-        System.out.println("        <" + WMO_ID + ">WMO_ID</ " + WMO_ID + " >");
-        System.out.println("        <" + ADDRESS + ">IP</ " + ADDRESS + " >");
+        System.out.println("        <" + WMO_ID + ">WMO_ID</" + WMO_ID + ">");
+        System.out.println("        <" + ADDRESS + ">IP</" + ADDRESS + ">");
         System.out.println("        <" + LOGIN + ">LOGIN</" + LOGIN + ">");
         System.out.println("        <" + PASSWORD + ">PASS</" + PASSWORD + ">");
         System.out
                 .println("        <" + DIRECTORY + ">DIR</" + DIRECTORY + ">");
         System.out.println("    </radar>");
         // System.out.println("    <start_time>mm</start_time>");
-        System.out.println("    <" + REPETITION + " >mm</" + REPETITION + ">");
+//        System.out.println("    <" + REPETITION + " >mm</" + REPETITION + ">");
         System.out.println("    <" + SERVER + ">HTTP_address</" + SERVER + ">");
         System.out.println("    <" + SENDER + ">Baltrad.IMGW.pl</" + SENDER
                 + ">");

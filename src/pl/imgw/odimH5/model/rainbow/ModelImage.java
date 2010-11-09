@@ -49,7 +49,7 @@ public class ModelImage {
 
         NodeList nodeList = null;
         ParametersContainer cont = new ParametersContainer();
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "data", verbose);
         String date = rb.getRAINBOWMetadataElement(nodeList, "date", verbose);
         String time = rb.getRAINBOWMetadataElement(nodeList, "time", verbose);
@@ -58,16 +58,18 @@ public class ModelImage {
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
         String radarName = "";
-        for(int i = 0; i < options.length; i++) {
-            if (source.matches(options[i].getRadarName())){
+        for (int i = 0; i < options.length; i++) {
+            if (source.matches(options[i].getRadarName())) {
                 radarName = options[i].getRadarWMOName();
                 break;
             }
         }
 
-        if(radarName.isEmpty()) {
+        if (radarName.isEmpty()) {
             System.out.println("Add " + source + " to options.xml");
             System.exit(0);
+        } else {
+            source = radarName;
         }
         cont.setSource(source);
 
@@ -227,7 +229,7 @@ public class ModelImage {
         // prepare actual dataset
         int width = Integer.parseInt(cont.getXsize());
         int height = Integer.parseInt(cont.getYsize());
-        
+
         int firstBlob = rb.getMin(flagBlobNumber, dataBlobNumber);
 
         DataBufferContainer dataBuff = rb.getRainbowDataSection(fileBuff,

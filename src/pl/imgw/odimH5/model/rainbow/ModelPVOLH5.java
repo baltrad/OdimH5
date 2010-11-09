@@ -71,6 +71,8 @@ public class ModelPVOLH5 {
         if(radarName.isEmpty()) {
             System.out.println("Add " + source + " to options.xml");
             System.exit(0);
+        } else {
+            source = radarName;
         }
 
         // ============== where group ============================
