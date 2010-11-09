@@ -21,6 +21,7 @@ public class OptionsHandler {
 
     public final static String OPTION_XML_FILE = "options.xml";
 
+    public final static String WMO_ID = "WMO_id";
     public final static String ADDRESS = "address";
     public final static String LOGIN = "login";
     public final static String PASSWORD = "password";
@@ -28,9 +29,6 @@ public class OptionsHandler {
     public final static String REPETITION = "repetition_time";
     public final static String SERVER = "server";
     public final static String SENDER = "sender";
-
-    private String startTime;
-    private String endTime;
 
     /**
      * 
@@ -75,6 +73,9 @@ public class OptionsHandler {
 
             options[i].setRadarName(radarList.item(i).getAttributes()
                     .getNamedItem("name").getNodeValue());
+            
+            options[i].setRadarWMOName(Model.getValueByName(radarList.item(i),
+                    WMO_ID, null));
             options[i].setAddress(Model.getValueByName(radarList.item(i),
                     ADDRESS, null));
             options[i].setLogin(Model.getValueByName(radarList.item(i), LOGIN,
@@ -133,6 +134,7 @@ public class OptionsHandler {
         System.out.println("<!-- FTP options -->");
         System.out.println("<options>");
         System.out.println("    <radar name=\"NAME\">");
+        System.out.println("        <" + WMO_ID + ">WMO_ID</ " + WMO_ID + " >");
         System.out.println("        <" + ADDRESS + ">IP</ " + ADDRESS + " >");
         System.out.println("        <" + LOGIN + ">LOGIN</" + LOGIN + ">");
         System.out.println("        <" + PASSWORD + ">PASS</" + PASSWORD + ">");
@@ -150,12 +152,5 @@ public class OptionsHandler {
 
     }
 
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
 
 }

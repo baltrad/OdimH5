@@ -14,6 +14,7 @@ package pl.imgw.odimH5.util;
 public class OptionContainer {
 
     private String radarName;
+    private String radarWMOName;
     private String address;
     private String login;
     private String password;
@@ -25,6 +26,14 @@ public class OptionContainer {
 
     public void setRadarName(String radarName) {
         this.radarName = radarName;
+    }
+    
+    public String getRadarWMOName() {
+        return radarWMOName;
+    }
+
+    public void setRadarWMOName(String radarWMOName) {
+        this.radarWMOName = radarWMOName;
     }
 
     public String getAddress() {

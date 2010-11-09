@@ -24,6 +24,7 @@ import pl.imgw.odimH5.util.BaltradFrameHandler;
 import pl.imgw.odimH5.util.BaltradLocalFeeder;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.MessageLogger;
+import pl.imgw.odimH5.util.OptionContainer;
 import pl.imgw.odimH5.util.OptionsHandler;
 
 /**
@@ -64,6 +65,9 @@ public class DataProcessorController {
 
         // Check if verbose mode is chosen
         verbose = cmd.hasArgument(cmd.VERBOSE_OPTION) ? true : false;
+
+        // Load options
+        Document doc = OptionsHandler.loadOptions(msgl, verbose);
 
         // Select operation mode depending on the command line arguments
         // provided
@@ -106,6 +110,14 @@ public class DataProcessorController {
 
             msgl.showMessage("Conversion mode selected", verbose);
 
+            if (doc == null) {
+                OptionsHandler.exampleOptionXML();
+                System.out.println("\nCreate and/or edit file "
+                        + OptionsHandler.OPTION_XML_FILE);
+                return;
+            }
+            
+            OptionContainer[] options = OptionsHandler.getOptions(doc);
             // Read input file
             byte[] fileBuff = proc.readDataFile(cmd
                     .getArgumentValue(cmd.INPUT_FILE_OPTION), verbose);
@@ -117,25 +129,25 @@ public class DataProcessorController {
                         rainbow.PVOL)) {
                     ModelPVOL.createDescriptor(cmd
                             .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
-                            fileBuff, verbose, rainbow);
+                            fileBuff, verbose, rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.IMAGE)) {
                     ModelImage.createDescriptor(cmd
                             .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
-                            fileBuff, verbose, rainbow);
+                            fileBuff, verbose, rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.VP)) {
                     ModelVP.createDescriptor(cmd
                             .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
-                            fileBuff, verbose, rainbow);
+                            fileBuff, verbose, rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.RHI)) {
                     ModelRHI.createDescriptor(cmd
                             .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
-                            fileBuff, verbose, rainbow);
+                            fileBuff, verbose, rainbow, options);
                 }
 
             }
@@ -147,32 +159,17 @@ public class DataProcessorController {
 
             msgl.showMessage("Baltrad feeder mode selected", verbose);
 
-            Document doc = OptionsHandler.loadOptions(msgl, verbose);
             if (doc == null) {
                 OptionsHandler.exampleOptionXML();
                 System.out.println("\nCreate and/or edit file "
                         + OptionsHandler.OPTION_XML_FILE);
-
-            } else {
-
-                BaltradLocalFeeder worker = new BaltradLocalFeeder(doc, rainbow, proc, verbose);
-                worker.start();
-                
-                /*
-                  OptionContainer[] options = OptionsHandler.getOptions(doc);
-                  int counter = options.length;
-                  
-                  for (int i = 0; i < counter; i++) { String server =
-                  options[i].getAddress();
-                  if (server != null) {
-                  BaltradRemoteFeeder worker = new BaltradRemoteFeeder( doc,
-                  rainbow, proc, cmd.getArgumentValue(cmd.CONTINOUOS_OPTION),
-                  verbose);
-                  
-                  worker.start(); 
-                  } else { //localFedder } }
-                 */
+                return;
             }
+
+            BaltradLocalFeeder worker = new BaltradLocalFeeder(doc, rainbow,
+                    proc, verbose);
+            worker.start();
+
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
                 && cmd.hasArgument(cmd.ADDRESS_OPTION)
                 && cmd.hasArgument(cmd.SENDER_OPTION)
@@ -184,9 +181,8 @@ public class DataProcessorController {
                     .getMessageLogger(), cmd
                     .getArgumentValue(cmd.ADDRESS_OPTION), verbose);
 
-            String a = bfh.createDataHdr(
-                    BaltradFrameHandler.MIME_MULTIPART, cmd
-                            .getArgumentValue(cmd.SENDER_OPTION), cmd
+            String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
+                    cmd.getArgumentValue(cmd.SENDER_OPTION), cmd
                             .getArgumentValue(cmd.RADAR_OPTION), cmd
                             .getArgumentValue(cmd.INPUT_FILE_OPTION));
 

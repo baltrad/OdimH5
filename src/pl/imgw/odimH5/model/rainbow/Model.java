@@ -101,14 +101,14 @@ public class Model {
     protected final double RAINBOW_NO_DATA = 0.0;
     protected final double RAINBOW_UNDETECT = 255.0;
 
-    public static final String BRZ = "WMO:12568";
-    public static final String GDA = "WMO:12151";
-    public static final String LEG = "WMO:12374";
-    public static final String PAS = "WMO:12544";
-    public static final String POZ = "WMO:12331";
-    public static final String RAM = "WMO:12514";
-    public static final String RZE = "WMO:12579";
-    public static final String SWI = "WMO:12220";
+//    public static final String BRZ = "WMO:12568";
+//    public static final String GDA = "WMO:12151";
+//    public static final String LEG = "WMO:12374";
+//    public static final String PAS = "WMO:12544";
+//    public static final String POZ = "WMO:12331";
+//    public static final String RAM = "WMO:12514";
+//    public static final String RZE = "WMO:12579";
+//    public static final String SWI = "WMO:12220";
 
     // Reference to MessageLogger object
     private MessageLogger msgl;

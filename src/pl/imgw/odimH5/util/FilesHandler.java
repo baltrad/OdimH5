@@ -60,7 +60,8 @@ public class FilesHandler {
 
     public static Vector<String> getVolFilesFTP(String server, String username,
             String password, String folder, Calendar start, Calendar end,
-            Model rb, DataProcessorModel proc, boolean verbose) {
+            Model rb, DataProcessorModel proc, OptionContainer[] options,
+            boolean verbose) {
 
         Vector<String> fileName = new Vector<String>();
 
@@ -99,7 +100,7 @@ public class FilesHandler {
                             files[i].getName().indexOf("."))
                             + ".h5";
                     ModelPVOL.createDescriptor(fileNameH5, baos.toByteArray(),
-                            verbose, rb);
+                            verbose, rb, options);
                     fileName.add(fileNameH5);
                     baos.close();
                 }
@@ -206,7 +207,7 @@ public class FilesHandler {
      */
     public static Vector<String> getVolFilesLocal(String folder,
             Calendar start, Calendar end, Model rb, DataProcessorModel proc,
-            boolean verbose) {
+            OptionContainer[] options, boolean verbose) {
 
         Vector<String> fileName = new Vector<String>();
 
@@ -243,7 +244,8 @@ public class FilesHandler {
                     e.printStackTrace();
                 }
 
-                ModelPVOL.createDescriptor(fileNameH5, file_buf, verbose, rb);
+                ModelPVOL.createDescriptor(fileNameH5, file_buf, verbose, rb,
+                        options);
                 fileName.add(fileNameH5);
             }
         }

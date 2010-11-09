@@ -10,6 +10,7 @@ import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.DataProcessorModel;
 import pl.imgw.odimH5.util.DataBufferContainer;
+import pl.imgw.odimH5.util.OptionContainer;
 
 /**
  * 
@@ -39,7 +40,7 @@ public class ModelPVOLH5 {
      * @return name of new HDF5 file
      */
     public static String createDescriptor(String fileName, byte[] fileBuff,
-            boolean verbose, Model rb, DataProcessorModel proc) {
+            boolean verbose, Model rb, DataProcessorModel proc, OptionContainer[] options) {
 
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.VOLUME, verbose);
 
@@ -59,22 +60,17 @@ public class ModelPVOLH5 {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
-        if (source.matches("BRZ")) {
-            source = "PLC:" + Model.BRZ;
-        } else if (source.matches("GDA")) {
-            source = "PLC:" + Model.GDA;
-        } else if (source.matches("LEG")) {
-            source = "PLC:" + Model.LEG;
-        } else if (source.matches("PAS")) {
-            source = "PLC:" + Model.PAS;
-        } else if (source.matches("POZ")) {
-            source = "PLC:" + Model.POZ;
-        } else if (source.matches("RAM")) {
-            source = "PLC:" + Model.RAM;
-        } else if (source.matches("RZE")) {
-            source = "PLC:" + Model.RZE;
-        } else if (source.matches("SWI")) {
-            source = "PLC:" + Model.SWI;
+        String radarName = "";
+        for(int i = 0; i < options.length; i++) {
+            if (source.matches(options[i].getRadarName())){
+                radarName = options[i].getRadarWMOName();
+                break;
+            }
+        }
+
+        if(radarName.isEmpty()) {
+            System.out.println("Add " + source + " to options.xml");
+            System.exit(0);
         }
 
         // ============== where group ============================

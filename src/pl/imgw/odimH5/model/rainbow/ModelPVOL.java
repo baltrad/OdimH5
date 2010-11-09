@@ -18,6 +18,7 @@ import pl.imgw.odimH5.model.DataProcessorModel;
 import pl.imgw.odimH5.model.ParametersContainer;
 import pl.imgw.odimH5.model.SliceContainer;
 import pl.imgw.odimH5.util.DataBufferContainer;
+import pl.imgw.odimH5.util.OptionContainer;
 
 /**
  * 
@@ -48,7 +49,7 @@ public class ModelPVOL {
 
     @SuppressWarnings("static-access")
     public static boolean createDescriptor(String fileNameOut, byte[] fileBuff,
-            boolean verbose, Model rb) {
+            boolean verbose, Model rb, OptionContainer[] options) {
 
         boolean isDirect = false;
         if (fileNameOut.endsWith(".h5"))
@@ -73,24 +74,19 @@ public class ModelPVOL {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
-        if (source.matches("BRZ")) {
-            source = Model.BRZ;
-        } else if (source.matches("GDA")) {
-            source = Model.GDA;
-        } else if (source.matches("LEG")) {
-            source = Model.LEG;
-        } else if (source.matches("PAS")) {
-            source = Model.PAS;
-        } else if (source.matches("POZ")) {
-            source = Model.POZ;
-        } else if (source.matches("RAM")) {
-            source = Model.RAM;
-        } else if (source.matches("RZE")) {
-            source = Model.RZE;
-        } else if (source.matches("SWI")) {
-            source = Model.SWI;
+        String radarName = "";
+        for(int i = 0; i < options.length; i++) {
+            if (source.matches(options[i].getRadarName())){
+                radarName = options[i].getRadarWMOName();
+                break;
+            }
         }
 
+        if(radarName.isEmpty()) {
+            System.out.println("Add " + source + " to options.xml");
+            System.exit(0);
+        }
+        
         cont.setSource(source);
 
         // ============== where group ============================

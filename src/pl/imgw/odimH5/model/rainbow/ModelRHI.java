@@ -10,6 +10,7 @@ import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.ParametersContainer;
 import pl.imgw.odimH5.util.DataBufferContainer;
+import pl.imgw.odimH5.util.OptionContainer;
 
 /**
  * 
@@ -36,7 +37,7 @@ public class ModelRHI {
      *            Rainbow class model
      */
     public static void createDescriptor(String fileName, byte[] fileBuff,
-            boolean verbose, Model rb) {
+            boolean verbose, Model rb, OptionContainer[] options) {
 
         boolean isDirect = false;
         if (fileName.endsWith(".h5"))
@@ -89,23 +90,19 @@ public class ModelRHI {
 
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
-        if (source.matches("BRZ")) {
-            source = "PLC:" + Model.BRZ;
-        } else if (source.matches("GDA")) {
-            source = "PLC:" + Model.GDA;
-        } else if (source.matches("LEG")) {
-            source = "PLC:" + Model.LEG;
-        } else if (source.matches("PAS")) {
-            source = "PLC:" + Model.PAS;
-        } else if (source.matches("POZ")) {
-            source = "PLC:" + Model.POZ;
-        } else if (source.matches("RAM")) {
-            source = "PLC:" + Model.RAM;
-        } else if (source.matches("RZE")) {
-            source = "PLC:" + Model.RZE;
-        } else if (source.matches("SWI")) {
-            source = "PLC:" + Model.SWI;
+        String radarName = "";
+        for(int i = 0; i < options.length; i++) {
+            if (source.matches(options[i].getRadarName())){
+                radarName = options[i].getRadarWMOName();
+                break;
+            }
         }
+
+        if(radarName.isEmpty()) {
+            System.out.println("Add " + source + " to options.xml");
+            System.exit(0);
+        }
+        
         cont.setSource(source);
 
         cont.setXsize(xsize);
