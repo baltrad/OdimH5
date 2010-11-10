@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 import org.apache.xerces.parsers.DOMParser;
@@ -72,6 +73,9 @@ public class Model {
     protected final String H5_LONG = "long";
     protected final String H5_DOUBLE = "double";
     protected final String H5_SEQUENCE = "sequence";
+    
+    
+    protected final String IMAGE_VER = "1.2";
     protected final String H5_DATA_CHUNK = "20";
     protected final String H5_GZIP_LEVEL = "2";
 
@@ -980,6 +984,7 @@ public class Model {
             System.exit(0);
         }
     }
+
 
     /**
      * Function reads Rainbow data section from Rainbow file and puts it into an

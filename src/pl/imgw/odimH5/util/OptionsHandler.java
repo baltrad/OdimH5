@@ -22,6 +22,7 @@ public class OptionsHandler {
     public final static String OPTION_XML_FILE = "options.xml";
 
     public final static String WMO_ID = "WMO_id";
+    public final static String FILE_NAME = "file_name";
     public final static String ADDRESS = "address";
     public final static String LOGIN = "login";
     public final static String PASSWORD = "password";
@@ -76,6 +77,8 @@ public class OptionsHandler {
             
             options[i].setRadarWMOName(Model.getValueByName(radarList.item(i),
                     WMO_ID, null));
+            options[i].setFileName(Model.getValueByName(radarList.item(i),
+                    FILE_NAME, null));
             options[i].setAddress(Model.getValueByName(radarList.item(i),
                     ADDRESS, null));
             options[i].setLogin(Model.getValueByName(radarList.item(i), LOGIN,
@@ -135,6 +138,7 @@ public class OptionsHandler {
         System.out.println("<options>");
         System.out.println("    <radar name=\"NAME\">");
         System.out.println("        <" + WMO_ID + ">WMO_ID</" + WMO_ID + ">");
+        System.out.println("        <" + FILE_NAME + ">FILE NAME PREFIX</" + FILE_NAME + ">");
         System.out.println("        <" + ADDRESS + ">IP</" + ADDRESS + ">");
         System.out.println("        <" + LOGIN + ">LOGIN</" + LOGIN + ">");
         System.out.println("        <" + PASSWORD + ">PASS</" + PASSWORD + ">");

@@ -125,6 +125,13 @@ public class ModelRHI_H5 {
                 HDF5Constants.H5T_STD_U16BE, dataspace_id, Integer
                         .parseInt(rb.H5_DATA_CHUNK), Integer
                         .parseInt(rb.H5_GZIP_LEVEL), verbose);
+        
+        proc.H5Acreate_any_wrap(grandchild_group_id, "CLASS",
+                rb.H5_STRING, "IMAGE", verbose);
+        
+        proc.H5Acreate_any_wrap(grandchild_group_id, "IMAGE_VERSION",
+                rb.H5_STRING, rb.IMAGE_VER, verbose);
+                        
 
         infDataBuff = proc.transposeArray(infDataBuff, dim_x, dim_y);
 

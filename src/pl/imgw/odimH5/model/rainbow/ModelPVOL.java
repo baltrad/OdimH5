@@ -75,20 +75,20 @@ public class ModelPVOL {
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
         String radarName = "";
-        for(int i = 0; i < options.length; i++) {
-            if (source.matches(options[i].getRadarName())){
+        for (int i = 0; i < options.length; i++) {
+            if (source.matches(options[i].getRadarName())) {
                 radarName = options[i].getRadarWMOName();
                 break;
             }
         }
 
-        if(radarName.isEmpty()) {
+        if (radarName.isEmpty()) {
             System.out.println("Add " + source + " to options.xml");
             System.exit(0);
         } else {
             source = "WMO:" + radarName;
         }
-        
+
         cont.setSource(source);
 
         // ============== where group ============================
@@ -122,11 +122,11 @@ public class ModelPVOL {
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "wavelen", verbose);
         cont.setWavelength(rb.getRAINBOWMetadataElement(nodeList, "", verbose));
-        
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "antspeed", verbose);
-        int antSpeed = Integer.parseInt(rb.getRAINBOWMetadataElement(nodeList, "", verbose));
-        int shift = (int)(360.0/antSpeed);
+        int antSpeed = Integer.parseInt(rb.getRAINBOWMetadataElement(nodeList,
+                "", verbose));
+        int shift = (int) (360.0 / antSpeed);
 
         // ===================== datasetn group =============================
 
@@ -160,8 +160,9 @@ public class ModelPVOL {
             slice.setStartTime(rb.parseRAINBOWTime(rb.getValueByName(sliceList
                     .item(i), "slicedata", "time"), verbose));
             slice.setEndDate(slice.getStartDate());
-            
-            slice.setEndTime(rb.parseRAINBOWTime(slice.getStartTime(), shift, verbose));
+
+            slice.setEndTime(rb.parseRAINBOWTime(slice.getStartTime(), shift,
+                    verbose));
             // ============= datasetn specific where group ============
 
             slice.setPangle(rb.getValueByName(sliceList.item(i), "posangle",
@@ -175,6 +176,9 @@ public class ModelPVOL {
 
             String rangestep = (rb.getValueByName(sliceList.item(i),
                     "rangestep", null));
+
+            // changing km to m
+            rangestep = String.valueOf(Double.parseDouble(rangestep) * 1000);
 
             if (rangestep == null)
                 rangestep = "0";
@@ -312,10 +316,10 @@ public class ModelPVOL {
                     cnt.getSlices()[i].getStartDate(), od, rb.H5_STRING));
             dataset_what.appendChild(rb.makeAttr("starttime",
                     cnt.getSlices()[i].getStartTime(), od, rb.H5_STRING));
-            dataset_what.appendChild(rb.makeAttr("enddate",
-                    cnt.getSlices()[i].getEndDate(), od, rb.H5_STRING));
-            dataset_what.appendChild(rb.makeAttr("endtime",
-                    cnt.getSlices()[i].getEndTime(), od, rb.H5_STRING));
+            dataset_what.appendChild(rb.makeAttr("enddate", cnt.getSlices()[i]
+                    .getEndDate(), od, rb.H5_STRING));
+            dataset_what.appendChild(rb.makeAttr("endtime", cnt.getSlices()[i]
+                    .getEndTime(), od, rb.H5_STRING));
             dataset.appendChild(dataset_what);
 
             Element dataset_where = od.createElement(rb.H5_GROUP);
@@ -507,8 +511,8 @@ public class ModelPVOL {
             int rays = Integer.parseInt(cnt.getSlices()[i].getRays());
             int bins = Integer.parseInt(cnt.getSlices()[i].getBins());
 
-            int dataspace_id = proc.H5Screate_simple_wrap(2, rays, bins,
-                    null, verbose);
+            int dataspace_id = proc.H5Screate_simple_wrap(2, rays, bins, null,
+                    verbose);
 
             grandgrandchild_group_id = proc.H5Dcreate_wrap(grandchild_group_id,
                     "data", HDF5Constants.H5T_STD_U8BE, dataspace_id, Integer
@@ -517,19 +521,18 @@ public class ModelPVOL {
 
             proc.H5Acreate_any_wrap(grandgrandchild_group_id, "CLASS",
                     rb.H5_STRING, "IMAGE", verbose);
+            proc.H5Acreate_any_wrap(grandgrandchild_group_id, "IMAGE_VERSION",
+                    rb.H5_STRING, rb.IMAGE_VER, verbose);
 
-            
             int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(cnt
-                    .getSlices()[i].getDataBuff().getDataBuffer(), bins,
-                    rays, verbose);
+                    .getSlices()[i].getDataBuff().getDataBuffer(), bins, rays,
+                    verbose);
 
             // przesunac azymuty
-            infDataBuff = proc.shiftAzimuths(infDataBuff, rays,
-                    bins, Integer.parseInt(cnt.getSlices()[i].getA1gate()));
-            
+            infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins, Integer
+                    .parseInt(cnt.getSlices()[i].getA1gate()));
+
             infDataBuff = proc.transposeArray(infDataBuff, rays, bins);
-            
-            
 
             proc.H5Dwrite_wrap(grandgrandchild_group_id,
                     HDF5Constants.H5T_NATIVE_INT, HDF5Constants.H5S_ALL,
@@ -568,8 +571,7 @@ public class ModelPVOL {
                 counter = i;
             }
         }
-        
-        
+
         return counter;
     }
 

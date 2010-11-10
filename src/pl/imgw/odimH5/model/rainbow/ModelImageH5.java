@@ -149,6 +149,9 @@ public class ModelImageH5 {
         
         proc.H5Acreate_any_wrap(grandchild_group_id, "CLASS",
                 rb.H5_STRING, "IMAGE", verbose);
+        
+        proc.H5Acreate_any_wrap(grandchild_group_id, "IMAGE_VERSION",
+                rb.H5_STRING, rb.IMAGE_VER, verbose);
 
         infDataBuff = proc.transposeArray(infDataBuff, dim_x, dim_y);
         

@@ -15,6 +15,7 @@ public class OptionContainer {
 
     private String radarName;
     private String radarWMOName;
+    private String fileName;
     private String address;
     private String login;
     private String password;
@@ -34,6 +35,14 @@ public class OptionContainer {
 
     public void setRadarWMOName(String radarWMOName) {
         this.radarWMOName = radarWMOName;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getAddress() {
