@@ -22,16 +22,16 @@ public class DataBufferContainer {
         // Data buffer
         private byte[] dataBuff = {0};
         // Number of bits used to describe one pixel
-        private int depth = 0;
+//        private int depth = 0;
         
 
         
-        public int getDepth() {
-            return depth;
-        }
-        public void setDepth(int depth) {
-            this.depth = depth;
-        }
+//        public int getDepth() {
+//            return depth;
+//        }
+//        public void setDepth(int depth) {
+//            this.depth = depth;
+//        }
         /**
          * Method returns data buffer length
          *

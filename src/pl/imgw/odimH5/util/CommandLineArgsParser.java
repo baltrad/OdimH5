@@ -168,7 +168,7 @@ public class CommandLineArgsParser {
                 cmd.hasOption(INPUT_FILE_OPTION)
                 && cmd.hasOption(FILE_OBJECT_OPTION)
                 && cmd.hasOption(PLATFORM_OPTION)
-                && cmd.hasOption(OUTPUT_FILE_OPTION)
+                
 
                 || cmd.hasOption(CONTINOUOS_OPTION)
 

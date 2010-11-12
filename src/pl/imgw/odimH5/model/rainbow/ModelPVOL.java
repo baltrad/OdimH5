@@ -5,6 +5,7 @@ package pl.imgw.odimH5.model.rainbow;
 
 import java.io.File;
 import java.sql.Time;
+import java.util.HashMap;
 
 import ncsa.hdf.hdf5lib.HDF5Constants;
 
@@ -52,7 +53,8 @@ public class ModelPVOL {
             boolean verbose, Model rb, OptionContainer[] options) {
 
         boolean isDirect = false;
-        if (fileNameOut.endsWith(".h5"))
+        if (fileNameOut.isEmpty() || fileNameOut.endsWith(".h5")
+                || fileNameOut.endsWith(".hdf"))
             isDirect = true;
 
         ParametersContainer cont = new ParametersContainer();
@@ -75,11 +77,12 @@ public class ModelPVOL {
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
         String radarName = "";
+        String filePrefix = "";
+
         for (int i = 0; i < options.length; i++) {
             if (source.matches(options[i].getRadarName())) {
                 radarName = options[i].getRadarWMOName();
-                fileNameOut = options[i].getFileName()
-                        + fileNameOut.substring(0, 12) + ".h5";
+                filePrefix = options[i].getFileName();
                 break;
             }
         }
@@ -115,6 +118,10 @@ public class ModelPVOL {
         cont.setDate(rb.parseRAINBOWDate(date, verbose));
         cont.setTime(rb.parseRAINBOWTime(time, verbose));
 
+        if (fileNameOut.isEmpty()) {
+            fileNameOut = filePrefix + cont.getDate()
+                    + cont.getTime().substring(0, 4) + ".h5";
+        }
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "volume", verbose);
         cont.setSwVersion(rb.getRAINBOWMetadataElement(nodeList, "version",
                 verbose));
@@ -136,6 +143,9 @@ public class ModelPVOL {
         int datasetSize = sliceList.getLength();
 
         SliceContainer slices[] = new SliceContainer[datasetSize];
+
+        HashMap<Integer, DataBufferContainer> blobs = rb
+                .getAllRainbowDataBlobs(fileBuff, verbose);
 
         // String sliceTime[] = new String[datasetSize];
         // String sliceDate[] = new String[datasetSize];
@@ -196,20 +206,24 @@ public class ModelPVOL {
             int dataBlobNumber = Integer.parseInt(rb.getValueByName(sliceList
                     .item(i), "rawdata", "blobid"));
 
-            if (firstBlob == -1) {
-                firstBlob = rb.getMin(raysBlobNumber, dataBlobNumber);
-            }
+            // if (firstBlob == -1) {
+            // firstBlob = rb.getMin(raysBlobNumber, dataBlobNumber);
+            // }
 
             int raysDepth = Integer.parseInt(rb.getValueByName(sliceList
                     .item(i), "rayinfo", "depth"));
             dataDepth = Integer.parseInt(rb.getValueByName(sliceList.item(i),
                     "rawdata", "depth"));
 
-            dataBuff = rb.getRainbowDataSection(fileBuff, dataBlobNumber,
-                    dataDepth, firstBlob, verbose);
+            // dataBuff = rb.getRainbowDataSection(fileBuff, dataBlobNumber,
+            // firstBlob, verbose);
 
-            DataBufferContainer raysBuff = rb.getRainbowDataSection(fileBuff,
-                    raysBlobNumber, raysDepth, firstBlob, verbose);
+            dataBuff = blobs.get(dataBlobNumber);
+
+            // DataBufferContainer raysBuff = rb.getRainbowDataSection(fileBuff,
+            // raysBlobNumber, firstBlob, verbose);
+
+            DataBufferContainer raysBuff = blobs.get(raysBlobNumber);
 
             byte[] infRaysBuff = rb.inflate1DRAINBOWDataSection(raysBuff
                     .getDataBuffer(), raysBuff.getDataBufferLength(), verbose);

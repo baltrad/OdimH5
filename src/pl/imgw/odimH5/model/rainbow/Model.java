@@ -73,8 +73,7 @@ public class Model {
     protected final String H5_LONG = "long";
     protected final String H5_DOUBLE = "double";
     protected final String H5_SEQUENCE = "sequence";
-    
-    
+
     protected final String IMAGE_VER = "1.2";
     protected final String H5_DATA_CHUNK = "20";
     protected final String H5_GZIP_LEVEL = "2";
@@ -985,6 +984,118 @@ public class Model {
         }
     }
 
+    /**
+     * Function reads Rainbow data section from Rainbow file and puts it into an
+     * array
+     * 
+     * @param fileBuff
+     *            File buffer
+     * @param blobNumber
+     *            Number of the blob in the volume file (starting with 1)
+     * @param depth
+     *            Number of bits used to describe one pixel.
+     * @param firstBlob
+     *            Starting blob number
+     * 
+     * @return Byte array containing data section
+     */
+    public HashMap<Integer, DataBufferContainer> getAllRainbowDataBlobs(
+            byte[] fileBuff, boolean verbose) {
+
+        
+        HashMap<Integer, DataBufferContainer> blobs = new HashMap<Integer, DataBufferContainer>();
+
+        // Data section tags
+        final String START_BIN = "<BLOB";
+        final String END_BIN = "</BLOB>";
+        // Tag buffers
+        byte[] start_bin_buf = new byte[6];
+        byte[] end_bin_buf = new byte[8];
+        // Data buffer
+        byte[] data_buf = null;
+        // Tag strings
+        String start_bin_seq = "";
+        String end_bin_seq = "";
+        // Current offset
+        int offset = 0;
+        // Data section markers
+        int start_bin = 0;
+        int end_bin = 0;
+        // Seek for data section
+
+        int blobNumber = 0;
+
+        int current = -1;
+        while (offset < fileBuff.length) {
+            try {
+                while (offset < fileBuff.length) {
+                    // Data section start
+
+                    start_bin_buf[5] = fileBuff[offset];
+                    for (int i = 1; i <= 5; i++) {
+                        start_bin_buf[i - 1] = start_bin_buf[i];
+                    }
+                    for (int i = 0; i < 5; i++) {
+                        start_bin_seq += (char) start_bin_buf[i];
+                    }
+                    if (start_bin_seq.matches(START_BIN)) {
+                        while ((char) fileBuff[offset] != '>') {
+                            offset++;
+                        }
+                        start_bin = offset;
+                        current++;
+                    }
+                    // Data section end
+                    end_bin_buf[7] = fileBuff[offset];
+                    for (int i = 1; i <= 7; i++) {
+                        end_bin_buf[i - 1] = end_bin_buf[i];
+                    }
+                    for (int i = 0; i < 7; i++) {
+                        end_bin_seq += (char) end_bin_buf[i];
+                    }
+                    if (end_bin_seq.matches(END_BIN) && current == blobNumber) {
+                        end_bin = offset;
+                        break;
+                    }
+                    start_bin_seq = "";
+                    end_bin_seq = "";
+                    offset++;
+                }
+                // Read 4 bytes representing data length
+                byte[] data_byte = new byte[4];
+                for (int i = 0; i < 4; i++) {
+                    data_byte[i] = fileBuff[start_bin + i + 2];
+                }
+                // Read data into data array
+                start_bin += 6;
+                end_bin -= 6;
+                int bin_count = 0;
+                data_buf = new byte[end_bin - start_bin];
+                for (int i = start_bin; i < end_bin; i++) {
+                    data_buf[bin_count] = fileBuff[i];
+                    bin_count++;
+                }
+
+                int buffLen = byteArray2Int(data_byte);
+                DataBufferContainer dbc = new DataBufferContainer();
+                dbc.setDataBuffer(data_buf);
+                dbc.setDataBufferLength(buffLen);
+                
+
+                blobs.put(blobNumber, dbc);
+                msgl.showMessage("Reading RAINBOW data section from BLOB "
+                        + blobNumber, verbose);
+                blobNumber++;
+
+
+            } catch (Exception e) {
+                msgl.showMessage(
+                        "Error while reading RAINBOW data section from BLOB "
+                                + blobNumber, verbose);
+            }
+        }
+        return blobs;
+    }
 
     /**
      * Function reads Rainbow data section from Rainbow file and puts it into an
@@ -1002,7 +1113,7 @@ public class Model {
      * @return Byte array containing data section
      */
     public DataBufferContainer getRainbowDataSection(byte[] fileBuff,
-            int blobNumber, int depth, int firstBlob, boolean verbose) {
+            int blobNumber, int firstBlob, boolean verbose) {
 
         DataBufferContainer dbc = new DataBufferContainer();
 
@@ -1077,7 +1188,7 @@ public class Model {
             int buffLen = byteArray2Int(data_byte);
             dbc.setDataBuffer(data_buf);
             dbc.setDataBufferLength(buffLen);
-            dbc.setDepth(depth);
+//            dbc.setDepth(depth);
 
             msgl.showMessage("Reading RAINBOW data section from BLOB "
                     + blobNumber, verbose);

@@ -130,7 +130,7 @@ public class BaltradLocalFeeder extends Thread {
                 e.printStackTrace();
             }
 
-            if (!ModelPVOL.createDescriptor(fileNameH5, file_buf, this.verbose,
+            if (!ModelPVOL.createDescriptor("", file_buf, this.verbose,
                     this.rb, options))
                 return;
         } else if (filePath.path.endsWith(".h5") || filePath.path.endsWith(".hdf")) {

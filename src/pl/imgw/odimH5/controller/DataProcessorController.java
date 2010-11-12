@@ -104,9 +104,15 @@ public class DataProcessorController {
             msgl.showMessage("Conversion completed.", verbose);
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
-                && cmd.hasArgument(cmd.OUTPUT_FILE_OPTION)
-                && cmd.hasArgument(cmd.FILE_OBJECT_OPTION)
+
+        && cmd.hasArgument(cmd.FILE_OBJECT_OPTION)
                 && cmd.hasArgument(cmd.PLATFORM_OPTION)) {
+
+            String fileName = "";
+            if (cmd.hasArgument(cmd.OUTPUT_FILE_OPTION))
+                fileName = cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION);
+            else
+                fileName = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + ".h5";
 
             msgl.showMessage("Conversion mode selected", verbose);
 
@@ -116,7 +122,7 @@ public class DataProcessorController {
                         + OptionsHandler.OPTION_XML_FILE);
                 return;
             }
-            
+
             OptionContainer[] options = OptionsHandler.getOptions(doc);
             // Read input file
             byte[] fileBuff = proc.readDataFile(cmd
@@ -127,27 +133,23 @@ public class DataProcessorController {
 
                 if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.PVOL)) {
-                    ModelPVOL.createDescriptor(cmd
-                            .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
-                            fileBuff, verbose, rainbow, options);
+                    ModelPVOL.createDescriptor(fileName, fileBuff, verbose,
+                            rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.IMAGE)) {
-                    ModelImage.createDescriptor(cmd
-                            .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
-                            fileBuff, verbose, rainbow, options);
+                    ModelImage.createDescriptor(fileName, fileBuff, verbose,
+                            rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.VP)) {
-                    ModelVP.createDescriptor(cmd
-                            .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
-                            fileBuff, verbose, rainbow, options);
+                    ModelVP.createDescriptor(fileName, fileBuff, verbose,
+                            rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.RHI)) {
-                    ModelRHI.createDescriptor(cmd
-                            .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
-                            fileBuff, verbose, rainbow, options);
+                    ModelRHI.createDescriptor(fileName, fileBuff, verbose,
+                            rainbow, options);
                 }
 
             }

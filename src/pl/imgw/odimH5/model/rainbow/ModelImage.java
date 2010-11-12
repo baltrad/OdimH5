@@ -227,9 +227,9 @@ public class ModelImage {
         int firstBlob = rb.getMin(flagBlobNumber, dataBlobNumber);
 
         DataBufferContainer dataBuff = rb.getRainbowDataSection(fileBuff,
-                dataBlobNumber, dataDepth, firstBlob, verbose);
+                dataBlobNumber, firstBlob, verbose);
         DataBufferContainer maskBuff = rb.getRainbowDataSection(fileBuff,
-                flagBlobNumber, flagDepth, firstBlob, verbose);
+                flagBlobNumber, firstBlob, verbose);
 
         // Inflate radar data section and mask section
         int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(dataBuff
