@@ -78,6 +78,8 @@ public class ModelPVOL {
         for (int i = 0; i < options.length; i++) {
             if (source.matches(options[i].getRadarName())) {
                 radarName = options[i].getRadarWMOName();
+                fileNameOut = options[i].getFileName()
+                        + fileNameOut.substring(0, 12) + ".h5";
                 break;
             }
         }
