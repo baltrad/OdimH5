@@ -24,7 +24,7 @@ import pl.imgw.odimH5.util.MessageLogger;
  */
 public class Main {
 
-    public static final String VERSION = "2.6";
+    public static final String VERSION = "2.11";
     
     /**
      * Main method creating
