@@ -62,31 +62,78 @@ public class OptionsHandler {
      * @param doc
      * @return
      */
-    public static OptionContainer[] getOptions(Document doc) {
+    public static RadarOptions[] getRadarOptions(Document doc) {
 
         NodeList radarList = doc.getElementsByTagName("radar");
         int counter = radarList.getLength();
-        OptionContainer[] options = new OptionContainer[counter];
+        RadarOptions[] options = new RadarOptions[counter];
 
         for (int i = 0; i < counter; i++) {
 
-            options[i] = new OptionContainer();
+            options[i] = new RadarOptions();
 
             options[i].setRadarName(radarList.item(i).getAttributes()
                     .getNamedItem("name").getNodeValue());
-            
+
             options[i].setRadarWMOName(Model.getValueByName(radarList.item(i),
                     WMO_ID, null));
             options[i].setFileName(Model.getValueByName(radarList.item(i),
                     FILE_NAME, null));
-            options[i].setAddress(Model.getValueByName(radarList.item(i),
-                    ADDRESS, null));
-            options[i].setLogin(Model.getValueByName(radarList.item(i), LOGIN,
-                    null));
-            options[i].setPassword(Model.getValueByName(radarList.item(i),
-                    PASSWORD, null));
             options[i].setDir(Model.getValueByName(radarList.item(i),
                     DIRECTORY, null));
+        }
+        return options;
+    }
+
+    /**
+     * 
+     * This method reads Baltrad options from XML document
+     * 
+     * @param doc
+     * @return
+     */
+    public static BaltradOptions getBaltrad(Document doc) {
+        
+        NodeList baltradList = doc.getElementsByTagName("baltrad");
+        
+        if(baltradList.getLength() == 0) {
+            return null;
+        }
+        BaltradOptions options = new BaltradOptions();
+        
+            
+            options.setSender(Model.getValueByName(baltradList.item(0),
+                    SENDER, null));
+            options.setServer(Model.getValueByName(baltradList.item(0), SERVER,
+                    null));
+        
+        return options;
+    }
+    /**
+     * 
+     * This method reads FTP options from XML document
+     * 
+     * @param doc
+     * @return
+     */
+    public static FTP_Options[] getFTPOptions(Document doc) {
+
+        NodeList ftpList = doc.getElementsByTagName("ftp");
+        int counter = ftpList.getLength();
+        FTP_Options[] options = new FTP_Options[counter];
+
+        for (int i = 0; i < counter; i++) {
+
+            options[i] = new FTP_Options();
+
+            options[i].setAddress(Model.getValueByName(ftpList.item(i),
+                    ADDRESS, null));
+            options[i].setLogin(Model.getValueByName(ftpList.item(i), LOGIN,
+                    null));
+            options[i].setPassword(Model.getValueByName(ftpList.item(i),
+                    PASSWORD, null));
+            options[i].setDir(Model.getValueByName(ftpList.item(i), DIRECTORY,
+                    null));
         }
         return options;
     }
@@ -138,23 +185,28 @@ public class OptionsHandler {
         System.out.println("<options>");
         System.out.println("    <radar name=\"NAME\">");
         System.out.println("        <" + WMO_ID + ">WMO_ID</" + WMO_ID + ">");
-        System.out.println("        <" + FILE_NAME + ">FILE NAME PREFIX</" + FILE_NAME + ">");
-        System.out.println("        <" + ADDRESS + ">IP</" + ADDRESS + ">");
+        System.out.println("        <" + FILE_NAME + ">FILE NAME PREFIX</"
+                + FILE_NAME + ">");
+        System.out.println("    </radar>");
+        System.out.println("    <ftp>");
+        System.out.println("        <" + ADDRESS + ">FTP</" + ADDRESS + ">");
         System.out.println("        <" + LOGIN + ">LOGIN</" + LOGIN + ">");
         System.out.println("        <" + PASSWORD + ">PASS</" + PASSWORD + ">");
         System.out
                 .println("        <" + DIRECTORY + ">DIR</" + DIRECTORY + ">");
-        System.out.println("    </radar>");
+        System.out.println("    </ftp>");
+        System.out.println("    <baltrad>");
         // System.out.println("    <start_time>mm</start_time>");
-//        System.out.println("    <" + REPETITION + " >mm</" + REPETITION + ">");
-        System.out.println("    <" + SERVER + ">HTTP_address</" + SERVER + ">");
-        System.out.println("    <" + SENDER + ">Baltrad.IMGW.pl</" + SENDER
+        // System.out.println("    <" + REPETITION + " >mm</" + REPETITION +
+        // ">");
+        System.out.println("        <" + SERVER + ">HTTP_address</" + SERVER + ">");
+        System.out.println("        <" + SENDER + ">Baltrad.IMGW.pl</" + SENDER
                 + ">");
+        System.out.println("    </baltrad>");
         System.out.println("</options>\n\n");
         System.out
                 .println("<address> <login> and <password> are optional for FTP handling.");
 
     }
-
 
 }

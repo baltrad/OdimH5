@@ -10,7 +10,7 @@ import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.DataProcessorModel;
 import pl.imgw.odimH5.util.DataBufferContainer;
-import pl.imgw.odimH5.util.OptionContainer;
+import pl.imgw.odimH5.util.RadarOptions;
 
 /**
  * 
@@ -40,7 +40,7 @@ public class ModelPVOLH5 {
      * @return name of new HDF5 file
      */
     public static String createDescriptor(String fileName, byte[] fileBuff,
-            boolean verbose, Model rb, DataProcessorModel proc, OptionContainer[] options) {
+            boolean verbose, Model rb, DataProcessorModel proc, RadarOptions[] options) {
 
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.VOLUME, verbose);
 

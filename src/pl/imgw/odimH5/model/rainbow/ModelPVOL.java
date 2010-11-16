@@ -19,7 +19,7 @@ import pl.imgw.odimH5.model.DataProcessorModel;
 import pl.imgw.odimH5.model.ParametersContainer;
 import pl.imgw.odimH5.model.SliceContainer;
 import pl.imgw.odimH5.util.DataBufferContainer;
-import pl.imgw.odimH5.util.OptionContainer;
+import pl.imgw.odimH5.util.RadarOptions;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class ModelPVOL {
 
     @SuppressWarnings("static-access")
     public static boolean createDescriptor(String fileNameOut, byte[] fileBuff,
-            boolean verbose, Model rb, OptionContainer[] options) {
+            boolean verbose, Model rb, RadarOptions[] options) {
 
         boolean isDirect = false;
         if (fileNameOut.isEmpty() || fileNameOut.endsWith(".h5")

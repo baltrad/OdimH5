@@ -19,6 +19,9 @@ import name.pachler.nio.file.WatchEvent;
 import name.pachler.nio.file.WatchKey;
 import name.pachler.nio.file.WatchService;
 
+import org.apache.commons.cli.Options;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 import org.w3c.dom.Document;
 
 import pl.imgw.odimH5.model.DataProcessorModel;
@@ -36,18 +39,19 @@ import pl.imgw.odimH5.model.rainbow.ModelPVOL;
 public class BaltradLocalFeeder extends Thread {
 
     WatchService watchService = FileSystems.getDefault().newWatchService();
-    private OptionContainer[] options;
+    private RadarOptions[] radarOptions;
+    private FTP_Options[] ftpOptions;
+    private BaltradOptions baltradOptions;
     Path[] watchedPath;
-    
+
     RadarOpt radarOpt = new RadarOpt();
 
-    HashMap<WatchKey, OptionContainer> pathMap = new HashMap<WatchKey, OptionContainer>();
+    HashMap<WatchKey, RadarOptions> pathMap = new HashMap<WatchKey, RadarOptions>();
     HashMap<RadarOpt, Long> fileTimeMap = new HashMap<RadarOpt, Long>();
 
     private Model rb;
     private DataProcessorModel proc;
-    private String sender, server;
-    
+
     private boolean verbose;
 
     /**
@@ -69,29 +73,29 @@ public class BaltradLocalFeeder extends Thread {
     public BaltradLocalFeeder(Document optionsDoc, Model rb,
             DataProcessorModel proc, boolean verbose) {
 
-        sender = OptionsHandler.getElementByName(optionsDoc,
-                OptionsHandler.SENDER);
-        server = OptionsHandler.getElementByName(optionsDoc,
-                OptionsHandler.SERVER);
-       
         this.rb = rb;
         this.proc = proc;
         this.verbose = verbose;
 
-        options = OptionsHandler.getOptions(optionsDoc);
-        watchedPath = new Path[options.length];
-        WatchKey key[] = new WatchKey[options.length];
-        
+        radarOptions = OptionsHandler.getRadarOptions(optionsDoc);
+        ftpOptions = OptionsHandler.getFTPOptions(optionsDoc);
+        baltradOptions = OptionsHandler.getBaltrad(optionsDoc);
 
-        for (int i = 0; i < options.length; i++) {
-            watchedPath[i] = Paths.get(options[i].getDir());
-            
+        watchedPath = new Path[radarOptions.length];
+        WatchKey key[] = new WatchKey[radarOptions.length];
+
+        for (int i = 0; i < radarOptions.length; i++) {
+
+            if (radarOptions[i].isEmpty())
+                continue;
+
+            watchedPath[i] = Paths.get(radarOptions[i].getDir());
 
             try {
                 key[i] = watchedPath[i].register(watchService,
                         StandardWatchEventKind.ENTRY_CREATE,
                         StandardWatchEventKind.ENTRY_MODIFY);
-                pathMap.put(key[i], options[i]);
+                pathMap.put(key[i], radarOptions[i]);
             } catch (UnsupportedOperationException uox) {
                 System.err.println("file watching not supported!");
                 // handle this error here
@@ -131,29 +135,80 @@ public class BaltradLocalFeeder extends Thread {
             }
 
             if (!ModelPVOL.createDescriptor("", file_buf, this.verbose,
-                    this.rb, options))
+                    this.rb, radarOptions))
                 return;
-        } else if (filePath.path.endsWith(".h5") || filePath.path.endsWith(".hdf")) {
+        } else if (filePath.path.endsWith(".h5")
+                || filePath.path.endsWith(".hdf")) {
             fileNameH5 = file.getName();
         } else {
             System.out.println("plik nie obslugiwany");
             return;
         }
+        
+        
+        System.out.println("ten plik jest tu: " + file.getAbsolutePath());
+        
+        if (!baltradOptions.isEmpty()) {
 
-        BaltradFrameHandler bfh = new BaltradFrameHandler(proc
-                .getMessageLogger(), server, verbose);
+            BaltradFrameHandler bfh = new BaltradFrameHandler(proc
+                    .getMessageLogger(), baltradOptions.getServer(), verbose);
 
-        String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
-                sender, filePath.radarName, fileNameH5);
+            String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
+                    baltradOptions.getSender(), filePath.radarName, fileNameH5);
 
-        // System.out.println("BFDataHdr:");
-        // System.out.println(a);
+            // System.out.println("BFDataHdr:");
+            // System.out.println(a);
 
-        BaltradFrame bf = new BaltradFrame(proc.getMessageLogger(), a,
-                fileNameH5, verbose);
+            BaltradFrame bf = new BaltradFrame(proc.getMessageLogger(), a,
+                    fileNameH5, verbose);
 
-        bfh.handleBF(bf);
+            bfh.handleBF(bf);
+        }
 
+        if (ftpOptions != null) {
+
+            for (int i = 0; i < ftpOptions.length; i++) {
+                if (ftpOptions[i].isEmpty())
+                    continue;
+
+                // sending file to FTP
+                FTPClient ftp = new FTPClient();
+                FileInputStream fis = null;
+
+                try {
+                    int reply;
+                    ftp.connect(ftpOptions[i].getAddress());
+
+                    // After connection attempt, you should check the reply code
+                    // to verify
+                    // success.
+                    reply = ftp.getReplyCode();
+
+                    if (!FTPReply.isPositiveCompletion(reply)) {
+                        ftp.disconnect();
+                        System.err.println("FTP server refused connection.");
+                        System.exit(1);
+                    }
+
+                    ftp.login(ftpOptions[i].getLogin(), ftpOptions[i]
+                            .getPassword());
+                    ftp.changeWorkingDirectory(ftpOptions[i].getDir());
+
+                    System.out.println("ten plik to: " + filePath.path);
+                    
+                    // transfer files
+                    fis = new FileInputStream(filePath.path);
+                    ftp.storeFile(fileNameH5, fis);
+
+                    ftp.logout();
+                } catch (IOException e) {
+
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
         // file.delete();
         // file = new File(fileNameH5);
         // file.delete();
@@ -189,7 +244,7 @@ public class BaltradLocalFeeder extends Thread {
                 Iterator<RadarOpt> itr = fileTimeMap.keySet().iterator();
                 while (itr.hasNext()) {
                     RadarOpt key = itr.next();
-                    
+
                     time = fileTimeMap.get(key);
                     if ((timeNow - time) > 3000) {
                         fileTimeMap.remove(key);
@@ -216,7 +271,7 @@ public class BaltradLocalFeeder extends Thread {
 
             }
             List<WatchEvent<?>> list = signalledKey.pollEvents();
-           
+
             radarOpt.path = pathMap.get(signalledKey).getDir() + "/";
             radarOpt.radarName = pathMap.get(signalledKey).getRadarName();
             // VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
@@ -229,14 +284,13 @@ public class BaltradLocalFeeder extends Thread {
                 if (e.kind() == StandardWatchEventKind.ENTRY_CREATE) {
                     Path context = (Path) e.context();
                     radarOpt.path += context.toString();
-                    System.out.println(radarOpt.radarName + ": " + radarOpt.path);
-                    fileTimeMap.put(radarOpt, System
-                            .currentTimeMillis());
+                    System.out.println(radarOpt.radarName + ": "
+                            + radarOpt.path);
+                    fileTimeMap.put(radarOpt, System.currentTimeMillis());
                 } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {
                     Path context = (Path) e.context();
                     radarOpt.path += context.toString();
-                    fileTimeMap.put(radarOpt, System
-                            .currentTimeMillis());
+                    fileTimeMap.put(radarOpt, System.currentTimeMillis());
                 } else if (e.kind() == StandardWatchEventKind.OVERFLOW) {
                     System.out
                             .println("OVERFLOW: more changes happened than we could retreive");
@@ -246,11 +300,11 @@ public class BaltradLocalFeeder extends Thread {
         }
 
     }
-    
-    class RadarOpt{
+
+    class RadarOpt {
         private String path = "";
         private String radarName = "";
-                
+
     }
-    
+
 }

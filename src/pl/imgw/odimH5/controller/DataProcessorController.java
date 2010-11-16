@@ -24,7 +24,7 @@ import pl.imgw.odimH5.util.BaltradFrameHandler;
 import pl.imgw.odimH5.util.BaltradLocalFeeder;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.MessageLogger;
-import pl.imgw.odimH5.util.OptionContainer;
+import pl.imgw.odimH5.util.RadarOptions;
 import pl.imgw.odimH5.util.OptionsHandler;
 
 /**
@@ -123,7 +123,7 @@ public class DataProcessorController {
                 return;
             }
 
-            OptionContainer[] options = OptionsHandler.getOptions(doc);
+            RadarOptions[] options = OptionsHandler.getRadarOptions(doc);
             // Read input file
             byte[] fileBuff = proc.readDataFile(cmd
                     .getArgumentValue(cmd.INPUT_FILE_OPTION), verbose);

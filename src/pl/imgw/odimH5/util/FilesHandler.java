@@ -60,7 +60,7 @@ public class FilesHandler {
 
     public static Vector<String> getVolFilesFTP(String server, String username,
             String password, String folder, Calendar start, Calendar end,
-            Model rb, DataProcessorModel proc, OptionContainer[] options,
+            Model rb, DataProcessorModel proc, RadarOptions[] options,
             boolean verbose) {
 
         Vector<String> fileName = new Vector<String>();
@@ -207,7 +207,7 @@ public class FilesHandler {
      */
     public static Vector<String> getVolFilesLocal(String folder,
             Calendar start, Calendar end, Model rb, DataProcessorModel proc,
-            OptionContainer[] options, boolean verbose) {
+            RadarOptions[] options, boolean verbose) {
 
         Vector<String> fileName = new Vector<String>();
 
