@@ -133,9 +133,14 @@ public class ModelPVOL {
         cont.setWavelength(rb.getRAINBOWMetadataElement(nodeList, "", verbose));
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "antspeed", verbose);
-        int antSpeed = Integer.parseInt(rb.getRAINBOWMetadataElement(nodeList,
+        double antSpeed = Double.parseDouble(rb.getRAINBOWMetadataElement(nodeList,
                 "", verbose));
         int shift = (int) (360.0 / antSpeed);
+        
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, "rangestep", verbose);
+        String rangestep = (rb.getRAINBOWMetadataElement(nodeList,
+                "", verbose));
+        rangestep = String.valueOf(Double.parseDouble(rangestep) * 1000);
 
         // ===================== datasetn group =============================
 
@@ -186,15 +191,12 @@ public class ModelPVOL {
             if (slice.getSrange() == null) // default value is "0"
                 slice.setSrange("0");
 
-            String rangestep = (rb.getValueByName(sliceList.item(i),
+            String rangestepslice = (rb.getValueByName(sliceList.item(i),
                     "rangestep", null));
 
-            // changing km to m
-            rangestep = String.valueOf(Double.parseDouble(rangestep) * 1000);
-
-            if (rangestep == null)
-                rangestep = "0";
-            slice.setRstep(rangestep);
+            if (rangestepslice == null)
+                rangestepslice = rangestep;
+            slice.setRstep(rangestepslice);
 
             slice.setRays(rb.getValueByName(sliceList.item(i), "rawdata",
                     "rays"));

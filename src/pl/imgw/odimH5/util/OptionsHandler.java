@@ -185,8 +185,9 @@ public class OptionsHandler {
         System.out.println("<options>");
         System.out.println("    <radar name=\"NAME\">");
         System.out.println("        <" + WMO_ID + ">WMO_ID</" + WMO_ID + ">");
-        System.out.println("        <" + FILE_NAME + ">FILE NAME PREFIX</"
+        System.out.println("        <" + FILE_NAME + ">FILE_NAME_PREFIX</"
                 + FILE_NAME + ">");
+        System.out.println("        <" + DIRECTORY + ">LOCAL_DIR</" + DIRECTORY + ">");
         System.out.println("    </radar>");
         System.out.println("    <ftp>");
         System.out.println("        <" + ADDRESS + ">FTP</" + ADDRESS + ">");
