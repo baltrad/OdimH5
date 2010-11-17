@@ -49,7 +49,7 @@ public class ModelPVOL {
      */
 
     @SuppressWarnings("static-access")
-    public static boolean createDescriptor(String fileNameOut, byte[] fileBuff,
+    public static String createDescriptor(String fileNameOut, byte[] fileBuff,
             boolean verbose, Model rb, RadarOptions[] options) {
 
         boolean isDirect = false;
@@ -62,7 +62,7 @@ public class ModelPVOL {
 
         Document inputDoc = rb.parseRAINBOWMetadataBuffer(hdrBuff, verbose);
         if (inputDoc == null)
-            return false;
+            return null;
 
         NodeList nodeList = null;
 
@@ -89,7 +89,7 @@ public class ModelPVOL {
 
         if (radarName.isEmpty()) {
             System.out.println("Add " + source + " to options.xml");
-            System.exit(0);
+            return null;
         } else {
             source = "WMO:" + radarName;
         }
@@ -122,6 +122,7 @@ public class ModelPVOL {
             fileNameOut = filePrefix + cont.getDate()
                     + cont.getTime().substring(0, 4) + ".h5";
         }
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "volume", verbose);
         cont.setSwVersion(rb.getRAINBOWMetadataElement(nodeList, "version",
                 verbose));
@@ -133,13 +134,12 @@ public class ModelPVOL {
         cont.setWavelength(rb.getRAINBOWMetadataElement(nodeList, "", verbose));
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "antspeed", verbose);
-        double antSpeed = Double.parseDouble(rb.getRAINBOWMetadataElement(nodeList,
-                "", verbose));
+        double antSpeed = Double.parseDouble(rb.getRAINBOWMetadataElement(
+                nodeList, "", verbose));
         int shift = (int) (360.0 / antSpeed);
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "rangestep", verbose);
-        String rangestep = (rb.getRAINBOWMetadataElement(nodeList,
-                "", verbose));
+        String rangestep = (rb.getRAINBOWMetadataElement(nodeList, "", verbose));
         rangestep = String.valueOf(Double.parseDouble(rangestep) * 1000);
 
         // ===================== datasetn group =============================
@@ -163,7 +163,6 @@ public class ModelPVOL {
         // String datatype[] = new String[datasetSize];
         // String min[] = new String[datasetSize];
         // String gain[] = new String[datasetSize];
-        int firstBlob = -1;
 
         for (int i = 0; i < datasetSize; i++) {
 
@@ -244,8 +243,14 @@ public class ModelPVOL {
 
             if (slice.getDatatype().matches(rb.DBZ))
                 slice.setDatatype("DBZH");
-            else if (slice.getDatatype().matches(rb.UPHIDP))
+            else if (slice.getDatatype().matches(rb.UPHIDP)) {
                 slice.setDatatype("PHIDP");
+                fileNameOut = cont.getDate() + cont.getTime().substring(0, 4)
+                        + slice.getDatatype() + ".h5";
+            } else {
+                fileNameOut = cont.getDate() + cont.getTime().substring(0, 4)
+                        + slice.getDatatype() + ".h5";
+            }
 
             slice.setMin(rb.getValueByName(sliceList.item(i), "dynz", "min"));
             String max = rb.getValueByName(sliceList.item(i), "dynz", "max");
@@ -255,9 +260,11 @@ public class ModelPVOL {
             slice.setDataBuff(dataBuff);
             slices[i] = slice;
 
+            
         }
 
         cont.setSlices(slices);
+        System.out.println("hdf ma nazwe: " + fileNameOut);
 
         if (isDirect) {
             makeH5(rb, verbose, cont, fileNameOut);
@@ -265,7 +272,7 @@ public class ModelPVOL {
             makeXML(rb, verbose, cont, fileNameOut);
         }
 
-        return true;
+        return fileNameOut;
 
     }
 

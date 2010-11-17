@@ -159,7 +159,7 @@ public class DataProcessorController {
 
         } else if (cmd.hasArgument(cmd.CONTINOUOS_OPTION)) {
 
-            msgl.showMessage("Baltrad feeder mode selected", verbose);
+            msgl.showMessage("Operational feeder mode selected", verbose);
 
             if (doc == null) {
                 OptionsHandler.exampleOptionXML();

@@ -113,14 +113,18 @@ public class BaltradLocalFeeder extends Thread {
      */
     private void convertAndSendFile(RadarOpt filePath) {
 
+        if (filePath.path.contains("KDP") || filePath.path.contains("PhiDP")
+                || filePath.path.contains("HV")
+                || filePath.path.contains("ZDR")) {
+
+            return;
+
+        }
+
         File file = new File(filePath.path);
         String fileNameH5 = "";
 
         if (filePath.path.endsWith(".vol")) {
-
-            fileNameH5 = file.getName().substring(0,
-                    file.getName().indexOf("."))
-                    + ".h5";
 
             int file_len = (int) file.length();
             byte[] file_buf = new byte[file_len];
@@ -134,20 +138,25 @@ public class BaltradLocalFeeder extends Thread {
                 e.printStackTrace();
             }
 
-            if (!ModelPVOL.createDescriptor("", file_buf, this.verbose,
-                    this.rb, radarOptions))
+            fileNameH5 = "hdf5/" + filePath.radarName;
+            File tmp = new File(fileNameH5);
+            if (!tmp.exists()) {
+                tmp.mkdir();
+            }
+
+            fileNameH5 = ModelPVOL.createDescriptor(tmp.getAbsolutePath() + "/"
+                    + file.getName() + ".h5", file_buf, this.verbose, this.rb,
+                    radarOptions);
+            if (fileNameH5 == null)
                 return;
         } else if (filePath.path.endsWith(".h5")
                 || filePath.path.endsWith(".hdf")) {
             fileNameH5 = file.getName();
         } else {
-            System.out.println("plik nie obslugiwany");
+            System.out.println("Format not supported");
             return;
         }
-        
-        
-        System.out.println("ten plik jest tu: " + file.getAbsolutePath());
-        
+
         if (!baltradOptions.isEmpty()) {
 
             BaltradFrameHandler bfh = new BaltradFrameHandler(proc
@@ -187,18 +196,27 @@ public class BaltradLocalFeeder extends Thread {
                     if (!FTPReply.isPositiveCompletion(reply)) {
                         ftp.disconnect();
                         System.err.println("FTP server refused connection.");
-                        System.exit(1);
+                        continue;
                     }
 
                     ftp.login(ftpOptions[i].getLogin(), ftpOptions[i]
                             .getPassword());
                     ftp.changeWorkingDirectory(ftpOptions[i].getDir());
 
-                    System.out.println("ten plik to: " + filePath.path);
-                    
+                    ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+                    ftp
+                            .setFileTransferMode(FTPClient.PASSIVE_REMOTE_DATA_CONNECTION_MODE);
+
                     // transfer files
-                    fis = new FileInputStream(filePath.path);
-                    ftp.storeFile(fileNameH5, fis);
+                    fis = new FileInputStream(fileNameH5);
+                    try {
+                        ftp.storeFile(filePath.prefix
+                                + file.getName().substring(0, 12) + ".h5", fis);
+                        fis.close();
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
 
                     ftp.logout();
                 } catch (IOException e) {
@@ -238,7 +256,6 @@ public class BaltradLocalFeeder extends Thread {
             }
 
             if (signalledKey == null) {
-                System.out.println("nic");
                 long time;
                 long timeNow = System.currentTimeMillis();
                 Iterator<RadarOpt> itr = fileTimeMap.keySet().iterator();
@@ -272,8 +289,6 @@ public class BaltradLocalFeeder extends Thread {
             }
             List<WatchEvent<?>> list = signalledKey.pollEvents();
 
-            radarOpt.path = pathMap.get(signalledKey).getDir() + "/";
-            radarOpt.radarName = pathMap.get(signalledKey).getRadarName();
             // VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
             // key to be reported again by the watch service
             signalledKey.reset();
@@ -283,14 +298,34 @@ public class BaltradLocalFeeder extends Thread {
             for (WatchEvent<?> e : list) {
                 if (e.kind() == StandardWatchEventKind.ENTRY_CREATE) {
                     Path context = (Path) e.context();
+
+                    radarOpt = new RadarOpt();
+                    radarOpt.path = pathMap.get(signalledKey).getDir();
+                    radarOpt.radarName = pathMap.get(signalledKey)
+                            .getRadarName();
+                    radarOpt.prefix = pathMap.get(signalledKey).getFileName();
+                    if (!radarOpt.path.endsWith("/"))
+                        radarOpt.path += "/";
+
                     radarOpt.path += context.toString();
-                    System.out.println(radarOpt.radarName + ": "
+
+                    System.out.println("New file " + radarOpt.radarName + ": "
                             + radarOpt.path);
                     fileTimeMap.put(radarOpt, System.currentTimeMillis());
                 } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {
                     Path context = (Path) e.context();
+
+                    radarOpt = new RadarOpt();
+                    radarOpt.path = pathMap.get(signalledKey).getDir();
+                    radarOpt.radarName = pathMap.get(signalledKey)
+                            .getRadarName();
+                    radarOpt.prefix = pathMap.get(signalledKey).getFileName();
+                    if (!radarOpt.path.endsWith("/"))
+                        radarOpt.path += "/";
+
                     radarOpt.path += context.toString();
                     fileTimeMap.put(radarOpt, System.currentTimeMillis());
+
                 } else if (e.kind() == StandardWatchEventKind.OVERFLOW) {
                     System.out
                             .println("OVERFLOW: more changes happened than we could retreive");
@@ -304,6 +339,7 @@ public class BaltradLocalFeeder extends Thread {
     class RadarOpt {
         private String path = "";
         private String radarName = "";
+        private String prefix = "";
 
     }
 
