@@ -279,6 +279,8 @@ public class ModelPVOL {
     private static void makeXML(Model rb, boolean verbose,
             ParametersContainer cnt, String fileName) {
 
+        DataProcessorModel proc = rb.getDataProcessorModel();
+        
         int datasetSize = cnt.getSlices().length;
 
         // Create XML document object
@@ -393,6 +395,9 @@ public class ModelPVOL {
             dataset1.setAttribute("dimensions", cnt.getSlices()[i].getRays()
                     + "x" + cnt.getSlices()[i].getBins());
             dataset1.setAttribute("gzip_level", rb.H5_GZIP_LEVEL);
+            
+            dataset1.setAttribute("class", "IMAGE");
+            dataset1.setAttribute("im_ver", rb.IMAGE_VER);
 
             String dataDir = rb.proc.createDirectory("data", verbose);
 
@@ -404,11 +409,20 @@ public class ModelPVOL {
             dataset.appendChild(data1);
             root.appendChild(dataset);
 
-            int width = Integer.parseInt(cnt.getSlices()[i].getRays());
-            int height = Integer.parseInt(cnt.getSlices()[i].getBins());
+            int rays = Integer.parseInt(cnt.getSlices()[i].getRays());
+            int bins = Integer.parseInt(cnt.getSlices()[i].getBins());
+            
+            
             int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(cnt
-                    .getSlices()[i].getDataBuff().getDataBuffer(), width,
-                    height, verbose);
+                    .getSlices()[i].getDataBuff().getDataBuffer(), bins, rays,
+                    verbose);
+
+         // przesunac azymuty
+            infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins, Integer
+                    .parseInt(cnt.getSlices()[i].getA1gate()));
+
+            infDataBuff = proc.transposeArray(infDataBuff, rays, bins);
+            
             rb.writeRAINBOWData(infDataBuff, dataFileName, verbose);
         }
 

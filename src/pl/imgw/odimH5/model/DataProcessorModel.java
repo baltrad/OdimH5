@@ -56,6 +56,9 @@ public class DataProcessorModel {
     private static final String XML_VERSION = "1.0";
     private static final String XML_ENCODING = "UTF-8";
 
+    private static final String H5_CLASS = "class";
+    private static final String H5_IM_VER = "im_ver";
+
     // Reference to MessageLogger object
     private MessageLogger msgl;
 
@@ -179,15 +182,27 @@ public class DataProcessorModel {
                 attr_name = attributes.getNamedItem(H5_OBJECT_NAME)
                         .getNodeValue();
                 dataset_id = H5Dcreate_wrap(cur_group_id, attr_name,
-                        HDF5Constants.H5T_STD_U16BE, dataspace_id, chunk,
+                        HDF5Constants.H5T_STD_U8BE, dataspace_id, chunk,
                         gZipLevel, verbose);
+                
+                attr_name = attributes.getNamedItem(H5_CLASS)
+                .getNodeValue();
+                
+                H5Acreate_any_wrap(dataset_id, "CLASS", "string", attr_name,
+                        verbose);
+                
+                attr_name = attributes.getNamedItem(H5_IM_VER)
+                .getNodeValue();
+                
+                H5Acreate_any_wrap(dataset_id, "IMAGE_VERSION", "string",
+                        attr_name, verbose);
+                
                 int[][] dataBuff = readData(attr_value, verbose);
-                int[][] buff = transposeArray(dataBuff, dim_x, dim_y);
 
                 status = H5Dwrite_wrap(dataset_id,
                         HDF5Constants.H5T_NATIVE_INT, HDF5Constants.H5S_ALL,
-                        HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, buff,
-                        verbose);
+                        HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
+                        dataBuff, verbose);
                 status = H5Dclose_wrap(dataset_id, verbose);
                 status = H5Sclose_wrap(dataspace_id, verbose);
             }
@@ -202,95 +217,6 @@ public class DataProcessorModel {
                         verbose);
                 NodeList childNodes = currentNode.getChildNodes();
                 H5FcreateFromXML(childNodes, child_group_id, verbose);
-                status = H5Gclose_wrap(child_group_id, verbose);
-            }
-        }
-    }
-
-    public void H5FcreateFromXML(NodeList nodeList, int cur_group_id,
-            boolean verbose, int[][] dataBuff) {
-
-        // Current XML node
-        Node currentNode = null;
-        // Attribute node map
-        NamedNodeMap attributes = null;
-        // HDF5 attribute name
-        String attr_name = null;
-        // HDF5 attribute class
-        String attr_class = null;
-        // HDF5 attribute value
-        String attr_value = null;
-        // Child group identifier
-        int child_group_id = -1;
-        // Dataspace identifier
-        int dataspace_id = -1;
-        // Dataset identifier
-        int dataset_id = -1;
-        // HDF5 operation status
-        @SuppressWarnings("unused")
-        int status = -1;
-
-        for (int i = 0; i < nodeList.getLength(); i++) {
-
-            currentNode = nodeList.item(i);
-            // If current node has attributes and represents HDF5 attribute
-            if (currentNode.hasAttributes()
-                    && currentNode.getNodeName().equals(XML_ATTR)) {
-                attributes = currentNode.getAttributes();
-                attr_name = attributes.getNamedItem(H5_OBJECT_NAME)
-                        .getNodeValue();
-                attr_class = attributes.getNamedItem(H5_OBJECT_CLASS)
-                        .getNodeValue();
-                attr_value = currentNode.getFirstChild().getNodeValue();
-
-                // Method creating HDF5 attributes of different types
-                H5Acreate_any_wrap(cur_group_id, attr_name, attr_class,
-                        attr_value, verbose);
-            }
-            // If curent node has children and represents HDF5 dataset
-            if (currentNode.hasAttributes()
-                    && currentNode.getNodeName().equals(H5_DATASET)) {
-                attributes = currentNode.getAttributes();
-                attr_value = currentNode.getFirstChild().getNodeValue();
-                attr_name = attributes.getNamedItem(H5_DIMENSIONS)
-                        .getNodeValue();
-                int dim_x = Integer.parseInt(attr_name.substring(0, attr_name
-                        .lastIndexOf("x")));
-                int dim_y = Integer.parseInt(attr_name.substring(attr_name
-                        .lastIndexOf("x") + 1, attr_name.length()));
-                dataspace_id = H5Screate_simple_wrap(2, dim_x, dim_y, null,
-                        verbose);
-                attr_name = attributes.getNamedItem(H5_DATA_CHUNK)
-                        .getNodeValue();
-                int chunk = Integer.parseInt(attr_name.substring(0, attr_name
-                        .lastIndexOf("x")));
-                attr_name = attributes.getNamedItem(H5_GZIP_LEVEL)
-                        .getNodeValue();
-                int gZipLevel = Integer.parseInt(attr_name);
-                attr_name = attributes.getNamedItem(H5_OBJECT_NAME)
-                        .getNodeValue();
-                dataset_id = H5Dcreate_wrap(cur_group_id, attr_name,
-                        HDF5Constants.H5T_STD_U16BE, dataspace_id, chunk,
-                        gZipLevel, verbose);
-                int[][] buff = transposeArray(dataBuff, dim_x, dim_y);
-
-                status = H5Dwrite_wrap(dataset_id,
-                        HDF5Constants.H5T_NATIVE_INT, HDF5Constants.H5S_ALL,
-                        HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT, buff,
-                        verbose);
-                status = H5Dclose_wrap(dataset_id, verbose);
-                status = H5Sclose_wrap(dataspace_id, verbose);
-            }
-
-            // If current node has children and represents HDF5 group
-            if (currentNode.hasChildNodes()
-                    && currentNode.getNodeName().equals(H5_GROUP)) {
-                String groupName = getXMLAttributeValue(currentNode,
-                        H5_OBJECT_NAME);
-                child_group_id = H5Gcreate_wrap(cur_group_id, groupName, 0,
-                        verbose);
-                NodeList childNodes = currentNode.getChildNodes();
-                H5FcreateFromXML(childNodes, child_group_id, verbose, dataBuff);
                 status = H5Gclose_wrap(child_group_id, verbose);
             }
         }
@@ -1068,39 +994,37 @@ public class DataProcessorModel {
      * @return transposed array
      */
     public int[][] transposeArray(int[][] intArray, int rays, int bins) {
-        
+
         int[][] newArray = new int[rays][bins];
-        
+
         for (int i = 0; i < bins; i++) {
             for (int j = 0; j < rays; j++) {
-                
+
                 newArray[j][i] = intArray[i][j];
             }
         }
-        
-        
-        
+
         return newArray;
     }
 
     /**
      * Function puts in order azimuths starting from 0 degree
      */
-    public int[][] shiftAzimuths(int[][] intArray, int rays,
-            int bins, int startingAzimuth) {
-        
+    public int[][] shiftAzimuths(int[][] intArray, int rays, int bins,
+            int startingAzimuth) {
+
         startingAzimuth = rays - startingAzimuth;
         int[][] newArray = new int[bins][rays];
         int newJ = 0;
         for (int i = 0; i < bins; i++) {
             for (int j = 0; j < rays; j++) {
-                
-                    newJ = (j + startingAzimuth) % rays;
-               
+
+                newJ = (j + startingAzimuth) % rays;
+
                 newArray[i][newJ] = intArray[i][j];
             }
         }
-        
+
         return newArray;
     }
 
