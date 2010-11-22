@@ -104,15 +104,14 @@ public class DataProcessorController {
             msgl.showMessage("Conversion completed.", verbose);
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
-
-        && cmd.hasArgument(cmd.FILE_OBJECT_OPTION)
+                && cmd.hasArgument(cmd.FILE_OBJECT_OPTION)
                 && cmd.hasArgument(cmd.PLATFORM_OPTION)) {
 
             String fileName = "";
             if (cmd.hasArgument(cmd.OUTPUT_FILE_OPTION))
                 fileName = cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION);
-            else
-                fileName = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + ".h5";
+//            else
+//                fileName = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + ".h5";
 
             msgl.showMessage("Conversion mode selected", verbose);
 

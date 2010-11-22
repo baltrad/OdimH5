@@ -19,7 +19,6 @@ import name.pachler.nio.file.WatchEvent;
 import name.pachler.nio.file.WatchKey;
 import name.pachler.nio.file.WatchService;
 
-import org.apache.commons.cli.Options;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.w3c.dom.Document;
@@ -121,16 +120,17 @@ public class BaltradLocalFeeder extends Thread {
 
         }
 
-        File file = new File(filePath.path);
+        File originalFile = new File(filePath.path);
+        File h5file = null;
         String fileNameH5 = "";
 
         if (filePath.path.endsWith(".vol")) {
 
-            int file_len = (int) file.length();
+            int file_len = (int) originalFile.length();
             byte[] file_buf = new byte[file_len];
 
             try {
-                FileInputStream fis = new FileInputStream(file);
+                FileInputStream fis = new FileInputStream(originalFile);
                 fis.read(file_buf, 0, file_len);
                 fis.close();
 
@@ -139,19 +139,20 @@ public class BaltradLocalFeeder extends Thread {
             }
 
             fileNameH5 = "hdf5/" + filePath.radarName;
-            File tmp = new File(fileNameH5);
-            if (!tmp.exists()) {
-                tmp.mkdir();
+            h5file = new File(fileNameH5);
+            if (!h5file.exists()) {
+                h5file.mkdir();
             }
 
-            fileNameH5 = ModelPVOL.createDescriptor(tmp.getAbsolutePath() + "/"
-                    + file.getName() + ".h5", file_buf, this.verbose, this.rb,
-                    radarOptions);
+            fileNameH5 = ModelPVOL.createDescriptor(h5file.getAbsolutePath()
+                    + "/" + originalFile.getName() + ".h5", file_buf,
+                    this.verbose, this.rb, radarOptions);
+            h5file = new File(fileNameH5);
             if (fileNameH5 == null)
                 return;
         } else if (filePath.path.endsWith(".h5")
                 || filePath.path.endsWith(".hdf")) {
-            fileNameH5 = file.getName();
+            fileNameH5 = originalFile.getName();
         } else {
             System.out.println("Format not supported");
             return;
@@ -207,16 +208,18 @@ public class BaltradLocalFeeder extends Thread {
                     ftp
                             .setFileTransferMode(FTPClient.PASSIVE_REMOTE_DATA_CONNECTION_MODE);
 
+                    String sendFileName = filePath.prefix
+                            + originalFile.getName().substring(0, 14) + ".tmp";
+
                     // transfer files
                     fis = new FileInputStream(fileNameH5);
-                    try {
-                        ftp.storeFile(filePath.prefix
-                                + file.getName().substring(0, 12) + ".h5", fis);
-                        fis.close();
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+
+                    ftp.storeFile(sendFileName, fis);
+                    fis.close();
+
+                    ftp
+                            .rename(sendFileName, sendFileName.replace("tmp",
+                                    "hdf"));
 
                     ftp.logout();
                 } catch (IOException e) {
@@ -227,7 +230,11 @@ public class BaltradLocalFeeder extends Thread {
             }
 
         }
-        // file.delete();
+        
+//        System.out.print("original file: " + originalFile.getAbsolutePath() + " ");
+//        System.out.print(originalFile.delete() + "\n");
+//        System.out.print("h5 file: " + h5file.getAbsolutePath() + " ");
+//        System.out.print(h5file.delete() + "\n");
         // file = new File(fileNameH5);
         // file.delete();
 
@@ -266,14 +273,14 @@ public class BaltradLocalFeeder extends Thread {
                     if ((timeNow - time) > 3000) {
                         fileTimeMap.remove(key);
                         itr = fileTimeMap.keySet().iterator();
-                        System.out.println(key.path + " download finished");
+                        System.out.println(key.radarName + " download finished");
                         convertAndSendFile(key);
 
                     }
                 }
                 if (fileTimeMap.isEmpty()) {
                     try {
-                        System.out.println("czekam na akcje....");
+                        System.out.println("Waiting....");
                         signalledKey = watchService.take();
                     } catch (ClosedWatchServiceException e1) {
                         // TODO Auto-generated catch block
@@ -309,7 +316,7 @@ public class BaltradLocalFeeder extends Thread {
 
                     radarOpt.path += context.toString();
 
-                    System.out.println("New file " + radarOpt.radarName + ": "
+                    System.out.println(radarOpt.radarName + " new file: "
                             + radarOpt.path);
                     fileTimeMap.put(radarOpt, System.currentTimeMillis());
                 } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {

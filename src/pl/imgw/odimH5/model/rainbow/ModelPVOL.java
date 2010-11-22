@@ -4,7 +4,6 @@
 package pl.imgw.odimH5.model.rainbow;
 
 import java.io.File;
-import java.sql.Time;
 import java.util.HashMap;
 
 import ncsa.hdf.hdf5lib.HDF5Constants;
@@ -120,7 +119,7 @@ public class ModelPVOL {
 
         if (fileNameOut.isEmpty()) {
             fileNameOut = filePrefix + cont.getDate()
-                    + cont.getTime().substring(0, 4) + ".h5";
+                    + cont.getTime() + ".h5";
         }
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "volume", verbose);
@@ -136,6 +135,7 @@ public class ModelPVOL {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "antspeed", verbose);
         double antSpeed = Double.parseDouble(rb.getRAINBOWMetadataElement(
                 nodeList, "", verbose));
+        
         int shift = (int) (360.0 / antSpeed);
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "rangestep", verbose);
@@ -190,12 +190,12 @@ public class ModelPVOL {
             if (slice.getSrange() == null) // default value is "0"
                 slice.setSrange("0");
 
-            String rangestepslice = (rb.getValueByName(sliceList.item(i),
-                    "rangestep", null));
-
-            if (rangestepslice == null)
-                rangestepslice = rangestep;
-            slice.setRstep(rangestepslice);
+//            String rangestepslice = (rb.getValueByName(sliceList.item(i),
+//                    "rangestep", null));
+//
+//            if (rangestepslice == null)
+//                rangestepslice = rangestep;
+            slice.setRstep(rangestep);
 
             slice.setRays(rb.getValueByName(sliceList.item(i), "rawdata",
                     "rays"));
@@ -211,8 +211,8 @@ public class ModelPVOL {
             // firstBlob = rb.getMin(raysBlobNumber, dataBlobNumber);
             // }
 
-            int raysDepth = Integer.parseInt(rb.getValueByName(sliceList
-                    .item(i), "rayinfo", "depth"));
+//            int raysDepth = Integer.parseInt(rb.getValueByName(sliceList
+//                    .item(i), "rayinfo", "depth"));
             dataDepth = Integer.parseInt(rb.getValueByName(sliceList.item(i),
                     "rawdata", "depth"));
 
@@ -264,7 +264,7 @@ public class ModelPVOL {
         }
 
         cont.setSlices(slices);
-        System.out.println("hdf ma nazwe: " + fileNameOut);
+//        System.out.println("hdf ma nazwe: " + fileNameOut);
 
         if (isDirect) {
             makeH5(rb, verbose, cont, fileNameOut);
@@ -327,7 +327,7 @@ public class ModelPVOL {
                 rb.H5_STRING));
         how.appendChild(rb.makeAttr("beamwidth", cnt.getBeamwidth(), od,
                 rb.H5_DOUBLE));
-        how.appendChild(rb.makeAttr("wavelength", cnt.getBeamwidth(), od,
+        how.appendChild(rb.makeAttr("wavelength", cnt.getWavelength(), od,
                 rb.H5_DOUBLE));
         root.appendChild(how);
 
