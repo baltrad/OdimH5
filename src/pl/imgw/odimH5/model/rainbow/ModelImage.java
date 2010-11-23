@@ -37,11 +37,11 @@ public class ModelImage {
      *            Rainbow class model
      */
     @SuppressWarnings("static-access")
-    public static void createDescriptor(String fileNameOut, byte[] fileBuff,
+    public static String createDescriptor(String fileNameOut, byte[] fileBuff,
             boolean verbose, Model rb, RadarOptions[] options) {
 
         boolean isDirect = false;
-        if (fileNameOut.endsWith(".h5"))
+        if (fileNameOut.endsWith(".h5") || fileNameOut.isEmpty())
             isDirect = true;
 
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.PRODUCT, verbose);
@@ -244,8 +244,12 @@ public class ModelImage {
         // =============================================================
         // Create XML document object
 
+        
         if (isDirect) {
 
+            if(fileNameOut.isEmpty())
+                fileNameOut = cont.getTime() + cont.getType() + ".h5";
+            
             ModelImageH5.createDescriptor(cont, rb, fileNameOut, infDataBuff,
                     verbose);
 
@@ -264,5 +268,6 @@ public class ModelImage {
             // Save data buffer to file
             rb.writeRAINBOWData(infDataBuff, dataFileName, verbose);
         }
+        return fileNameOut;
     }
 }

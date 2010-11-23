@@ -36,7 +36,7 @@ public class ModelRHI {
      * @param rb
      *            Rainbow class model
      */
-    public static void createDescriptor(String fileName, byte[] fileBuff,
+    public static String createDescriptor(String fileName, byte[] fileBuff,
             boolean verbose, Model rb, RadarOptions[] options) {
 
         boolean isDirect = false;
@@ -210,6 +210,7 @@ public class ModelRHI {
             rb.proc.saveXMLFile(od, fileName, verbose);
 
         }
+        return fileName;
     }
 
 }

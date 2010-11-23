@@ -51,7 +51,7 @@ public class OptionsHandler {
                     verbose);
         } catch (Exception e) {
             msgl.showMessage("Failed to parse options file: " + e.getMessage(),
-                    verbose);
+                    true);
         }
         return doc;
     }

@@ -24,7 +24,7 @@ import pl.imgw.odimH5.util.RadarOptions;
  */
 public class ModelVP {
 
-    public static void createDescriptor(String fileName, byte[] fileBuff,
+    public static String createDescriptor(String fileName, byte[] fileBuff,
             boolean verbose, Model rb, RadarOptions[] options) {
 
         
@@ -86,6 +86,7 @@ public class ModelVP {
         
         // Save XML document in file
         rb.proc.saveXMLFile(od, fileName, verbose);
+        return fileName;
     }
 
 }

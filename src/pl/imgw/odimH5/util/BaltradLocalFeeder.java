@@ -57,6 +57,7 @@ public class BaltradLocalFeeder extends Thread {
     private Model531 rb531;
     private Model rb;
     private DataProcessorModel proc;
+    private MessageLogger msgl;
 
     private boolean verbose;
 
@@ -73,16 +74,18 @@ public class BaltradLocalFeeder extends Thread {
      *            Rainbow model class instance
      * @param proc
      *            Data processor model class instance
+     * @param msgl
      * @param verbose
      *            verbose mode
      */
     public BaltradLocalFeeder(Document optionsDoc, Model rb, Model531 rb531,
-            DataProcessorModel proc, boolean verbose) {
+            DataProcessorModel proc, MessageLogger msgl, boolean verbose) {
 
         this.rb = rb;
         this.rb531 = rb531;
         this.proc = proc;
         this.verbose = verbose;
+        this.msgl = msgl;
 
         radarOptions = OptionsHandler.getRadarOptions(optionsDoc);
         ftpOptions = OptionsHandler.getFTPOptions(optionsDoc);
@@ -196,8 +199,10 @@ public class BaltradLocalFeeder extends Thread {
             BaltradFrame bf = new BaltradFrame(a, fileNameH5);
 
             if (bfh.handleBF(bf) == 1) {
-                System.out
-                        .println(filePath.radarName + " file sent to BALTRAD");
+
+                msgl.showMessage(filePath.radarName + " file sent to BALTRAD",
+                        true);
+
             } else {
                 System.out.println(filePath.radarName
                         + " failed to send file to BALTRAD");
@@ -246,14 +251,13 @@ public class BaltradLocalFeeder extends Thread {
                     ftp.storeFile(sendFileName, fis);
                     fis.close();
 
-                    ftp
-                            .rename(sendFileName, sendFileName.replace("tmp",
-                                    "hdf"));
+                    boolean sentOK = ftp.rename(sendFileName, sendFileName
+                            .replace("tmp", "hdf"));
 
                     ftp.logout();
 
-                    System.out
-                            .println(filePath.radarName + " file sent to FTP");
+                    msgl.showMessage(filePath.radarName + " file sent to "
+                            + ftpOptions[i].getAddress(), sentOK);
 
                 } catch (IOException e) {
 
@@ -307,15 +311,15 @@ public class BaltradLocalFeeder extends Thread {
                     if ((timeNow - time) > 3000) {
                         fileTimeMap.remove(key);
                         itr = fileTimeMap.keySet().iterator();
-                        System.out
-                                .println(key.radarName + " download finished");
+                        msgl.showMessage(key.radarName + " download finished",
+                                verbose);
                         convertAndSendFile(key);
 
                     }
                 }
                 if (fileTimeMap.isEmpty()) {
                     try {
-                        System.out.println("Waiting....");
+                        // System.out.println("Waiting....");
                         signalledKey = watchService.take();
                     } catch (ClosedWatchServiceException e1) {
                         // TODO Auto-generated catch block
@@ -352,8 +356,9 @@ public class BaltradLocalFeeder extends Thread {
 
                     radarOpt.path += context.toString();
 
-                    System.out.println(radarOpt.radarName + " new file: "
-                            + radarOpt.path);
+                    msgl.showMessage(radarOpt.radarName + " new file: "
+                            + radarOpt.path, verbose);
+
                     fileTimeMap.put(radarOpt, System.currentTimeMillis());
                 } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {
                     Path context = (Path) e.context();

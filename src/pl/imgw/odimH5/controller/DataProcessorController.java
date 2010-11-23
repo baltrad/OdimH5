@@ -110,8 +110,10 @@ public class DataProcessorController {
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
                 && cmd.hasArgument(cmd.FILE_OBJECT_OPTION)
                 && cmd.hasArgument(cmd.PLATFORM_OPTION)) {
-
+            
             String fileName = "";
+            String fileNameOut = "";
+
             if (cmd.hasArgument(cmd.OUTPUT_FILE_OPTION))
                 fileName = cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION);
             // else
@@ -136,22 +138,22 @@ public class DataProcessorController {
 
                 if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.PVOL)) {
-                    ModelPVOL.createDescriptor(fileName, fileBuff, verbose,
+                    fileNameOut = ModelPVOL.createDescriptor(fileName, fileBuff, verbose,
                             rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.IMAGE)) {
-                    ModelImage.createDescriptor(fileName, fileBuff, verbose,
+                    fileNameOut = ModelImage.createDescriptor(fileName, fileBuff, verbose,
                             rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.VP)) {
-                    ModelVP.createDescriptor(fileName, fileBuff, verbose,
+                    fileNameOut = ModelVP.createDescriptor(fileName, fileBuff, verbose,
                             rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.RHI)) {
-                    ModelRHI.createDescriptor(fileName, fileBuff, verbose,
+                    fileNameOut = ModelRHI.createDescriptor(fileName, fileBuff, verbose,
                             rainbow, options);
                 }
 
@@ -160,7 +162,7 @@ public class DataProcessorController {
 
                 if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.PVOL)) {
-                    Model531PVOL.createDescriptor(fileName, fileBuff, verbose,
+                    fileNameOut = Model531PVOL.createDescriptor(fileName, fileBuff, verbose,
                             rainbow531, options);
 
                 }
@@ -185,11 +187,12 @@ public class DataProcessorController {
             }
 
             // Other platforms will come here at a later time...
-            msgl.showMessage("Descriptor preparation completed.", verbose);
+            if(!fileNameOut.isEmpty())
+                msgl.showMessage("Descriptor preparation completed.", verbose);
 
         } else if (cmd.hasArgument(cmd.CONTINOUOS_OPTION)) {
 
-            msgl.showMessage("Operational feeder mode selected", verbose);
+            msgl.showMessage("Operational feeder mode selected", true);
 
             if (doc == null) {
                 OptionsHandler.exampleOptionXML();
@@ -199,7 +202,7 @@ public class DataProcessorController {
             }
 
             BaltradLocalFeeder worker = new BaltradLocalFeeder(doc, rainbow,
-                    rainbow531, proc, verbose);
+                    rainbow531, proc, msgl, verbose);
             worker.start();
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
