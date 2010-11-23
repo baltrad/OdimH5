@@ -19,13 +19,15 @@ import pl.imgw.odimH5.model.rainbow.ModelImage;
 import pl.imgw.odimH5.model.rainbow.ModelPVOL;
 import pl.imgw.odimH5.model.rainbow.ModelRHI;
 import pl.imgw.odimH5.model.rainbow.ModelVP;
-import pl.imgw.odimH5.util.BaltradFrame;
-import pl.imgw.odimH5.util.BaltradFrameHandler;
+import pl.imgw.odimH5.model.rainbow531.Model531;
+import pl.imgw.odimH5.model.rainbow531.Model531PVOL;
 import pl.imgw.odimH5.util.BaltradLocalFeeder;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.MessageLogger;
-import pl.imgw.odimH5.util.RadarOptions;
 import pl.imgw.odimH5.util.OptionsHandler;
+import pl.imgw.odimH5.util.RadarOptions;
+import eu.baltrad.frame.model.BaltradFrame;
+import eu.baltrad.frame.model.BaltradFrameHandler;
 
 /**
  * Controller class for data processing routines.
@@ -37,12 +39,14 @@ import pl.imgw.odimH5.util.OptionsHandler;
 public class DataProcessorController {
 
     // Constants
-    private final static String RAINBOW_PLATFORM = "RAINBOW";
+    public final static String RAINBOW531_PLATFORM = "RAINBOW531";
+    public final static String RAINBOW_PLATFORM = "RAINBOW";
 
     // Reference to DataProcessorModel object
     private DataProcessorModel proc;
     // Reference to RAINBOWModel object
     private Model rainbow;
+    private Model531 rainbow531;
     // Reference to CommandLineArgsParser object
     private CommandLineArgsParser cmd;
     // Reference to MessageLogger object
@@ -110,8 +114,8 @@ public class DataProcessorController {
             String fileName = "";
             if (cmd.hasArgument(cmd.OUTPUT_FILE_OPTION))
                 fileName = cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION);
-//            else
-//                fileName = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + ".h5";
+            // else
+            // fileName = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + ".h5";
 
             msgl.showMessage("Conversion mode selected", verbose);
 
@@ -151,6 +155,33 @@ public class DataProcessorController {
                             rainbow, options);
                 }
 
+            } else if (cmd.getArgumentValue(cmd.PLATFORM_OPTION).equals(
+                    RAINBOW531_PLATFORM)) {
+
+                if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
+                        rainbow.PVOL)) {
+                    Model531PVOL.createDescriptor(fileName, fileBuff, verbose,
+                            rainbow531, options);
+
+                }
+                // else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
+                // rainbow.IMAGE)) {
+                // ModelImage.createDescriptor(fileName, fileBuff, verbose,
+                // rainbow, options);
+                //
+                // } else if
+                // (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
+                // rainbow.VP)) {
+                // ModelVP.createDescriptor(fileName, fileBuff, verbose,
+                // rainbow, options);
+                //
+                // } else if
+                // (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
+                // rainbow.RHI)) {
+                // ModelRHI.createDescriptor(fileName, fileBuff, verbose,
+                // rainbow, options);
+                // }
+
             }
 
             // Other platforms will come here at a later time...
@@ -168,7 +199,7 @@ public class DataProcessorController {
             }
 
             BaltradLocalFeeder worker = new BaltradLocalFeeder(doc, rainbow,
-                    proc, verbose);
+                    rainbow531, proc, verbose);
             worker.start();
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
@@ -178,9 +209,8 @@ public class DataProcessorController {
 
             msgl.showMessage("Sending file to server", verbose);
 
-            BaltradFrameHandler bfh = new BaltradFrameHandler(proc
-                    .getMessageLogger(), cmd
-                    .getArgumentValue(cmd.ADDRESS_OPTION), verbose);
+            BaltradFrameHandler bfh = new BaltradFrameHandler(cmd
+                    .getArgumentValue(cmd.ADDRESS_OPTION));
 
             String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
                     cmd.getArgumentValue(cmd.SENDER_OPTION), cmd
@@ -190,8 +220,8 @@ public class DataProcessorController {
             // System.out.println("BFDataHdr:");
             // System.out.println(a);
 
-            BaltradFrame bf = new BaltradFrame(proc.getMessageLogger(), a, cmd
-                    .getArgumentValue(cmd.INPUT_FILE_OPTION), verbose);
+            BaltradFrame bf = new BaltradFrame(a, cmd
+                    .getArgumentValue(cmd.INPUT_FILE_OPTION));
 
             bfh.handleBF(bf);
 
@@ -215,6 +245,25 @@ public class DataProcessorController {
      */
     public void setDataProcessorModel(DataProcessorModel proc) {
         this.proc = proc;
+    }
+
+    /**
+     * Method returns reference to RAINBOWModel object.
+     * 
+     * @return Reference to RAINBOWModel object
+     */
+    public Model531 getRAINBOW531Model() {
+        return rainbow531;
+    }
+
+    /**
+     * Method sets reference to RAINBOWModel object.
+     * 
+     * @param rainbow
+     *            Reference to RAINBOWModel object
+     */
+    public void setRAINBOW531Model(Model531 rainbow531) {
+        this.rainbow531 = rainbow531;
     }
 
     /**

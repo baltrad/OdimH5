@@ -13,10 +13,19 @@ package pl.imgw.odimH5.util;
  */
 public class RadarOptions {
 
+    private String platform = "";
     private String radarName = "";
     private String radarWMOName = "";
     private String fileName = "";
     private String dir = "";
+
+    public String getPlatform() {
+        return platform;
+    }
+    
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
 
     public String getRadarName() {
         return radarName;

@@ -11,6 +11,7 @@ package pl.imgw.odimH5;
 import pl.imgw.odimH5.controller.DataProcessorController;
 import pl.imgw.odimH5.model.DataProcessorModel;
 import pl.imgw.odimH5.model.rainbow.Model;
+import pl.imgw.odimH5.model.rainbow531.Model531;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.MessageLogger;
 
@@ -36,9 +37,12 @@ public class Main {
 
         DataProcessorModel proc = new DataProcessorModel();
         Model rainbow = new Model();
+        Model531 rainbow531 = new Model531();
         CommandLineArgsParser cmd = new CommandLineArgsParser();
         MessageLogger msgl = new MessageLogger();
         DataProcessorController cont = new DataProcessorController();
+        rainbow531.setDataProcessorModel(proc);
+        rainbow531.setMessageLogger(msgl);
         rainbow.setDataProcessorModel(proc);
         rainbow.setMessageLogger(msgl);
         proc.setMessageLogger(msgl);
@@ -46,6 +50,7 @@ public class Main {
         cont.setCmdParser(cmd);
         cont.setDataProcessorModel(proc);
         cont.setRAINBOWModel(rainbow);
+        cont.setRAINBOW531Model(rainbow531);
         cont.startProcessor(args);
         
     }

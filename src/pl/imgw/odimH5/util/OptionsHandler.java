@@ -21,6 +21,7 @@ public class OptionsHandler {
 
     public final static String OPTION_XML_FILE = "options.xml";
 
+    public final static String PLATFORM = "platform";
     public final static String WMO_ID = "WMO_id";
     public final static String FILE_NAME = "file_name";
     public final static String ADDRESS = "address";
@@ -71,6 +72,9 @@ public class OptionsHandler {
         for (int i = 0; i < counter; i++) {
 
             options[i] = new RadarOptions();
+            
+            options[i].setPlatform(Model.getValueByName(radarList.item(i),
+                    PLATFORM, null));
 
             options[i].setRadarName(radarList.item(i).getAttributes()
                     .getNamedItem("name").getNodeValue());
@@ -184,6 +188,7 @@ public class OptionsHandler {
         System.out.println("<!-- FTP options -->");
         System.out.println("<options>");
         System.out.println("    <radar name=\"NAME\">");
+        System.out.println("        <" + PLATFORM + ">Processing Software</" + PLATFORM + ">");
         System.out.println("        <" + WMO_ID + ">WMO_ID</" + WMO_ID + ">");
         System.out.println("        <" + FILE_NAME + ">FILE_NAME_PREFIX</"
                 + FILE_NAME + ">");

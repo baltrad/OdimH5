@@ -23,9 +23,15 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.w3c.dom.Document;
 
+import eu.baltrad.frame.model.BaltradFrame;
+import eu.baltrad.frame.model.BaltradFrameHandler;
+
+import pl.imgw.odimH5.controller.DataProcessorController;
 import pl.imgw.odimH5.model.DataProcessorModel;
 import pl.imgw.odimH5.model.rainbow.Model;
 import pl.imgw.odimH5.model.rainbow.ModelPVOL;
+import pl.imgw.odimH5.model.rainbow531.Model531;
+import pl.imgw.odimH5.model.rainbow531.Model531PVOL;
 
 /**
  * 
@@ -48,6 +54,7 @@ public class BaltradLocalFeeder extends Thread {
     HashMap<WatchKey, RadarOptions> pathMap = new HashMap<WatchKey, RadarOptions>();
     HashMap<RadarOpt, Long> fileTimeMap = new HashMap<RadarOpt, Long>();
 
+    private Model531 rb531;
     private Model rb;
     private DataProcessorModel proc;
 
@@ -69,10 +76,11 @@ public class BaltradLocalFeeder extends Thread {
      * @param verbose
      *            verbose mode
      */
-    public BaltradLocalFeeder(Document optionsDoc, Model rb,
+    public BaltradLocalFeeder(Document optionsDoc, Model rb, Model531 rb531,
             DataProcessorModel proc, boolean verbose) {
 
         this.rb = rb;
+        this.rb531 = rb531;
         this.proc = proc;
         this.verbose = verbose;
 
@@ -144,9 +152,25 @@ public class BaltradLocalFeeder extends Thread {
                 h5file.mkdir();
             }
 
-            fileNameH5 = ModelPVOL.createDescriptor(h5file.getAbsolutePath()
-                    + "/" + originalFile.getName() + ".h5", file_buf,
-                    this.verbose, this.rb, radarOptions);
+            if (filePath.platform
+                    .equals(DataProcessorController.RAINBOW531_PLATFORM)) {
+
+                fileNameH5 = Model531PVOL.createDescriptor(h5file
+                        .getAbsolutePath()
+                        + "/" + originalFile.getName() + ".h5", file_buf,
+                        this.verbose, this.rb531, radarOptions);
+            } else if (filePath.platform
+                    .equals(DataProcessorController.RAINBOW_PLATFORM)) {
+
+                fileNameH5 = ModelPVOL.createDescriptor(h5file
+                        .getAbsolutePath()
+                        + "/" + originalFile.getName() + ".h5", file_buf,
+                        this.verbose, this.rb, radarOptions);
+            } else {
+                System.out.println("Platform not supported.");
+                return;
+            }
+
             h5file = new File(fileNameH5);
             if (fileNameH5 == null)
                 return;
@@ -160,8 +184,8 @@ public class BaltradLocalFeeder extends Thread {
 
         if (!baltradOptions.isEmpty()) {
 
-            BaltradFrameHandler bfh = new BaltradFrameHandler(proc
-                    .getMessageLogger(), baltradOptions.getServer(), verbose);
+            BaltradFrameHandler bfh = new BaltradFrameHandler(baltradOptions
+                    .getServer());
 
             String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
                     baltradOptions.getSender(), filePath.radarName, fileNameH5);
@@ -169,10 +193,15 @@ public class BaltradLocalFeeder extends Thread {
             // System.out.println("BFDataHdr:");
             // System.out.println(a);
 
-            BaltradFrame bf = new BaltradFrame(proc.getMessageLogger(), a,
-                    fileNameH5, verbose);
+            BaltradFrame bf = new BaltradFrame(a, fileNameH5);
 
-            bfh.handleBF(bf);
+            if (bfh.handleBF(bf) == 1) {
+                System.out
+                        .println(filePath.radarName + " file sent to BALTRAD");
+            } else {
+                System.out.println(filePath.radarName
+                        + " failed to send file to BALTRAD");
+            }
         }
 
         if (ftpOptions != null) {
@@ -222,6 +251,10 @@ public class BaltradLocalFeeder extends Thread {
                                     "hdf"));
 
                     ftp.logout();
+
+                    System.out
+                            .println(filePath.radarName + " file sent to FTP");
+
                 } catch (IOException e) {
 
                     e.printStackTrace();
@@ -230,11 +263,12 @@ public class BaltradLocalFeeder extends Thread {
             }
 
         }
-        
-//        System.out.print("original file: " + originalFile.getAbsolutePath() + " ");
-//        System.out.print(originalFile.delete() + "\n");
-//        System.out.print("h5 file: " + h5file.getAbsolutePath() + " ");
-//        System.out.print(h5file.delete() + "\n");
+
+        // System.out.print("original file: " + originalFile.getAbsolutePath() +
+        // " ");
+        // System.out.print(originalFile.delete() + "\n");
+        // System.out.print("h5 file: " + h5file.getAbsolutePath() + " ");
+        // System.out.print(h5file.delete() + "\n");
         // file = new File(fileNameH5);
         // file.delete();
 
@@ -273,7 +307,8 @@ public class BaltradLocalFeeder extends Thread {
                     if ((timeNow - time) > 3000) {
                         fileTimeMap.remove(key);
                         itr = fileTimeMap.keySet().iterator();
-                        System.out.println(key.radarName + " download finished");
+                        System.out
+                                .println(key.radarName + " download finished");
                         convertAndSendFile(key);
 
                     }
@@ -311,6 +346,7 @@ public class BaltradLocalFeeder extends Thread {
                     radarOpt.radarName = pathMap.get(signalledKey)
                             .getRadarName();
                     radarOpt.prefix = pathMap.get(signalledKey).getFileName();
+                    radarOpt.platform = pathMap.get(signalledKey).getPlatform();
                     if (!radarOpt.path.endsWith("/"))
                         radarOpt.path += "/";
 
@@ -347,6 +383,7 @@ public class BaltradLocalFeeder extends Thread {
         private String path = "";
         private String radarName = "";
         private String prefix = "";
+        private String platform = "";
 
     }
 
