@@ -12,11 +12,21 @@ package pl.imgw.odimH5.util;
  * 
  */
 public class FTP_Options {
-
+    
+    private String[] radars = null;
     private String address = "";
     private String login = "";
     private String password = "";
     private String dir = "";
+
+    
+    public String[] getRadars() {
+        return radars;
+    }
+
+    public void setRadars(String[] radars) {
+        this.radars = radars;
+    }
 
     public String getAddress() {
         return address;
@@ -57,6 +67,9 @@ public class FTP_Options {
      * @return
      */
     public boolean isEmpty() {
+        if(radars == null)
+            return true;
+        
         if(address == null || address.isEmpty())
             return true;
         

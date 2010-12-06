@@ -18,6 +18,7 @@ public class RadarOptions {
     private String radarWMOName = "";
     private String fileName = "";
     private String dir = "";
+    private String nrays = "";
 
     public String getPlatform() {
         return platform;
@@ -58,10 +59,18 @@ public class RadarOptions {
     public void setDir(String remoteDir) {
         this.dir = remoteDir;
     }
+    
+    public String getNrays() {
+        return nrays;
+    }
+
+    public void setNrays(String nrays) {
+        this.nrays = nrays;
+    }
 
     /**
      * 
-     * Returns true if any of its fields is empty
+     * Returns true if any of obligated fields is empty
      * 
      * @return
      */

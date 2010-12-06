@@ -21,14 +21,14 @@ public class OptionsHandler {
 
     public final static String OPTION_XML_FILE = "options.xml";
 
-    public final static String PLATFORM = "platform";
     public final static String WMO_ID = "WMO_id";
     public final static String FILE_NAME = "file_name";
+    public final static String RADARS = "radars";
     public final static String ADDRESS = "address";
     public final static String LOGIN = "login";
     public final static String PASSWORD = "password";
     public final static String DIRECTORY = "directory";
-    public final static String REPETITION = "repetition_time";
+    public final static String NRAYS = "nrays";
     public final static String SERVER = "server";
     public final static String SENDER = "sender";
 
@@ -72,9 +72,6 @@ public class OptionsHandler {
         for (int i = 0; i < counter; i++) {
 
             options[i] = new RadarOptions();
-            
-            options[i].setPlatform(Model.getValueByName(radarList.item(i),
-                    PLATFORM, null));
 
             options[i].setRadarName(radarList.item(i).getAttributes()
                     .getNamedItem("name").getNodeValue());
@@ -85,6 +82,8 @@ public class OptionsHandler {
                     FILE_NAME, null));
             options[i].setDir(Model.getValueByName(radarList.item(i),
                     DIRECTORY, null));
+            options[i].setNrays(Model.getValueByName(radarList.item(i), NRAYS,
+                    null));
         }
         return options;
     }
@@ -97,22 +96,22 @@ public class OptionsHandler {
      * @return
      */
     public static BaltradOptions getBaltrad(Document doc) {
-        
+
         NodeList baltradList = doc.getElementsByTagName("baltrad");
-        
-        if(baltradList.getLength() == 0) {
+
+        if (baltradList.getLength() == 0) {
             return null;
         }
         BaltradOptions options = new BaltradOptions();
-        
-            
-            options.setSender(Model.getValueByName(baltradList.item(0),
-                    SENDER, null));
-            options.setServer(Model.getValueByName(baltradList.item(0), SERVER,
-                    null));
-        
+
+        options.setSender(Model.getValueByName(baltradList.item(0), SENDER,
+                null));
+        options.setServer(Model.getValueByName(baltradList.item(0), SERVER,
+                null));
+
         return options;
     }
+
     /**
      * 
      * This method reads FTP options from XML document
@@ -129,6 +128,11 @@ public class OptionsHandler {
         for (int i = 0; i < counter; i++) {
 
             options[i] = new FTP_Options();
+
+            String radars = Model.getValueByName(ftpList.item(i), RADARS, null);
+
+            if (radars != null && !radars.isEmpty())
+                options[i].setRadars(radars.split(" "));
 
             options[i].setAddress(Model.getValueByName(ftpList.item(i),
                     ADDRESS, null));
@@ -188,14 +192,19 @@ public class OptionsHandler {
         System.out.println("<!-- FTP options -->");
         System.out.println("<options>");
         System.out.println("    <radar name=\"NAME\">");
-        System.out.println("        <" + PLATFORM + ">Processing Software</" + PLATFORM + ">");
         System.out.println("        <" + WMO_ID + ">WMO_ID</" + WMO_ID + ">");
         System.out.println("        <" + FILE_NAME + ">FILE_NAME_PREFIX</"
                 + FILE_NAME + ">");
-        System.out.println("        <" + DIRECTORY + ">LOCAL_DIR</" + DIRECTORY + ">");
+        System.out.println("        <" + DIRECTORY + ">LOCAL_DIR</" + DIRECTORY
+                + ">");
+        System.out.println("        <" + NRAYS + ">number of rays</" + NRAYS
+                + ">");
         System.out.println("    </radar>");
         System.out.println("    <ftp>");
-        System.out.println("        <" + ADDRESS + ">FTP</" + ADDRESS + ">");
+        System.out.println("        <" + RADARS + ">LIST OF RADARS</" + RADARS
+                + ">");
+        System.out.println("        <" + ADDRESS + ">FTP_SERVER</" + ADDRESS
+                + ">");
         System.out.println("        <" + LOGIN + ">LOGIN</" + LOGIN + ">");
         System.out.println("        <" + PASSWORD + ">PASS</" + PASSWORD + ">");
         System.out
@@ -205,7 +214,8 @@ public class OptionsHandler {
         // System.out.println("    <start_time>mm</start_time>");
         // System.out.println("    <" + REPETITION + " >mm</" + REPETITION +
         // ">");
-        System.out.println("        <" + SERVER + ">HTTP_address</" + SERVER + ">");
+        System.out.println("        <" + SERVER + ">HTTP_address</" + SERVER
+                + ">");
         System.out.println("        <" + SENDER + ">Baltrad.IMGW.pl</" + SENDER
                 + ">");
         System.out.println("    </baltrad>");

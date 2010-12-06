@@ -361,16 +361,16 @@ public class DataProcessorModel {
 
         if (attr_class.equals("long")) {
             attribute_id = H5Acreate_numeric_wrap(group_id, attr_name,
-                    HDF5Constants.H5T_STD_I64BE, dataspace_id,
+                    HDF5Constants.H5T_NATIVE_LONG, dataspace_id,
                     HDF5Constants.H5P_DEFAULT, verbose);
             long[] value = new long[1];
             value[0] = (long) Long.parseLong(attr_value);
             status = H5Awrite_wrap(attribute_id,
-                    HDF5Constants.H5T_NATIVE_INT64, value, verbose);
+                    HDF5Constants.H5T_NATIVE_LONG, value, verbose);
         }
         if (attr_class.equals("double")) {
             attribute_id = H5Acreate_numeric_wrap(group_id, attr_name,
-                    HDF5Constants.H5T_IEEE_F64BE, dataspace_id,
+                    HDF5Constants.H5T_IEEE_F32BE, dataspace_id,
                     HDF5Constants.H5P_DEFAULT, verbose);
             double[] value = new double[1];
             value[0] = (double) Double.parseDouble(attr_value);
@@ -696,6 +696,7 @@ public class DataProcessorModel {
             int create_plist_id = H5
                     .H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
             status = H5.H5Pset_chunk(create_plist_id, 2, cdims);
+            
             status = H5.H5Pset_deflate(create_plist_id, gZipLevel);
             // Create the dataset
             dataset_id = H5.H5Dcreate(file_id, group_name, datatype_id,

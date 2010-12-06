@@ -118,8 +118,7 @@ public class ModelPVOL {
         cont.setTime(rb.parseRAINBOWTime(time, verbose));
 
         if (fileNameOut.isEmpty()) {
-            fileNameOut = filePrefix + cont.getDate()
-                    + cont.getTime() + ".h5";
+            fileNameOut = filePrefix + cont.getDate() + cont.getTime() + ".h5";
         }
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "volume", verbose);
@@ -135,7 +134,7 @@ public class ModelPVOL {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "antspeed", verbose);
         double antSpeed = Double.parseDouble(rb.getRAINBOWMetadataElement(
                 nodeList, "", verbose));
-        
+
         int shift = (int) (360.0 / antSpeed);
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "rangestep", verbose);
@@ -190,11 +189,11 @@ public class ModelPVOL {
             if (slice.getSrange() == null) // default value is "0"
                 slice.setSrange("0");
 
-//            String rangestepslice = (rb.getValueByName(sliceList.item(i),
-//                    "rangestep", null));
-//
-//            if (rangestepslice == null)
-//                rangestepslice = rangestep;
+            // String rangestepslice = (rb.getValueByName(sliceList.item(i),
+            // "rangestep", null));
+            //
+            // if (rangestepslice == null)
+            // rangestepslice = rangestep;
             slice.setRstep(rangestep);
 
             slice.setRays(rb.getValueByName(sliceList.item(i), "rawdata",
@@ -211,8 +210,8 @@ public class ModelPVOL {
             // firstBlob = rb.getMin(raysBlobNumber, dataBlobNumber);
             // }
 
-//            int raysDepth = Integer.parseInt(rb.getValueByName(sliceList
-//                    .item(i), "rayinfo", "depth"));
+            // int raysDepth = Integer.parseInt(rb.getValueByName(sliceList
+            // .item(i), "rayinfo", "depth"));
             dataDepth = Integer.parseInt(rb.getValueByName(sliceList.item(i),
                     "rawdata", "depth"));
 
@@ -237,7 +236,6 @@ public class ModelPVOL {
 
             // data specific where group
 
-            nodeList = rb.getRAINBOWNodesByName(inputDoc, "volume", verbose);
             slice.setDatatype(rb.getValueByName(sliceList.item(i), "rawdata",
                     "type"));
 
@@ -260,11 +258,10 @@ public class ModelPVOL {
             slice.setDataBuff(dataBuff);
             slices[i] = slice;
 
-            
         }
 
         cont.setSlices(slices);
-//        System.out.println("hdf ma nazwe: " + fileNameOut);
+        // System.out.println("hdf ma nazwe: " + fileNameOut);
 
         if (isDirect) {
             makeH5(rb, verbose, cont, fileNameOut);
@@ -280,7 +277,7 @@ public class ModelPVOL {
             ParametersContainer cnt, String fileName) {
 
         DataProcessorModel proc = rb.getDataProcessorModel();
-        
+
         int datasetSize = cnt.getSlices().length;
 
         // Create XML document object
@@ -374,8 +371,10 @@ public class ModelPVOL {
                     .getDatatype().toUpperCase(), od, rb.H5_STRING));
             data_what.appendChild(rb.makeAttr("gain", cnt.getSlices()[i]
                     .getGain(), od, rb.H5_DOUBLE));
-            data_what.appendChild(rb.makeAttr("offset", cnt.getSlices()[i]
-                    .getMin(), od, rb.H5_DOUBLE));
+
+            data_what.appendChild(rb.makeAttr("offset", rb.getRAINBOWOffset(cnt
+                    .getSlices()[i].getMin(), cnt.getSlices()[i].getGain()),
+                    od, rb.H5_DOUBLE));
 
             data_what.appendChild(rb.makeAttr("nodata", String
                     .valueOf(rb.RAINBOW_NO_DATA), od, rb.H5_DOUBLE));
@@ -395,7 +394,7 @@ public class ModelPVOL {
             dataset1.setAttribute("dimensions", cnt.getSlices()[i].getRays()
                     + "x" + cnt.getSlices()[i].getBins());
             dataset1.setAttribute("gzip_level", rb.H5_GZIP_LEVEL);
-            
+
             dataset1.setAttribute("class", "IMAGE");
             dataset1.setAttribute("im_ver", rb.IMAGE_VER);
 
@@ -411,18 +410,17 @@ public class ModelPVOL {
 
             int rays = Integer.parseInt(cnt.getSlices()[i].getRays());
             int bins = Integer.parseInt(cnt.getSlices()[i].getBins());
-            
-            
+
             int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(cnt
                     .getSlices()[i].getDataBuff().getDataBuffer(), bins, rays,
                     verbose);
 
-         // przesunac azymuty
+            // przesunac azymuty
             infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins, Integer
                     .parseInt(cnt.getSlices()[i].getA1gate()));
 
             infDataBuff = proc.transposeArray(infDataBuff, rays, bins);
-            
+
             rb.writeRAINBOWData(infDataBuff, dataFileName, verbose);
         }
 
@@ -538,8 +536,10 @@ public class ModelPVOL {
                     rb.H5_STRING, cnt.getSlices()[i].getDatatype(), verbose);
             proc.H5Acreate_any_wrap(grandgrandchild_group_id, "gain",
                     rb.H5_DOUBLE, cnt.getSlices()[i].getGain(), verbose);
+
             proc.H5Acreate_any_wrap(grandgrandchild_group_id, "offset",
-                    rb.H5_DOUBLE, cnt.getSlices()[i].getMin(), verbose);
+                    rb.H5_DOUBLE, rb.getRAINBOWOffset(cnt.getSlices()[i]
+                            .getMin(), cnt.getSlices()[i].getGain()), verbose);
             proc.H5Acreate_any_wrap(grandgrandchild_group_id, "nodata",
                     rb.H5_DOUBLE, String.valueOf(rb.RAINBOW_NO_DATA), verbose);
             proc.H5Acreate_any_wrap(grandgrandchild_group_id, "undetect",

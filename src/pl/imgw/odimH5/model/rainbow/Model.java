@@ -76,7 +76,7 @@ public class Model {
 
     protected final String IMAGE_VER = "1.2";
     protected final String H5_DATA_CHUNK = "20";
-    protected final String H5_GZIP_LEVEL = "2";
+    protected final String H5_GZIP_LEVEL = "6";
 
     protected final String EARTH_RAD = "6371000";
 
@@ -98,10 +98,13 @@ public class Model {
     public final String VERSION = "H5rad 2.0";
     protected final String RAINBOW_SYSTEM = "GEMA";
     protected final String RAINBOW_SOFTWARE = "RAINBOW";
+    protected final String RAINBOW_SCAN = "SCAN";
     public final String IMAGE = "IMAGE";
     public final String PVOL = "PVOL";
     public final String VP = "VP";
     public final String RHI = "RHI";
+
+    protected final double FIRST_VALUE = 1.0;
     protected final double RAINBOW_NO_DATA = 255.0;
     protected final double RAINBOW_UNDETECT = 0.0;
 
@@ -787,6 +790,37 @@ public class Model {
     }
 
     /**
+     * Method calculate offset parameter
+     * 
+     * @param min
+     *            Minimal value of data
+     * 
+     * @param step
+     * 
+     * @return
+     */
+    public String getRAINBOWOffset(String min, String step) {
+
+        double offset = 0;
+        double gain = 0;
+        try {
+            offset = Double.parseDouble(min);
+
+            gain = Double.parseDouble(step);
+
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+
+            System.out.println(e.getLocalizedMessage());
+            return null;
+        }
+
+        offset -= (gain * FIRST_VALUE);
+
+        return String.valueOf(offset);
+    }
+
+    /**
      * Method parses RAINBOW projection string
      * 
      * @param lon0
@@ -1002,7 +1036,6 @@ public class Model {
     public HashMap<Integer, DataBufferContainer> getAllRainbowDataBlobs(
             byte[] fileBuff, boolean verbose) {
 
-        
         HashMap<Integer, DataBufferContainer> blobs = new HashMap<Integer, DataBufferContainer>();
 
         // Data section tags
@@ -1080,13 +1113,11 @@ public class Model {
                 DataBufferContainer dbc = new DataBufferContainer();
                 dbc.setDataBuffer(data_buf);
                 dbc.setDataBufferLength(buffLen);
-                
 
                 blobs.put(blobNumber, dbc);
                 msgl.showMessage("Reading RAINBOW data section from BLOB "
                         + blobNumber, verbose);
                 blobNumber++;
-
 
             } catch (Exception e) {
                 msgl.showMessage(
@@ -1188,7 +1219,7 @@ public class Model {
             int buffLen = byteArray2Int(data_byte);
             dbc.setDataBuffer(data_buf);
             dbc.setDataBufferLength(buffLen);
-//            dbc.setDepth(depth);
+            // dbc.setDepth(depth);
 
             msgl.showMessage("Reading RAINBOW data section from BLOB "
                     + blobNumber, verbose);

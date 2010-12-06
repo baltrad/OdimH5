@@ -6,6 +6,7 @@ package pl.imgw.odimH5.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,17 +22,14 @@ import name.pachler.nio.file.WatchService;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.io.CopyStreamException;
 import org.w3c.dom.Document;
 
-import eu.baltrad.frame.model.BaltradFrame;
-import eu.baltrad.frame.model.BaltradFrameHandler;
-
-import pl.imgw.odimH5.controller.DataProcessorController;
 import pl.imgw.odimH5.model.DataProcessorModel;
 import pl.imgw.odimH5.model.rainbow.Model;
-import pl.imgw.odimH5.model.rainbow.ModelPVOL;
-import pl.imgw.odimH5.model.rainbow531.Model531;
-import pl.imgw.odimH5.model.rainbow531.Model531PVOL;
+import pl.imgw.odimH5.model.rainbow.RainbowPVOL;
+import eu.baltrad.frame.model.BaltradFrame;
+import eu.baltrad.frame.model.BaltradFrameHandler;
 
 /**
  * 
@@ -54,9 +52,7 @@ public class BaltradLocalFeeder extends Thread {
     HashMap<WatchKey, RadarOptions> pathMap = new HashMap<WatchKey, RadarOptions>();
     HashMap<RadarOpt, Long> fileTimeMap = new HashMap<RadarOpt, Long>();
 
-    private Model531 rb531;
     private Model rb;
-    private DataProcessorModel proc;
     private MessageLogger msgl;
 
     private boolean verbose;
@@ -78,12 +74,10 @@ public class BaltradLocalFeeder extends Thread {
      * @param verbose
      *            verbose mode
      */
-    public BaltradLocalFeeder(Document optionsDoc, Model rb, Model531 rb531,
+    public BaltradLocalFeeder(Document optionsDoc, Model rb,
             DataProcessorModel proc, MessageLogger msgl, boolean verbose) {
 
         this.rb = rb;
-        this.rb531 = rb531;
-        this.proc = proc;
         this.verbose = verbose;
         this.msgl = msgl;
 
@@ -121,11 +115,13 @@ public class BaltradLocalFeeder extends Thread {
      * 
      * @param filePath
      */
-    private void convertAndSendFile(RadarOpt filePath) {
+    private void convertAndSendFile(RadarOpt filePath) throws Exception {
 
         if (filePath.path.contains("KDP") || filePath.path.contains("PhiDP")
                 || filePath.path.contains("HV")
                 || filePath.path.contains("ZDR")) {
+
+            new File(filePath.path).delete();
 
             return;
 
@@ -135,7 +131,7 @@ public class BaltradLocalFeeder extends Thread {
         File h5file = null;
         String fileNameH5 = "";
 
-        if (filePath.path.endsWith(".vol")) {
+        if (originalFile.getName().endsWith(".vol")) {
 
             int file_len = (int) originalFile.length();
             byte[] file_buf = new byte[file_len];
@@ -149,34 +145,12 @@ public class BaltradLocalFeeder extends Thread {
                 e.printStackTrace();
             }
 
-            fileNameH5 = "hdf5/" + filePath.radarName;
+            RainbowPVOL vol = new RainbowPVOL("", file_buf, verbose, rb,
+                    radarOptions);
+            vol.makeH5();
+
+            fileNameH5 = vol.getOutputFileName();
             h5file = new File(fileNameH5);
-            if (!h5file.exists()) {
-                h5file.mkdir();
-            }
-
-            if (filePath.platform
-                    .equals(DataProcessorController.RAINBOW531_PLATFORM)) {
-
-                fileNameH5 = Model531PVOL.createDescriptor(h5file
-                        .getAbsolutePath()
-                        + "/" + originalFile.getName() + ".h5", file_buf,
-                        this.verbose, this.rb531, radarOptions);
-            } else if (filePath.platform
-                    .equals(DataProcessorController.RAINBOW_PLATFORM)) {
-
-                fileNameH5 = ModelPVOL.createDescriptor(h5file
-                        .getAbsolutePath()
-                        + "/" + originalFile.getName() + ".h5", file_buf,
-                        this.verbose, this.rb, radarOptions);
-            } else {
-                System.out.println("Platform not supported.");
-                return;
-            }
-
-            h5file = new File(fileNameH5);
-            if (fileNameH5 == null)
-                return;
         } else if (filePath.path.endsWith(".h5")
                 || filePath.path.endsWith(".hdf")) {
             fileNameH5 = originalFile.getName();
@@ -215,66 +189,92 @@ public class BaltradLocalFeeder extends Thread {
                 if (ftpOptions[i].isEmpty())
                     continue;
 
-                // sending file to FTP
-                FTPClient ftp = new FTPClient();
-                FileInputStream fis = null;
+                for (int j = 0; j < ftpOptions[i].getRadars().length; j++)
+                    if (filePath.radarName
+                            .matches(ftpOptions[i].getRadars()[j])) {
 
-                try {
-                    int reply;
-                    ftp.connect(ftpOptions[i].getAddress());
+                        // sending file to FTP
 
-                    // After connection attempt, you should check the reply code
-                    // to verify
-                    // success.
-                    reply = ftp.getReplyCode();
+                        String sendFileName = filePath.prefix
+                                + originalFile.getName().substring(0, 14)
+                                + ".tmp";
 
-                    if (!FTPReply.isPositiveCompletion(reply)) {
-                        ftp.disconnect();
-                        System.err.println("FTP server refused connection.");
-                        continue;
+                        try {
+
+                            storeFileOnServer(ftpOptions[i], fileNameH5,
+                                    sendFileName);
+
+                        } catch (CopyStreamException e) {
+
+                            msgl.showMessage(fileNameH5 + " cannot be sent to "
+                                    + ftpOptions[i].getAddress()
+                                    + "sending file again...", true);
+
+                            storeFileOnServer(ftpOptions[i], fileNameH5,
+                                    sendFileName);
+
+                        } catch (IOException e) {
+
+                            e.printStackTrace();
+                            LogsHandler.saveProgramLogs(e.getMessage());
+
+                            msgl.showMessage(filePath.radarName
+                                    + " file cannot be sent to "
+                                    + ftpOptions[i].getAddress(), true);
+
+                        }
                     }
-
-                    ftp.login(ftpOptions[i].getLogin(), ftpOptions[i]
-                            .getPassword());
-                    ftp.changeWorkingDirectory(ftpOptions[i].getDir());
-
-                    ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-                    ftp
-                            .setFileTransferMode(FTPClient.PASSIVE_REMOTE_DATA_CONNECTION_MODE);
-
-                    String sendFileName = filePath.prefix
-                            + originalFile.getName().substring(0, 14) + ".tmp";
-
-                    // transfer files
-                    fis = new FileInputStream(fileNameH5);
-
-                    ftp.storeFile(sendFileName, fis);
-                    fis.close();
-
-                    boolean sentOK = ftp.rename(sendFileName, sendFileName
-                            .replace("tmp", "hdf"));
-
-                    ftp.logout();
-
-                    msgl.showMessage(filePath.radarName + " file sent to "
-                            + ftpOptions[i].getAddress(), sentOK);
-
-                } catch (IOException e) {
-
-                    e.printStackTrace();
-                }
-
             }
 
         }
 
-        // System.out.print("original file: " + originalFile.getAbsolutePath() +
-        // " ");
-        // System.out.print(originalFile.delete() + "\n");
-        // System.out.print("h5 file: " + h5file.getAbsolutePath() + " ");
-        // System.out.print(h5file.delete() + "\n");
-        // file = new File(fileNameH5);
-        // file.delete();
+        originalFile.delete();
+        h5file.delete();
+
+    }
+
+    private void storeFileOnServer(FTP_Options ftpOptions, String fileNameH5,
+            String sendFileName) throws SocketException, IOException {
+
+        FTPClient ftp = new FTPClient();
+
+        int reply;
+        ftp.connect(ftpOptions.getAddress());
+
+        // After connection attempt, you should check the
+        // reply code
+        // to verify
+        // success.
+        reply = ftp.getReplyCode();
+
+        if (!FTPReply.isPositiveCompletion(reply)) {
+            ftp.disconnect();
+            System.err.println("FTP server refused connection.");
+            return;
+        }
+
+        ftp.login(ftpOptions.getLogin(), ftpOptions.getPassword());
+
+        ftp.changeWorkingDirectory(ftpOptions.getDir());
+
+        ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+
+        // ftp
+        // .setFileTransferMode(FTPClient.PASSIVE_REMOTE_DATA_CONNECTION_MODE);
+
+        // transfer files
+        FileInputStream fis = null;
+        fis = new FileInputStream(fileNameH5);
+
+        ftp.storeFile(sendFileName, fis);
+
+        fis.close();
+
+        boolean sentOK = ftp.rename(sendFileName, sendFileName.replace("tmp",
+                "hdf"));
+
+        msgl.showMessage("file " + fileNameH5 + " sent to "
+                + ftpOptions.getAddress(), sentOK);
 
     }
 
@@ -293,6 +293,7 @@ public class BaltradLocalFeeder extends Thread {
                         java.util.concurrent.TimeUnit.SECONDS);
             } catch (InterruptedException ix) {
                 // we'll ignore being interrupted
+                System.out.println("watch service interrupted.");
                 continue;
             } catch (ClosedWatchServiceException cwse) {
                 // other thread closed watch service
@@ -306,14 +307,19 @@ public class BaltradLocalFeeder extends Thread {
                 Iterator<RadarOpt> itr = fileTimeMap.keySet().iterator();
                 while (itr.hasNext()) {
                     RadarOpt key = itr.next();
-
                     time = fileTimeMap.get(key);
                     if ((timeNow - time) > 3000) {
                         fileTimeMap.remove(key);
                         itr = fileTimeMap.keySet().iterator();
                         msgl.showMessage(key.radarName + " download finished",
                                 verbose);
-                        convertAndSendFile(key);
+                        try {
+                            convertAndSendFile(key);
+                        } catch (Exception e1) {
+                            // TODO Auto-generated catch block
+                            System.out.println("Convertion method has crashed");
+                            e1.printStackTrace();
+                        }
 
                     }
                 }
@@ -350,7 +356,6 @@ public class BaltradLocalFeeder extends Thread {
                     radarOpt.radarName = pathMap.get(signalledKey)
                             .getRadarName();
                     radarOpt.prefix = pathMap.get(signalledKey).getFileName();
-                    radarOpt.platform = pathMap.get(signalledKey).getPlatform();
                     if (!radarOpt.path.endsWith("/"))
                         radarOpt.path += "/";
 
@@ -388,7 +393,6 @@ public class BaltradLocalFeeder extends Thread {
         private String path = "";
         private String radarName = "";
         private String prefix = "";
-        private String platform = "";
 
     }
 

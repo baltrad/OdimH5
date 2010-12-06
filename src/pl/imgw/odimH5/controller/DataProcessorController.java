@@ -16,11 +16,9 @@ import org.w3c.dom.NodeList;
 import pl.imgw.odimH5.model.DataProcessorModel;
 import pl.imgw.odimH5.model.rainbow.Model;
 import pl.imgw.odimH5.model.rainbow.ModelImage;
-import pl.imgw.odimH5.model.rainbow.ModelPVOL;
 import pl.imgw.odimH5.model.rainbow.ModelRHI;
 import pl.imgw.odimH5.model.rainbow.ModelVP;
-import pl.imgw.odimH5.model.rainbow531.Model531;
-import pl.imgw.odimH5.model.rainbow531.Model531PVOL;
+import pl.imgw.odimH5.model.rainbow.RainbowPVOL;
 import pl.imgw.odimH5.util.BaltradLocalFeeder;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.MessageLogger;
@@ -39,14 +37,12 @@ import eu.baltrad.frame.model.BaltradFrameHandler;
 public class DataProcessorController {
 
     // Constants
-    public final static String RAINBOW531_PLATFORM = "RAINBOW531";
     public final static String RAINBOW_PLATFORM = "RAINBOW";
 
     // Reference to DataProcessorModel object
     private DataProcessorModel proc;
     // Reference to RAINBOWModel object
     private Model rainbow;
-    private Model531 rainbow531;
     // Reference to CommandLineArgsParser object
     private CommandLineArgsParser cmd;
     // Reference to MessageLogger object
@@ -110,12 +106,11 @@ public class DataProcessorController {
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
                 && cmd.hasArgument(cmd.FILE_OBJECT_OPTION)
                 && cmd.hasArgument(cmd.PLATFORM_OPTION)) {
-            
-            String fileName = "";
+
             String fileNameOut = "";
 
             if (cmd.hasArgument(cmd.OUTPUT_FILE_OPTION))
-                fileName = cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION);
+                fileNameOut = cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION);
             // else
             // fileName = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + ".h5";
 
@@ -138,56 +133,40 @@ public class DataProcessorController {
 
                 if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.PVOL)) {
-                    fileNameOut = ModelPVOL.createDescriptor(fileName, fileBuff, verbose,
-                            rainbow, options);
+                    /*
+                     * old way of making conversion
+                     * fileNameOut = ModelPVOL.createDescriptor(fileName,
+                     * fileBuff, verbose, rainbow, options);
+                     */
+                    RainbowPVOL vol = new RainbowPVOL(fileNameOut, fileBuff,
+                            verbose, rainbow, options);
+
+                    if (vol.getOutputFileName().endsWith("hdf")
+                            || vol.getOutputFileName().endsWith("h5"))
+                        vol.makeH5();
+                    else
+                        vol.makeXML();
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.IMAGE)) {
-                    fileNameOut = ModelImage.createDescriptor(fileName, fileBuff, verbose,
-                            rainbow, options);
+                    fileNameOut = ModelImage.createDescriptor(fileNameOut,
+                            fileBuff, verbose, rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.VP)) {
-                    fileNameOut = ModelVP.createDescriptor(fileName, fileBuff, verbose,
-                            rainbow, options);
+                    fileNameOut = ModelVP.createDescriptor(fileNameOut,
+                            fileBuff, verbose, rainbow, options);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.RHI)) {
-                    fileNameOut = ModelRHI.createDescriptor(fileName, fileBuff, verbose,
-                            rainbow, options);
+                    fileNameOut = ModelRHI.createDescriptor(fileNameOut,
+                            fileBuff, verbose, rainbow, options);
                 }
 
-            } else if (cmd.getArgumentValue(cmd.PLATFORM_OPTION).equals(
-                    RAINBOW531_PLATFORM)) {
-
-                if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
-                        rainbow.PVOL)) {
-                    fileNameOut = Model531PVOL.createDescriptor(fileName, fileBuff, verbose,
-                            rainbow531, options);
-
-                }
-                // else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
-                // rainbow.IMAGE)) {
-                // ModelImage.createDescriptor(fileName, fileBuff, verbose,
-                // rainbow, options);
-                //
-                // } else if
-                // (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
-                // rainbow.VP)) {
-                // ModelVP.createDescriptor(fileName, fileBuff, verbose,
-                // rainbow, options);
-                //
-                // } else if
-                // (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
-                // rainbow.RHI)) {
-                // ModelRHI.createDescriptor(fileName, fileBuff, verbose,
-                // rainbow, options);
-                // }
-
-            }
+            } 
 
             // Other platforms will come here at a later time...
-            if(!fileNameOut.isEmpty())
+            if (!fileNameOut.isEmpty())
                 msgl.showMessage("Descriptor preparation completed.", verbose);
 
         } else if (cmd.hasArgument(cmd.CONTINOUOS_OPTION)) {
@@ -202,7 +181,7 @@ public class DataProcessorController {
             }
 
             BaltradLocalFeeder worker = new BaltradLocalFeeder(doc, rainbow,
-                    rainbow531, proc, msgl, verbose);
+                    proc, msgl, verbose);
             worker.start();
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
@@ -248,25 +227,6 @@ public class DataProcessorController {
      */
     public void setDataProcessorModel(DataProcessorModel proc) {
         this.proc = proc;
-    }
-
-    /**
-     * Method returns reference to RAINBOWModel object.
-     * 
-     * @return Reference to RAINBOWModel object
-     */
-    public Model531 getRAINBOW531Model() {
-        return rainbow531;
-    }
-
-    /**
-     * Method sets reference to RAINBOWModel object.
-     * 
-     * @param rainbow
-     *            Reference to RAINBOWModel object
-     */
-    public void setRAINBOW531Model(Model531 rainbow531) {
-        this.rainbow531 = rainbow531;
     }
 
     /**
