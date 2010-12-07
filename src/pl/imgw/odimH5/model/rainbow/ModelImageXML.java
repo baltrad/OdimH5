@@ -31,10 +31,10 @@ public class ModelImageXML {
      *            verbose mode
      * @return XML document
      */
-    public static Document createDescriptor(ParametersContainer cont, Model rb,
+    public static Document createDescriptor(ParametersContainer cont, RainbowModel rb,
             boolean verbose) {
         // Create XML document object
-        Document od = rb.proc.createXMLDocumentObject(verbose);
+        Document od = rb.hdf.createXMLDocumentObject(verbose);
 
         Comment comment = od
                 .createComment("ODIM_H5 descriptor file, platform: RAINBOW,"

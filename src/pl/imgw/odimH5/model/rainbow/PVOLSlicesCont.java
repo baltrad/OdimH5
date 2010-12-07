@@ -19,10 +19,16 @@ public class PVOLSlicesCont {
 
     private DataBufferContainer dataBuff = null;
     
+    //HDF
     public HashMap<String, String> dsWhat = new HashMap<String, String>();
     public HashMap<String, String> dsWhere = new HashMap<String, String>();
     public HashMap<String, String> dsdWhat = new HashMap<String, String>();
     public HashMap<String, String> dsdData = new HashMap<String, String>();
+    
+    //Rainbow
+    public HashMap<String, String> slice = new HashMap<String, String>();
+    public HashMap<String, String> rayinfo = new HashMap<String, String>();
+    public HashMap<String, String> rawdata = new HashMap<String, String>();
    
     public DataBufferContainer getDataBuff() {
         return dataBuff;

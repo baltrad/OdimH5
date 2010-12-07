@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 
-import pl.imgw.odimH5.model.DataProcessorModel;
+import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.util.DataBufferContainer;
 import pl.imgw.odimH5.util.MessageLogger;
 
@@ -48,7 +48,7 @@ import com.jhlabs.map.proj.ProjectionFactory;
  * @since 1.0
  */
 
-public class Model {
+public class RainbowModel {
 
     public final int PRODUCT = 0;
     public final int VOLUME = 1;
@@ -120,7 +120,7 @@ public class Model {
     // Reference to MessageLogger object
     private MessageLogger msgl;
     // Reference to DataProcessorModel object
-    DataProcessorModel proc;
+    HDF5Model hdf;
 
     /**
      * Method returns reference to MessageLogger object.
@@ -146,8 +146,8 @@ public class Model {
      * 
      * @return Reference to DataProcessorModel object
      */
-    public DataProcessorModel getDataProcessorModel() {
-        return proc;
+    public HDF5Model getHDFModel() {
+        return hdf;
     }
 
     /**
@@ -156,8 +156,8 @@ public class Model {
      * @param proc
      *            Reference to DataProcessorModel object
      */
-    public void setDataProcessorModel(DataProcessorModel proc) {
-        this.proc = proc;
+    public void setHDFModel(HDF5Model proc) {
+        this.hdf = proc;
     }
 
     /**

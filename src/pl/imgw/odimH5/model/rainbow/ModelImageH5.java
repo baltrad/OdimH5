@@ -4,7 +4,7 @@
 package pl.imgw.odimH5.model.rainbow;
 
 import ncsa.hdf.hdf5lib.HDF5Constants;
-import pl.imgw.odimH5.model.DataProcessorModel;
+import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.ParametersContainer;
 
 /**
@@ -28,10 +28,10 @@ public class ModelImageH5 {
      * @param verbose
      *            verbose mode
      */
-    public static void createDescriptor(ParametersContainer cnt, Model rb,
+    public static void createDescriptor(ParametersContainer cnt, RainbowModel rb,
             String fileName, int[][] infDataBuff, boolean verbose) {
 
-        DataProcessorModel proc = rb.getDataProcessorModel();
+        HDF5Model proc = rb.getHDFModel();
 
         // HDF5 file identifier
         int file_id = -1;

@@ -13,13 +13,13 @@ import ncsa.hdf.hdf5lib.HDF5Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import pl.imgw.odimH5.model.DataProcessorModel;
-import pl.imgw.odimH5.model.rainbow.Model;
+import pl.imgw.odimH5.model.HDF5Model;
+import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.model.rainbow.ModelImage;
 import pl.imgw.odimH5.model.rainbow.ModelRHI;
 import pl.imgw.odimH5.model.rainbow.ModelVP;
 import pl.imgw.odimH5.model.rainbow.RainbowPVOL;
-import pl.imgw.odimH5.util.BaltradLocalFeeder;
+import pl.imgw.odimH5.util.LocalFeeder;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.MessageLogger;
 import pl.imgw.odimH5.util.OptionsHandler;
@@ -40,9 +40,9 @@ public class DataProcessorController {
     public final static String RAINBOW_PLATFORM = "RAINBOW";
 
     // Reference to DataProcessorModel object
-    private DataProcessorModel proc;
+    private HDF5Model hdf;
     // Reference to RAINBOWModel object
-    private Model rainbow;
+    private RainbowModel rainbow;
     // Reference to CommandLineArgsParser object
     private CommandLineArgsParser cmd;
     // Reference to MessageLogger object
@@ -86,20 +86,20 @@ public class DataProcessorController {
             int status = -1;
 
             // Get a list of top-level nodes
-            NodeList topLevelNodes = proc.getTopLevelNodes(proc
+            NodeList topLevelNodes = hdf.getTopLevelNodes(hdf
                     .parseDescriptor(cmd
                             .getArgumentValue(cmd.INPUT_FILE_OPTION), verbose));
             // Append root path to top-level nodes
-            proc.appendRootPath(topLevelNodes);
+            hdf.appendRootPath(topLevelNodes);
             // Create new HDF5 file
-            file_id = proc.H5Fcreate_wrap(cmd
+            file_id = hdf.H5Fcreate_wrap(cmd
                     .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
                     HDF5Constants.H5F_ACC_TRUNC, HDF5Constants.H5P_DEFAULT,
                     HDF5Constants.H5P_DEFAULT, verbose);
             // Create HDF5 file based on XML descriptor
-            proc.H5FcreateFromXML(topLevelNodes, file_id, verbose);
+            hdf.H5FcreateFromXML(topLevelNodes, file_id, verbose);
             // Close HDF5 file
-            status = proc.H5Fclose_wrap(file_id, verbose);
+            status = hdf.H5Fclose_wrap(file_id, verbose);
 
             msgl.showMessage("Conversion completed.", verbose);
 
@@ -125,7 +125,7 @@ public class DataProcessorController {
 
             RadarOptions[] options = OptionsHandler.getRadarOptions(doc);
             // Read input file
-            byte[] fileBuff = proc.readDataFile(cmd
+            byte[] fileBuff = hdf.readDataFile(cmd
                     .getArgumentValue(cmd.INPUT_FILE_OPTION), verbose);
             // Data processing depending on platform type
             if (cmd.getArgumentValue(cmd.PLATFORM_OPTION).equals(
@@ -133,11 +133,12 @@ public class DataProcessorController {
 
                 if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.PVOL)) {
-                    /*
-                     * old way of making conversion
-                     * fileNameOut = ModelPVOL.createDescriptor(fileName,
-                     * fileBuff, verbose, rainbow, options);
-                     */
+                   
+                    //only input files with ".vol" extention will be accepted
+                    if(cmd.getArgumentValue(cmd.INPUT_FILE_OPTION).endsWith("vol")) {
+                        
+                    
+                    
                     RainbowPVOL vol = new RainbowPVOL(fileNameOut, fileBuff,
                             verbose, rainbow, options);
 
@@ -146,7 +147,11 @@ public class DataProcessorController {
                         vol.makeH5();
                     else
                         vol.makeXML();
-
+                    } else if(cmd.getArgumentValue(cmd.INPUT_FILE_OPTION).endsWith("h5")) {
+                     
+                        //TO-DO: hdf to rainbow conversion
+                        
+                    }
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.IMAGE)) {
                     fileNameOut = ModelImage.createDescriptor(fileNameOut,
@@ -180,8 +185,8 @@ public class DataProcessorController {
                 return;
             }
 
-            BaltradLocalFeeder worker = new BaltradLocalFeeder(doc, rainbow,
-                    proc, msgl, verbose);
+            LocalFeeder worker = new LocalFeeder(doc, rainbow,
+                    hdf, msgl, verbose);
             worker.start();
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
@@ -215,8 +220,8 @@ public class DataProcessorController {
      * 
      * @return Reference to DataProcessorModel object
      */
-    public DataProcessorModel getDataProcessorModel() {
-        return proc;
+    public HDF5Model getHDFModel() {
+        return hdf;
     }
 
     /**
@@ -225,8 +230,8 @@ public class DataProcessorController {
      * @param proc
      *            Reference to DataProcessorModel object
      */
-    public void setDataProcessorModel(DataProcessorModel proc) {
-        this.proc = proc;
+    public void setHDFModel(HDF5Model proc) {
+        this.hdf = proc;
     }
 
     /**
@@ -234,7 +239,7 @@ public class DataProcessorController {
      * 
      * @return Reference to RAINBOWModel object
      */
-    public Model getRAINBOWModel() {
+    public RainbowModel getRAINBOWModel() {
         return rainbow;
     }
 
@@ -244,7 +249,7 @@ public class DataProcessorController {
      * @param rainbow
      *            Reference to RAINBOWModel object
      */
-    public void setRAINBOWModel(Model rainbow) {
+    public void setRAINBOWModel(RainbowModel rainbow) {
         this.rainbow = rainbow;
     }
 

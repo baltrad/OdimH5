@@ -37,7 +37,7 @@ public class ModelRHI {
      *            Rainbow class model
      */
     public static String createDescriptor(String fileName, byte[] fileBuff,
-            boolean verbose, Model rb, RadarOptions[] options) {
+            boolean verbose, RainbowModel rb, RadarOptions[] options) {
 
         boolean isDirect = false;
         if (fileName.endsWith(".h5"))
@@ -196,7 +196,7 @@ public class ModelRHI {
         } else {
 
             // Save data buffer to file
-            String dataDir = rb.proc.createDirectory("data", verbose);
+            String dataDir = rb.hdf.createDirectory("data", verbose);
             String dataFileName = dataDir + File.separator + rb.H5_DATA_N
                     + ".dat";
 
@@ -207,7 +207,7 @@ public class ModelRHI {
             rb.writeRAINBOWData(infDataBuff, dataFileName, verbose);
 
             // Save XML document in file
-            rb.proc.saveXMLFile(od, fileName, verbose);
+            rb.hdf.saveXMLFile(od, fileName, verbose);
 
         }
         return fileName;

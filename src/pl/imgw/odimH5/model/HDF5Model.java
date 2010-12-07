@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,6 +21,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import ncsa.hdf.hdf5lib.H5;
 import ncsa.hdf.hdf5lib.HDF5Constants;
 import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
+import ncsa.hdf.object.Attribute;
+import ncsa.hdf.object.Dataset;
+import ncsa.hdf.object.FileFormat;
+import ncsa.hdf.object.Group;
+import ncsa.hdf.object.HObject;
+import ncsa.hdf.object.h5.H5File;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.OutputFormat;
@@ -32,13 +39,13 @@ import org.w3c.dom.NodeList;
 import pl.imgw.odimH5.util.MessageLogger;
 
 /**
- * Class encapsulating common data processing methods.
+ * Class encapsulating HDF5 processing methods.
  * 
  * @author szewczenko
  * @version 1.0
  * @since 1.0
  */
-public class DataProcessorModel {
+public class HDF5Model {
 
     // Constants
     private static final String XML_ATTR = "attribute";
@@ -1027,6 +1034,320 @@ public class DataProcessorModel {
         }
 
         return newArray;
+    }
+    
+    /**
+     * Method used to verify whether current file is HDF5 file 
+     * 
+     * @param fileName Input file name 
+     * @return True if current file is HDF5 file
+     */
+    public boolean verifyHDF5File( String fileName ) {
+        boolean res;
+        try {    
+            FileFormat fileFormat = FileFormat.getFileFormat( FileFormat.FILE_TYPE_HDF5 );
+            H5File inputFile = ( H5File )fileFormat.open( fileName, FileFormat.READ );
+            inputFile.open();
+            res = true;
+        } catch ( Exception e ) {
+            res = false;
+        }
+        return res;
+    }
+    /**
+     * Method opens HDF5 file
+     * 
+     * @param fileName Input file name
+     * @return Reference to open HDF5 file
+     */
+    public H5File openHDF5File( String fileName ) {
+        FileFormat fileFormat = FileFormat.getFileFormat( FileFormat.FILE_TYPE_HDF5 );
+        H5File inputFile = null;
+        try {
+            inputFile = ( H5File )fileFormat.open( fileName, FileFormat.READ );
+            inputFile.open();
+        } catch( Exception e ) {}
+        return inputFile;
+    }
+    /**
+     * Method opens HDF5 file and gets its root group
+     * 
+     * @param inputFile Reference to open HDF5 file 
+     * @return Root group of HDF5 file 
+     */
+    public Group getHDF5RootGroup( H5File inputFile, boolean verbose ) {
+        Group root = null;
+        try {
+            root = ( Group )( ( javax.swing.tree.DefaultMutableTreeNode )
+                            inputFile.getRootNode() ).getUserObject();    
+        } catch( Exception e ) {
+            msgl.showMessage( "I/O error: Error while opening HDF5 file", verbose );
+        }
+        return root;       
+    }   
+    /**
+     * Method retrieves HDF5 string attribute value
+     * 
+     * @param grp Root group of HDF5 file
+     * @param grpName Root group name of HDF5 file
+     * @param attrName Attribute name which value is retrieved 
+     * @param verbose 
+     * @return Given attribute value 
+     */
+    public String getHDF5StringValue( Group grp, String grpName, String attrName, boolean verbose ) {
+        List grpsList = grp.getMemberList();
+        HObject obj = null;
+        String[ ] ret = null;
+        try {
+            for( int i=0; i<grpsList.size(); i++ ) {
+                obj = ( HObject )grpsList.get( i );
+                // if group name matches given name, retrieve its attributes
+                if( obj.toString().matches( grpName ) ) {
+                    List attrsList = obj.getMetadata();
+                    // if attribute name matches given name, retrieve its value
+                    for( int j=0; j<attrsList.size(); j++ ) {
+                        Attribute attr = ( Attribute )attrsList.get( j );
+                        if( attr.getName().matches( attrName )) {
+                            ret = ( String[] )attr.getValue();
+                        }
+                    }
+                }
+            }                
+        } catch( Exception e ) {
+            msgl.showMessage( "I/O error: Error while retrieving HDF5 string attribute value",
+                                            verbose );
+        } 
+        return( ret[ 0 ] );
+    }
+    /**
+     * Method etrieves HDF5 integer attribute value
+     * 
+     * @param grp Root group of HDF5 file
+     * @param grpName Root group name of HDF5 file
+     * @param attrName Attribute name which value is retrieved 
+     * @param verbose 
+     * @return Given attribute value 
+     */
+    public int getHDF5IntegerValue( Group grp, String grpName, String attrName, boolean verbose ) {
+        List grpsList = grp.getMemberList();
+        HObject obj = null;
+        int[ ] ret = null;
+        try {
+            for( int i=0; i<grpsList.size(); i++ ) {
+                obj = ( HObject )grpsList.get( i );
+                // if group name matches given name, retrieve its attributes
+                if( obj.toString().matches( grpName ) ) {
+                    List attrsList = obj.getMetadata();
+                    // if attribute name matches given name, retrieve its value
+                    for( int j=0; j<attrsList.size(); j++ ) {
+                        Attribute attr = ( Attribute )attrsList.get( j );
+                        if( attr.getName().matches( attrName )) {
+                            ret = ( int[] )attr.getValue();
+                        }
+                    }
+                }
+            }
+        } catch( Exception e ) {
+            msgl.showMessage( "I/O error: Error while retrieving HDF5 integer attribute value", 
+                                            verbose );
+        }
+        return( ret[ 0 ] );
+    }
+    /**
+     * Method retrieves HDF5 float attribute value
+     * 
+     * @param grp Root group of HDF5 file
+     * @param grpName Root group name of HDF5 file
+     * @param attrName Attribute name which value is retrieved 
+     * @param verbose 
+     * @return Given attribute value 
+     */
+    public float getHDF5FloatValue( Group grp, String grpName, String attrName, boolean verbose ) {    
+        List grpsList = grp.getMemberList();
+        HObject obj = null;
+        float[ ] ret = null;
+        try {
+            for( int i=0; i<grpsList.size(); i++ ) {
+                obj = ( HObject )grpsList.get( i );
+                // if group name matches given name, retrieve its attributes
+                if( obj.toString().matches( grpName ) ) {
+                    List attrsList = obj.getMetadata();
+                    // if attribute name matches given name, retrieve its value
+                    for( int j=0; j<attrsList.size(); j++ ) {
+                        Attribute attr = ( Attribute )attrsList.get( j );
+                        if( attr.getName().matches( attrName )) {
+                            ret = ( float[ ] )attr.getValue();
+                        }   
+                    }   
+                }       
+            }
+        } catch( Exception e ) {
+            msgl.showMessage( "I/O error: Error while retrieving HDF5 float attribute value", 
+                                            verbose );
+        }
+        return( ret[ 0 ] ); 
+    }
+    /**
+     * Method retrieves HDF5 leaf string attribute value
+     * 
+     * @param grp Root group of HDF5 file
+     * @param grpName Root group name of HDF5 file
+     * @param leafGrpName Leaf group name of HDF5 file 
+     * @param leafAttrName Leaf attribute name which value is retrieved 
+     * @param verbose 
+     * @return Given leaf attribute value 
+     */
+    public String getHDF5StringLeafValue( Group grp, String grpName, String leafGrpName, 
+                                                String leafAttrName, boolean verbose ) {
+        List grpsList = grp.getMemberList();
+        HObject obj = null;
+        String[ ] ret = null;
+        try {
+            for( int i = 0; i < grpsList.size(); i++ ) {
+                obj = ( HObject )grpsList.get( i );
+                // if group name matches given group name, retrieve its subgroups
+                if( obj.toString().matches( grpName ) ) {
+                    Group g = ( Group )grpsList.get( i );
+                    List leafGrpsList = g.getMemberList();
+                    for( int j = 0; j < leafGrpsList.size(); j++ ) {
+                        obj = ( HObject )leafGrpsList.get( j );
+                        // if subgroup name matches given subgroup, retrieve its attributes
+                        if( obj.toString().matches( leafGrpName ) ) {
+                            List leafAttrsList = obj.getMetadata();
+                            for( int k = 0; k < leafAttrsList.size(); k++ ) {
+                                Attribute leafAttr = ( Attribute )leafAttrsList.get( k );
+                                // if leaf attribute name matches given leaf attribute name,
+                                // retrieve its value
+                                if( leafAttr.getName().matches( leafAttrName ) ) {
+                                    ret = ( String[ ] )leafAttr.getValue();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch( Exception e ) {
+            msgl.showMessage( "I/O error: Error while retrieving HDF5 string attribute value", 
+                                            verbose );
+        }
+        return( ret[ 0 ] );
+    }
+    /**
+     * Method retrieves of HDF5 leaf float attribute value
+     * 
+     * @param grp Root group of HDF5 file
+     * @param grpName Root group name of HDF5 file
+     * @param leafGrpName Leaf group name of HDF5 file 
+     * @param leafAttrName Leaf attribute name which value is retrieved 
+     * @param verbose 
+     * @return Given attribute value 
+     */
+    public float getHDF5FloatLeafValue( Group grp, String grpName, String leafGrpName, 
+                                                String leafAttrName, boolean verbose ) {
+        List grpsList = grp.getMemberList();
+        HObject obj = null;
+        float[ ] ret = null;
+        try {
+            for( int i = 0; i < grpsList.size(); i++ ) {
+                obj = ( HObject )grpsList.get( i );
+                // if group name matches given group name, retrieve its subgroups
+                if( obj.toString().matches( grpName ) ) {
+                    Group g = ( Group )grpsList.get( i );
+                    List leafGrpsList = g.getMemberList();
+                    for( int j = 0; j < leafGrpsList.size(); j++ ) {
+                        obj = ( HObject )leafGrpsList.get( j );
+                        // if subgroup name matches given subgroup, retrieve its attributes
+                        if( obj.toString().matches( leafGrpName ) ) {
+                            List leafAttrsList = obj.getMetadata();
+                            for( int k = 0; k < leafAttrsList.size(); k++ ) {
+                                Attribute leafAttr = ( Attribute )leafAttrsList.get( k );
+                                // if leaf attribute name matches given leaf attribute name,
+                                // retrieve its value
+                                if( leafAttr.getName().matches( leafAttrName ) ) {
+                                    ret = ( float[ ] )leafAttr.getValue();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch( Exception e ) {
+            msgl.showMessage( "I/O error: Error while retrieving HDF5 float attribute value", 
+                                            verbose );
+        }
+        return( ret[ 0 ] );
+    }
+
+    /**
+     * Method retrieves HDF5 dataset. Dataset is converted from byte array to
+     * integer array.
+     * 
+     * @param inputFile
+     *            Reference to open HDF5 file
+     * @param datasetPath
+     *            Absolute HDF5 path to dataset
+     * @param width
+     *            Dataset width
+     * @param height
+     *            Dataset height
+     * @param verbose
+     * @return Dataset as integer array
+     */
+    public int[ ][ ] getHDF5Dataset( H5File inputFile, String datasetPath, int width, int height, boolean verbose ) {
+        int[ ][ ] dataArray2D = new int[ width ][ height ];
+        try {
+            Dataset dataset = ( Dataset )inputFile.get( datasetPath );
+            byte[ ] dataArray = ( byte[ ] )dataset.read();
+            int count = 0;
+            for( int x = 0; x < width; x++ ) {
+                for( int y = 0; y < height; y++ ) {
+                    count = y * width + x;                    
+                    dataArray2D[ x ][ y ] = ( int )dataArray[ count ] & 0xFF;
+                }
+            }
+            
+        } catch( Exception e ) {
+            msgl.showMessage( "I/O error: Error while retrieving HDF5 dataset", verbose );
+        }
+        return( dataArray2D );
+    }
+    /**
+     * Method converts HDF5 date format into desired format.
+     * 
+     * @param dateStr Input date string
+     * @param delimiter Date delimiter character
+     * @return Formatted date string
+     */
+    public String parseHDF5Date( String dateStr, String delimiter ) {
+        String date = new String( "" );
+        String year = dateStr.substring( 0, 4 );        
+        date = year; 
+        date += delimiter;
+        String month = dateStr.substring( 4, 6 );
+        date += month;
+        date += delimiter;
+        String day = dateStr.substring( 6, 8 );
+        date += day;
+        return date;
+    }
+    /**
+     * Method converts HDF5 time format into desired format.
+     * 
+     * @param timeStr Input time string
+     * @param delimiter Time delimiter character
+     * @return Formatted time string
+     */
+    public String parseHDF5Time( String timeStr, String delimiter ) {
+        String time = new String( "" );
+        String hour = timeStr.substring( 0, 2 );        
+        time = hour; 
+        time += delimiter;
+        String minute = timeStr.substring( 2, 4 );
+        time += minute;
+        time += delimiter;
+        String second = timeStr.substring( 4, 6 );
+        time += second;
+        return time;
     }
 
 }

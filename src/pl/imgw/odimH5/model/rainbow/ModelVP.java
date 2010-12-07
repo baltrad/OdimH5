@@ -25,7 +25,7 @@ import pl.imgw.odimH5.util.RadarOptions;
 public class ModelVP {
 
     public static String createDescriptor(String fileName, byte[] fileBuff,
-            boolean verbose, Model rb, RadarOptions[] options) {
+            boolean verbose, RainbowModel rb, RadarOptions[] options) {
 
         
         //I'll finish that later ....
@@ -67,12 +67,12 @@ public class ModelVP {
         cont.setSource(source);
         
 
-        String dataDir = rb.proc.createDirectory("data", verbose);
+        String dataDir = rb.hdf.createDirectory("data", verbose);
         String dataFileName = dataDir + File.separator + rb.H5_DATA_N + ".dat";
         cont.setDataFileName(dataFileName);
         
      // Create XML document object
-        Document od = rb.proc.createXMLDocumentObject(verbose);
+        Document od = rb.hdf.createXMLDocumentObject(verbose);
 
         Comment comment = od
                 .createComment("ODIM_H5 descriptor file, platform: RAINBOW,"
@@ -85,7 +85,7 @@ public class ModelVP {
         
         
         // Save XML document in file
-        rb.proc.saveXMLFile(od, fileName, verbose);
+        rb.hdf.saveXMLFile(od, fileName, verbose);
         return fileName;
     }
 

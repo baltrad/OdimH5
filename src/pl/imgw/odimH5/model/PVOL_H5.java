@@ -12,7 +12,7 @@ package pl.imgw.odimH5.model;
  * @author <a href="mailto:lukasz.wojtas@imgw.pl">Lukasz Wojtas</a>
  * 
  */
-public class PVOL {
+public class PVOL_H5 {
 
     // what
     public static final String OBJECT = "object";

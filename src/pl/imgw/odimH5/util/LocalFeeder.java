@@ -25,8 +25,8 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.io.CopyStreamException;
 import org.w3c.dom.Document;
 
-import pl.imgw.odimH5.model.DataProcessorModel;
-import pl.imgw.odimH5.model.rainbow.Model;
+import pl.imgw.odimH5.model.HDF5Model;
+import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.model.rainbow.RainbowPVOL;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
@@ -39,7 +39,7 @@ import eu.baltrad.frame.model.BaltradFrameHandler;
  * @author <a href="mailto:lukasz.wojtas@imgw.pl">Lukasz Wojtas</a>
  * 
  */
-public class BaltradLocalFeeder extends Thread {
+public class LocalFeeder extends Thread {
 
     WatchService watchService = FileSystems.getDefault().newWatchService();
     private RadarOptions[] radarOptions;
@@ -52,7 +52,7 @@ public class BaltradLocalFeeder extends Thread {
     HashMap<WatchKey, RadarOptions> pathMap = new HashMap<WatchKey, RadarOptions>();
     HashMap<RadarOpt, Long> fileTimeMap = new HashMap<RadarOpt, Long>();
 
-    private Model rb;
+    private RainbowModel rb;
     private MessageLogger msgl;
 
     private boolean verbose;
@@ -74,8 +74,8 @@ public class BaltradLocalFeeder extends Thread {
      * @param verbose
      *            verbose mode
      */
-    public BaltradLocalFeeder(Document optionsDoc, Model rb,
-            DataProcessorModel proc, MessageLogger msgl, boolean verbose) {
+    public LocalFeeder(Document optionsDoc, RainbowModel rb,
+            HDF5Model proc, MessageLogger msgl, boolean verbose) {
 
         this.rb = rb;
         this.verbose = verbose;
@@ -208,7 +208,7 @@ public class BaltradLocalFeeder extends Thread {
 
                             msgl.showMessage(fileNameH5 + " cannot be sent to "
                                     + ftpOptions[i].getAddress()
-                                    + "sending file again...", true);
+                                    + " sending file again...", true);
 
                             storeFileOnServer(ftpOptions[i], fileNameH5,
                                     sendFileName);

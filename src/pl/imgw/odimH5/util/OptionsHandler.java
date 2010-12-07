@@ -7,7 +7,7 @@ import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import pl.imgw.odimH5.model.rainbow.Model;
+import pl.imgw.odimH5.model.rainbow.RainbowModel;
 
 /**
  * 
@@ -76,13 +76,13 @@ public class OptionsHandler {
             options[i].setRadarName(radarList.item(i).getAttributes()
                     .getNamedItem("name").getNodeValue());
 
-            options[i].setRadarWMOName(Model.getValueByName(radarList.item(i),
+            options[i].setRadarWMOName(RainbowModel.getValueByName(radarList.item(i),
                     WMO_ID, null));
-            options[i].setFileName(Model.getValueByName(radarList.item(i),
+            options[i].setFileName(RainbowModel.getValueByName(radarList.item(i),
                     FILE_NAME, null));
-            options[i].setDir(Model.getValueByName(radarList.item(i),
+            options[i].setDir(RainbowModel.getValueByName(radarList.item(i),
                     DIRECTORY, null));
-            options[i].setNrays(Model.getValueByName(radarList.item(i), NRAYS,
+            options[i].setNrays(RainbowModel.getValueByName(radarList.item(i), NRAYS,
                     null));
         }
         return options;
@@ -104,9 +104,9 @@ public class OptionsHandler {
         }
         BaltradOptions options = new BaltradOptions();
 
-        options.setSender(Model.getValueByName(baltradList.item(0), SENDER,
+        options.setSender(RainbowModel.getValueByName(baltradList.item(0), SENDER,
                 null));
-        options.setServer(Model.getValueByName(baltradList.item(0), SERVER,
+        options.setServer(RainbowModel.getValueByName(baltradList.item(0), SERVER,
                 null));
 
         return options;
@@ -129,18 +129,18 @@ public class OptionsHandler {
 
             options[i] = new FTP_Options();
 
-            String radars = Model.getValueByName(ftpList.item(i), RADARS, null);
+            String radars = RainbowModel.getValueByName(ftpList.item(i), RADARS, null);
 
             if (radars != null && !radars.isEmpty())
                 options[i].setRadars(radars.split(" "));
 
-            options[i].setAddress(Model.getValueByName(ftpList.item(i),
+            options[i].setAddress(RainbowModel.getValueByName(ftpList.item(i),
                     ADDRESS, null));
-            options[i].setLogin(Model.getValueByName(ftpList.item(i), LOGIN,
+            options[i].setLogin(RainbowModel.getValueByName(ftpList.item(i), LOGIN,
                     null));
-            options[i].setPassword(Model.getValueByName(ftpList.item(i),
+            options[i].setPassword(RainbowModel.getValueByName(ftpList.item(i),
                     PASSWORD, null));
-            options[i].setDir(Model.getValueByName(ftpList.item(i), DIRECTORY,
+            options[i].setDir(RainbowModel.getValueByName(ftpList.item(i), DIRECTORY,
                     null));
         }
         return options;

@@ -38,7 +38,7 @@ public class ModelImage {
      */
     @SuppressWarnings("static-access")
     public static String createDescriptor(String fileNameOut, byte[] fileBuff,
-            boolean verbose, Model rb, RadarOptions[] options) {
+            boolean verbose, RainbowModel rb, RadarOptions[] options) {
 
         boolean isDirect = false;
         if (fileNameOut.endsWith(".h5") || fileNameOut.isEmpty())
@@ -254,7 +254,7 @@ public class ModelImage {
                     verbose);
 
         } else {
-            String dataDir = rb.proc.createDirectory("data", verbose);
+            String dataDir = rb.hdf.createDirectory("data", verbose);
             String dataFileName = dataDir + File.separator + rb.H5_DATA_N
                     + ".dat";
             cont.setDataFileName(dataFileName);
@@ -264,7 +264,7 @@ public class ModelImage {
             // creation
 
             // Save XML document in file
-            rb.proc.saveXMLFile(od, fileNameOut, verbose);
+            rb.hdf.saveXMLFile(od, fileNameOut, verbose);
             // Save data buffer to file
             rb.writeRAINBOWData(infDataBuff, dataFileName, verbose);
         }
