@@ -317,7 +317,7 @@ public class BaltradLocalFeeder extends Thread {
                             convertAndSendFile(key);
                         } catch (Exception e1) {
                             // TODO Auto-generated catch block
-                            System.out.println("Convertion method has crashed");
+                            System.out.println("Conversion method has crashed");
                             e1.printStackTrace();
                         }
 
@@ -339,50 +339,56 @@ public class BaltradLocalFeeder extends Thread {
                     continue;
 
             }
-            List<WatchEvent<?>> list = signalledKey.pollEvents();
+            
+            try {
+                List<WatchEvent<?>> list = signalledKey.pollEvents();
 
-            // VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
-            // key to be reported again by the watch service
-            signalledKey.reset();
+                // VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
+                // key to be reported again by the watch service
+                signalledKey.reset();
 
-            // we'll simply print what has happened; real applications
-            // will do something more sensible here
-            for (WatchEvent<?> e : list) {
-                if (e.kind() == StandardWatchEventKind.ENTRY_CREATE) {
-                    Path context = (Path) e.context();
+                // we'll simply print what has happened; real applications
+                // will do something more sensible here
+                for (WatchEvent<?> e : list) {
+                    if (e.kind() == StandardWatchEventKind.ENTRY_CREATE) {
+                        Path context = (Path) e.context();
 
-                    radarOpt = new RadarOpt();
-                    radarOpt.path = pathMap.get(signalledKey).getDir();
-                    radarOpt.radarName = pathMap.get(signalledKey)
-                            .getRadarName();
-                    radarOpt.prefix = pathMap.get(signalledKey).getFileName();
-                    if (!radarOpt.path.endsWith("/"))
-                        radarOpt.path += "/";
+                        radarOpt = new RadarOpt();
+                        radarOpt.path = pathMap.get(signalledKey).getDir();
+                        radarOpt.radarName = pathMap.get(signalledKey)
+                                .getRadarName();
+                        radarOpt.prefix = pathMap.get(signalledKey).getFileName();
+                        if (!radarOpt.path.endsWith("/"))
+                            radarOpt.path += "/";
 
-                    radarOpt.path += context.toString();
+                        radarOpt.path += context.toString();
 
-                    msgl.showMessage(radarOpt.radarName + " new file: "
-                            + radarOpt.path, verbose);
+                        msgl.showMessage(radarOpt.radarName + " new file: "
+                                + radarOpt.path, verbose);
 
-                    fileTimeMap.put(radarOpt, System.currentTimeMillis());
-                } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {
-                    Path context = (Path) e.context();
+                        fileTimeMap.put(radarOpt, System.currentTimeMillis());
+                    } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {
+                        Path context = (Path) e.context();
 
-                    radarOpt = new RadarOpt();
-                    radarOpt.path = pathMap.get(signalledKey).getDir();
-                    radarOpt.radarName = pathMap.get(signalledKey)
-                            .getRadarName();
-                    radarOpt.prefix = pathMap.get(signalledKey).getFileName();
-                    if (!radarOpt.path.endsWith("/"))
-                        radarOpt.path += "/";
+                        radarOpt = new RadarOpt();
+                        radarOpt.path = pathMap.get(signalledKey).getDir();
+                        radarOpt.radarName = pathMap.get(signalledKey)
+                                .getRadarName();
+                        radarOpt.prefix = pathMap.get(signalledKey).getFileName();
+                        if (!radarOpt.path.endsWith("/"))
+                            radarOpt.path += "/";
 
-                    radarOpt.path += context.toString();
-                    fileTimeMap.put(radarOpt, System.currentTimeMillis());
+                        radarOpt.path += context.toString();
+                        fileTimeMap.put(radarOpt, System.currentTimeMillis());
 
-                } else if (e.kind() == StandardWatchEventKind.OVERFLOW) {
-                    System.out
-                            .println("OVERFLOW: more changes happened than we could retreive");
+                    } else if (e.kind() == StandardWatchEventKind.OVERFLOW) {
+                        System.out
+                                .println("OVERFLOW: more changes happened than we could retreive");
+                    }
                 }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
 
         }
