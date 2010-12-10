@@ -38,7 +38,7 @@ public class RainbowPVOL {
     private RadarOptions[] options;
 
     private String version;
-//    private String radarName = "";
+    // private String radarName = "";
     private String filePrefix = "";
     private String outputFileName = "";
     private String date = "";
@@ -102,8 +102,8 @@ public class RainbowPVOL {
             antSpeed = Double.parseDouble(rb.getRAINBOWMetadataElement(
                     nodeList, "", verbose));
         } catch (NumberFormatException e) {
-            System.out.println("<antspeed> is not a number");
-            return;
+            System.out.println("<antspeed> is missing or is not a number");
+            // return;
         }
 
         shift = (int) (360.0 / antSpeed);
@@ -151,15 +151,17 @@ public class RainbowPVOL {
         // what group
         Element what = od.createElement(rb.H5_GROUP);
         what.setAttribute(rb.H5_OBJECT_NAME, rb.H5_WHAT);
-        what.appendChild(rb.makeAttr(PVOL_H5.OBJECT, rb.PVOL, od, rb.H5_STRING));
-        what.appendChild(rb
-                .makeAttr(PVOL_H5.VERSION, rb.VERSION, od, rb.H5_STRING));
+        what
+                .appendChild(rb.makeAttr(PVOL_H5.OBJECT, rb.PVOL, od,
+                        rb.H5_STRING));
+        what.appendChild(rb.makeAttr(PVOL_H5.VERSION, rb.VERSION, od,
+                rb.H5_STRING));
         what.appendChild(rb.makeAttr(PVOL_H5.DATE, whatG.get(PVOL_H5.DATE), od,
                 rb.H5_STRING));
         what.appendChild(rb.makeAttr(PVOL_H5.TIME, whatG.get(PVOL_H5.TIME), od,
                 rb.H5_STRING));
-        what.appendChild(rb.makeAttr(PVOL_H5.SOURCE, whatG.get(PVOL_H5.SOURCE), od,
-                rb.H5_STRING));
+        what.appendChild(rb.makeAttr(PVOL_H5.SOURCE, whatG.get(PVOL_H5.SOURCE),
+                od, rb.H5_STRING));
         root.appendChild(what);
 
         // where group
@@ -169,8 +171,8 @@ public class RainbowPVOL {
                 rb.H5_DOUBLE));
         where.appendChild(rb.makeAttr(PVOL_H5.LAT, whereG.get(PVOL_H5.LAT), od,
                 rb.H5_DOUBLE));
-        where.appendChild(rb.makeAttr(PVOL_H5.HEIGHT, whereG.get(PVOL_H5.HEIGHT), od,
-                rb.H5_DOUBLE));
+        where.appendChild(rb.makeAttr(PVOL_H5.HEIGHT, whereG
+                .get(PVOL_H5.HEIGHT), od, rb.H5_DOUBLE));
         root.appendChild(where);
 
         // how group
@@ -178,18 +180,18 @@ public class RainbowPVOL {
         how.setAttribute(rb.H5_OBJECT_NAME, rb.H5_HOW);
         how.appendChild(rb.makeAttr(PVOL_H5.STARTEPOCHS, howG
                 .get(PVOL_H5.STARTEPOCHS), od, rb.H5_LONG));
-        how.appendChild(rb.makeAttr(PVOL_H5.ENDEPOCHS, howG.get(PVOL_H5.ENDEPOCHS),
-                od, rb.H5_LONG));
+        how.appendChild(rb.makeAttr(PVOL_H5.ENDEPOCHS, howG
+                .get(PVOL_H5.ENDEPOCHS), od, rb.H5_LONG));
         how.appendChild(rb.makeAttr(PVOL_H5.SYSTEM, rb.RAINBOW_SYSTEM, od,
                 rb.H5_STRING));
         how.appendChild(rb.makeAttr(PVOL_H5.SOFTWARE, rb.RAINBOW_SOFTWARE, od,
                 rb.H5_STRING));
-        how.appendChild(rb.makeAttr(PVOL_H5.SW_VERSION, howG.get(PVOL_H5.SW_VERSION),
-                od, rb.H5_STRING));
-        how.appendChild(rb.makeAttr(PVOL_H5.BEAMWIDTH, howG.get(PVOL_H5.BEAMWIDTH),
-                od, rb.H5_DOUBLE));
-        how.appendChild(rb.makeAttr(PVOL_H5.WAVELENGTH, howG.get(PVOL_H5.WAVELENGTH),
-                od, rb.H5_DOUBLE));
+        how.appendChild(rb.makeAttr(PVOL_H5.SW_VERSION, howG
+                .get(PVOL_H5.SW_VERSION), od, rb.H5_STRING));
+        how.appendChild(rb.makeAttr(PVOL_H5.BEAMWIDTH, howG
+                .get(PVOL_H5.BEAMWIDTH), od, rb.H5_DOUBLE));
+        how.appendChild(rb.makeAttr(PVOL_H5.WAVELENGTH, howG
+                .get(PVOL_H5.WAVELENGTH), od, rb.H5_DOUBLE));
         root.appendChild(how);
 
         for (int i = 0; i < size; i++) {
@@ -203,8 +205,8 @@ public class RainbowPVOL {
             // what
             Element dataset_what = od.createElement(rb.H5_GROUP);
             dataset_what.setAttribute(rb.H5_OBJECT_NAME, rb.H5_WHAT);
-            dataset_what.appendChild(rb.makeAttr(PVOL_H5.PRODUCT, rb.RAINBOW_SCAN,
-                    od, rb.H5_STRING));
+            dataset_what.appendChild(rb.makeAttr(PVOL_H5.PRODUCT,
+                    rb.RAINBOW_SCAN, od, rb.H5_STRING));
             dataset_what.appendChild(rb.makeAttr(PVOL_H5.STARTDATE, s.dsWhat
                     .get(PVOL_H5.STARTDATE), od, rb.H5_STRING));
             dataset_what.appendChild(rb.makeAttr(PVOL_H5.STARTTIME, s.dsWhat
@@ -267,12 +269,13 @@ public class RainbowPVOL {
             dataset1.setAttribute(rb.H5_OBJECT_NAME, rb.H5_DATA);
 
             dataset1.setAttribute(PVOL_H5.DATA_TYPE, rb.H5_INTEGER);
-            dataset1
-                    .setAttribute(PVOL_H5.DATA_SIZE, s.dsdData.get(PVOL_H5.DATA_SIZE));
+            dataset1.setAttribute(PVOL_H5.DATA_SIZE, s.dsdData
+                    .get(PVOL_H5.DATA_SIZE));
             dataset1.setAttribute(PVOL_H5.CHUNK, rb.H5_DATA_CHUNK + "x"
                     + rb.H5_DATA_CHUNK);
 
-            dataset1.setAttribute(PVOL_H5.DIMENSIONS, s.dsWhere.get(PVOL_H5.NRAYS)
+            dataset1.setAttribute(PVOL_H5.DIMENSIONS, s.dsWhere
+                    .get(PVOL_H5.NRAYS)
                     + "x" + s.dsWhere.get(PVOL_H5.NBINS));
             dataset1.setAttribute(PVOL_H5.GZIP_LEVEL, rb.H5_GZIP_LEVEL);
 
@@ -315,10 +318,10 @@ public class RainbowPVOL {
                 rb.PVOL, verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.VERSION, rb.H5_STRING,
                 rb.VERSION, verbose);
-        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.DATE, rb.H5_STRING, whatG
-                .get(PVOL_H5.DATE), verbose);
-        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.TIME, rb.H5_STRING, whatG
-                .get(PVOL_H5.TIME), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.DATE, rb.H5_STRING,
+                whatG.get(PVOL_H5.DATE), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.TIME, rb.H5_STRING,
+                whatG.get(PVOL_H5.TIME), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SOURCE, rb.H5_STRING,
                 whatG.get(PVOL_H5.SOURCE), verbose);
 
@@ -326,30 +329,30 @@ public class RainbowPVOL {
 
         // ======================= where group =============================
         child_group_id = proc.H5Gcreate_wrap(file_id, "/where", 0, verbose);
-        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.LON, rb.H5_DOUBLE, whereG
-                .get(PVOL_H5.LON), verbose);
-        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.LAT, rb.H5_DOUBLE, whereG
-                .get(PVOL_H5.LAT), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.LON, rb.H5_DOUBLE,
+                whereG.get(PVOL_H5.LON), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.LAT, rb.H5_DOUBLE,
+                whereG.get(PVOL_H5.LAT), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.HEIGHT, rb.H5_DOUBLE,
                 whereG.get(PVOL_H5.HEIGHT), verbose);
         proc.H5Gclose_wrap(child_group_id, verbose);
 
         // ======================= how group ===============================
         child_group_id = proc.H5Gcreate_wrap(file_id, "/how", 0, verbose);
-        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.STARTEPOCHS, rb.H5_LONG,
-                howG.get(PVOL_H5.STARTEPOCHS), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.STARTEPOCHS,
+                rb.H5_LONG, howG.get(PVOL_H5.STARTEPOCHS), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.ENDEPOCHS, rb.H5_LONG,
                 howG.get(PVOL_H5.ENDEPOCHS), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SYSTEM, rb.H5_STRING,
                 rb.RAINBOW_SYSTEM, verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SOFTWARE, rb.H5_STRING,
                 rb.RAINBOW_SOFTWARE, verbose);
-        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SW_VERSION, rb.H5_STRING,
-                howG.get(PVOL_H5.SW_VERSION), verbose);
-        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.BEAMWIDTH, rb.H5_DOUBLE,
-                howG.get(PVOL_H5.BEAMWIDTH), verbose);
-        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.WAVELENGTH, rb.H5_DOUBLE,
-                howG.get(PVOL_H5.WAVELENGTH), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SW_VERSION,
+                rb.H5_STRING, howG.get(PVOL_H5.SW_VERSION), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.BEAMWIDTH,
+                rb.H5_DOUBLE, howG.get(PVOL_H5.BEAMWIDTH), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.WAVELENGTH,
+                rb.H5_DOUBLE, howG.get(PVOL_H5.WAVELENGTH), verbose);
         proc.H5Gclose_wrap(child_group_id, verbose);
 
         for (int i = 0; i < size; i++) {
@@ -489,7 +492,8 @@ public class RainbowPVOL {
             if (source.matches(options[i].getRadarName())) {
                 radarName = options[i].getRadarWMOName();
                 filePrefix = options[i].getFileName();
-                nray_new = options[i].getNrays();
+                if (options[i].getNrays() != null)
+                    nray_new = options[i].getNrays();
                 break;
             }
         }
@@ -533,8 +537,8 @@ public class RainbowPVOL {
 
         how.put(PVOL_H5.STARTEPOCHS, rb.convertRAINBOWDate2Epoch(date, time,
                 verbose));
-        how.put(PVOL_H5.ENDEPOCHS, rb
-                .convertRAINBOWDate2Epoch(date, time, verbose));
+        how.put(PVOL_H5.ENDEPOCHS, rb.convertRAINBOWDate2Epoch(date, time,
+                verbose));
         how.put(PVOL_H5.SYSTEM, rb.RAINBOW_SYSTEM);
         how.put(PVOL_H5.SOFTWARE, rb.RAINBOW_SOFTWARE);
         how.put(PVOL_H5.SW_VERSION, version);
@@ -615,8 +619,8 @@ public class RainbowPVOL {
             slices[i].dsWhat.put(PVOL_H5.STARTDATE, date);
             slices[i].dsWhat.put(PVOL_H5.STARTTIME, time);
             slices[i].dsWhat.put(PVOL_H5.ENDDATE, date);
-            slices[i].dsWhat.put(PVOL_H5.ENDTIME, rb.parseRAINBOWTime(time, shift,
-                    verbose));
+            slices[i].dsWhat.put(PVOL_H5.ENDTIME, rb.parseRAINBOWTime(time,
+                    shift, verbose));
 
             // =============== where group ================================
             String posangle = rb.getValueByName(sliceList.item(i), "posangle",
@@ -670,7 +674,8 @@ public class RainbowPVOL {
 
             slices[i].dsdWhat.put(PVOL_H5.QUANTITY, dataType);
             slices[i].dsdWhat.put(PVOL_H5.GAIN, gain);
-            slices[i].dsdWhat.put(PVOL_H5.OFFSET, rb.getRAINBOWOffset(min, gain));
+            slices[i].dsdWhat.put(PVOL_H5.OFFSET, rb
+                    .getRAINBOWOffset(min, gain));
 
             // =============== data dataset ================================
             DataBufferContainer dataBuff = blobs.get(dataBlobNumber);

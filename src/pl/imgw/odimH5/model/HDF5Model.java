@@ -368,16 +368,16 @@ public class HDF5Model {
 
         if (attr_class.equals("long")) {
             attribute_id = H5Acreate_numeric_wrap(group_id, attr_name,
-                    HDF5Constants.H5T_NATIVE_LONG, dataspace_id,
+                    HDF5Constants.H5T_NATIVE_INT, dataspace_id,
                     HDF5Constants.H5P_DEFAULT, verbose);
             long[] value = new long[1];
             value[0] = (long) Long.parseLong(attr_value);
             status = H5Awrite_wrap(attribute_id,
-                    HDF5Constants.H5T_NATIVE_LONG, value, verbose);
+                    HDF5Constants.H5T_NATIVE_INT, value, verbose);
         }
         if (attr_class.equals("double")) {
             attribute_id = H5Acreate_numeric_wrap(group_id, attr_name,
-                    HDF5Constants.H5T_IEEE_F32BE, dataspace_id,
+                    HDF5Constants.H5T_NATIVE_DOUBLE, dataspace_id,
                     HDF5Constants.H5P_DEFAULT, verbose);
             double[] value = new double[1];
             value[0] = (double) Double.parseDouble(attr_value);
@@ -904,8 +904,6 @@ public class HDF5Model {
      *            XML document
      * @param fileName
      *            Output file name
-     * @param verbose
-     *            Verbose mode toggle
      */
     public void saveXMLFile(Document doc, String fileName, boolean verbose) {
 
@@ -1120,7 +1118,7 @@ public class HDF5Model {
         return( ret[ 0 ] );
     }
     /**
-     * Method etrieves HDF5 integer attribute value
+     * Method retrieves HDF5 integer attribute value
      * 
      * @param grp Root group of HDF5 file
      * @param grpName Root group name of HDF5 file
@@ -1162,10 +1160,10 @@ public class HDF5Model {
      * @param verbose 
      * @return Given attribute value 
      */
-    public float getHDF5FloatValue( Group grp, String grpName, String attrName, boolean verbose ) {    
+    public double getHDF5DoubleValue( Group grp, String grpName, String attrName, boolean verbose ) {    
         List grpsList = grp.getMemberList();
         HObject obj = null;
-        float[ ] ret = null;
+        double[ ] ret = null;
         try {
             for( int i=0; i<grpsList.size(); i++ ) {
                 obj = ( HObject )grpsList.get( i );
@@ -1176,7 +1174,7 @@ public class HDF5Model {
                     for( int j=0; j<attrsList.size(); j++ ) {
                         Attribute attr = ( Attribute )attrsList.get( j );
                         if( attr.getName().matches( attrName )) {
-                            ret = ( float[ ] )attr.getValue();
+                            ret = ( double[ ] )attr.getValue();
                         }   
                     }   
                 }       
@@ -1220,6 +1218,7 @@ public class HDF5Model {
                                 // retrieve its value
                                 if( leafAttr.getName().matches( leafAttrName ) ) {
                                     ret = ( String[ ] )leafAttr.getValue();
+                                    
                                 }
                             }
                         }
@@ -1272,8 +1271,101 @@ public class HDF5Model {
                 }
             }
         } catch( Exception e ) {
+            e.printStackTrace();
             msgl.showMessage( "I/O error: Error while retrieving HDF5 float attribute value", 
                                             verbose );
+        }
+        return( ret[ 0 ] );
+    }
+    /**
+     * Method retrieves of HDF5 leaf float attribute value
+     * 
+     * @param grp Root group of HDF5 file
+     * @param grpName Root group name of HDF5 file
+     * @param leafGrpName Leaf group name of HDF5 file 
+     * @param leafAttrName Leaf attribute name which value is retrieved 
+     * @param verbose 
+     * @return Given attribute value 
+     */
+    public int getHDF5IntLeafValue( Group grp, String grpName, String leafGrpName, 
+            String leafAttrName, boolean verbose ) {
+        List grpsList = grp.getMemberList();
+        HObject obj = null;
+        int[ ] ret = null;
+        try {
+            for( int i = 0; i < grpsList.size(); i++ ) {
+                obj = ( HObject )grpsList.get( i );
+                // if group name matches given group name, retrieve its subgroups
+                if( obj.toString().matches( grpName ) ) {
+                    Group g = ( Group )grpsList.get( i );
+                    List leafGrpsList = g.getMemberList();
+                    for( int j = 0; j < leafGrpsList.size(); j++ ) {
+                        obj = ( HObject )leafGrpsList.get( j );
+                        // if subgroup name matches given subgroup, retrieve its attributes
+                        if( obj.toString().matches( leafGrpName ) ) {
+                            List leafAttrsList = obj.getMetadata();
+                            for( int k = 0; k < leafAttrsList.size(); k++ ) {
+                                Attribute leafAttr = ( Attribute )leafAttrsList.get( k );
+                                // if leaf attribute name matches given leaf attribute name,
+                                // retrieve its value
+                                if( leafAttr.getName().matches( leafAttrName ) ) {
+                                    ret = ( int[ ] )leafAttr.getValue();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch( Exception e ) {
+            e.printStackTrace();
+            msgl.showMessage( "I/O error: Error while retrieving HDF5 float attribute value", 
+                    verbose );
+        }
+        return( ret[ 0 ] );
+    }
+    /**
+     * Method retrieves of HDF5 leaf float attribute value
+     * 
+     * @param grp Root group of HDF5 file
+     * @param grpName Root group name of HDF5 file
+     * @param leafGrpName Leaf group name of HDF5 file 
+     * @param leafAttrName Leaf attribute name which value is retrieved 
+     * @param verbose 
+     * @return Given attribute value 
+     */
+    public double getHDF5DoubleLeafValue( Group grp, String grpName, String leafGrpName, 
+            String leafAttrName, boolean verbose ) {
+        List grpsList = grp.getMemberList();
+        HObject obj = null;
+        double[ ] ret = null;
+        try {
+            for( int i = 0; i < grpsList.size(); i++ ) {
+                obj = ( HObject )grpsList.get( i );
+                // if group name matches given group name, retrieve its subgroups
+                if( obj.toString().matches( grpName ) ) {
+                    Group g = ( Group )grpsList.get( i );
+                    List leafGrpsList = g.getMemberList();
+                    for( int j = 0; j < leafGrpsList.size(); j++ ) {
+                        obj = ( HObject )leafGrpsList.get( j );
+                        // if subgroup name matches given subgroup, retrieve its attributes
+                        if( obj.toString().matches( leafGrpName ) ) {
+                            List leafAttrsList = obj.getMetadata();
+                            for( int k = 0; k < leafAttrsList.size(); k++ ) {
+                                Attribute leafAttr = ( Attribute )leafAttrsList.get( k );
+                                // if leaf attribute name matches given leaf attribute name,
+                                // retrieve its value
+                                if( leafAttr.getName().matches( leafAttrName ) ) {
+                                    ret = ( double[ ] )leafAttr.getValue();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch( Exception e ) {
+            e.printStackTrace();
+            msgl.showMessage( "I/O error: Error while retrieving HDF5 float attribute value", 
+                    verbose );
         }
         return( ret[ 0 ] );
     }
@@ -1307,6 +1399,7 @@ public class HDF5Model {
             }
             
         } catch( Exception e ) {
+            e.printStackTrace();
             msgl.showMessage( "I/O error: Error while retrieving HDF5 dataset", verbose );
         }
         return( dataArray2D );

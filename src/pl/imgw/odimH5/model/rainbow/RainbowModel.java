@@ -66,7 +66,7 @@ public class RainbowModel {
     protected final String H5_DATASET = "dataset";
     protected final String H5_DATASET_N = "dataset1";
     protected final String H5_DATA = "data";
-    protected final String H5_DATA_N = "data1";
+    protected final String H5_DATA_1 = "data1";
     protected final String H5_STRING = "string";
     protected final String H5_INTEGER = "integer";
     protected final String H5_DATA_SIZE = "32";
@@ -461,11 +461,28 @@ public class RainbowModel {
 
         Element attribute = outputDoc.createElement(H5_ATTRIBUTE);
         attribute.setAttribute(H5_OBJECT_NAME, attributeName);
-        attribute.setAttribute(H5_OBJECT_CLASS, type);
+        if (!type.isEmpty())
+            attribute.setAttribute(H5_OBJECT_CLASS, type);
         Text text = outputDoc.createTextNode(attributeValue);
         attribute.appendChild(text);
 
         return attribute;
+    }
+    
+    /**
+     * Method creates XML tag element with given name and value.
+     * 
+     * @param tagName
+     * @param value
+     * @param od
+     * @return
+     */
+    public Element makeTag(String tagName, String value, Document od) {
+        Element tag = od.createElement(tagName);
+        Text text = od.createTextNode(value);
+        tag.appendChild(text);
+        return tag;
+        
     }
 
     /**

@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.HDF5Model;
+import pl.imgw.odimH5.model.rainbow.HDF5PVOL;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.model.rainbow.ModelImage;
 import pl.imgw.odimH5.model.rainbow.ModelRHI;
@@ -86,9 +87,8 @@ public class DataProcessorController {
             int status = -1;
 
             // Get a list of top-level nodes
-            NodeList topLevelNodes = hdf.getTopLevelNodes(hdf
-                    .parseDescriptor(cmd
-                            .getArgumentValue(cmd.INPUT_FILE_OPTION), verbose));
+            NodeList topLevelNodes = hdf.getTopLevelNodes(hdf.parseDescriptor(
+                    cmd.getArgumentValue(cmd.INPUT_FILE_OPTION), verbose));
             // Append root path to top-level nodes
             hdf.appendRootPath(topLevelNodes);
             // Create new HDF5 file
@@ -108,6 +108,7 @@ public class DataProcessorController {
                 && cmd.hasArgument(cmd.PLATFORM_OPTION)) {
 
             String fileNameOut = "";
+            String fileNameIn = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION);
 
             if (cmd.hasArgument(cmd.OUTPUT_FILE_OPTION))
                 fileNameOut = cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION);
@@ -133,24 +134,23 @@ public class DataProcessorController {
 
                 if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.PVOL)) {
-                   
-                    //only input files with ".vol" extention will be accepted
-                    if(cmd.getArgumentValue(cmd.INPUT_FILE_OPTION).endsWith("vol")) {
-                        
-                    
-                    
-                    RainbowPVOL vol = new RainbowPVOL(fileNameOut, fileBuff,
-                            verbose, rainbow, options);
 
-                    if (vol.getOutputFileName().endsWith("hdf")
-                            || vol.getOutputFileName().endsWith("h5"))
-                        vol.makeH5();
-                    else
-                        vol.makeXML();
-                    } else if(cmd.getArgumentValue(cmd.INPUT_FILE_OPTION).endsWith("h5")) {
-                     
-                        //TO-DO: hdf to rainbow conversion
-                        
+                    // only input files with ".vol" extention will be accepted
+                    if (fileNameIn.endsWith("vol")) {
+
+                        RainbowPVOL vol = new RainbowPVOL(fileNameOut,
+                                fileBuff, verbose, rainbow, options);
+
+                        if (vol.getOutputFileName().endsWith("hdf")
+                                || vol.getOutputFileName().endsWith("h5"))
+                            vol.makeH5();
+                        else
+                            vol.makeXML();
+                    } else if (fileNameIn.endsWith("h5")) {
+
+                        HDF5PVOL hdf = new HDF5PVOL(fileNameOut, fileNameIn,
+                                verbose, rainbow, options);
+
                     }
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.IMAGE)) {
@@ -168,7 +168,7 @@ public class DataProcessorController {
                             fileBuff, verbose, rainbow, options);
                 }
 
-            } 
+            }
 
             // Other platforms will come here at a later time...
             if (!fileNameOut.isEmpty())
@@ -185,8 +185,8 @@ public class DataProcessorController {
                 return;
             }
 
-            LocalFeeder worker = new LocalFeeder(doc, rainbow,
-                    hdf, msgl, verbose);
+            LocalFeeder worker = new LocalFeeder(doc, rainbow, hdf, msgl,
+                    verbose);
             worker.start();
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)

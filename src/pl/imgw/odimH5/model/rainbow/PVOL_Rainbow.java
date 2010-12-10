@@ -33,6 +33,13 @@ public class PVOL_Rainbow {
     public static final String DATE = "date";
     
     public static final String SLICE = "slice";
+    public static final String POSANGLE = "posangle";
+    public static final String STOPRANGE = "stoprange";
+    public static final String STARTANGLE = "startangle";
+    public static final String STOPANGLE = "stopangle";
+    public static final String RANGESTEP = "rangestep";
+    public static final String RANGESAMP = "rangesamp";
+    
     public static final String REFID = "refid";
     public static final String SLICEDATA = "slicedata";
     

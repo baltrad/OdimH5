@@ -18,6 +18,8 @@ import pl.imgw.odimH5.util.DataBufferContainer;
 public class PVOLSlicesCont {
 
     private DataBufferContainer dataBuff = null;
+    private int[][] datasetFromHdf = null;
+
     
     //HDF
     public HashMap<String, String> dsWhat = new HashMap<String, String>();
@@ -33,9 +35,18 @@ public class PVOLSlicesCont {
     public DataBufferContainer getDataBuff() {
         return dataBuff;
     }
+    
     public void setDataBuff(DataBufferContainer dataBuff) {
         this.dataBuff = dataBuff;
     }
-       
+   
+    public int[][] getDatasetFromHdf() {
+        return datasetFromHdf;
+    }
+    
+    public void setDatasetFromHdf(int[][] datasetFromHdf) {
+        this.datasetFromHdf = datasetFromHdf;
+    }
+    
     
 }

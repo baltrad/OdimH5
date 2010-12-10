@@ -149,7 +149,7 @@ public class ModelImageXML {
 
         // ====================== data group ================================
         Element data = od.createElement(rb.H5_GROUP);
-        data.setAttribute(rb.H5_OBJECT_NAME, rb.H5_DATA_N);
+        data.setAttribute(rb.H5_OBJECT_NAME, rb.H5_DATA_1);
 
         // dataset
         Element dataset = od.createElement(rb.H5_DATASET);

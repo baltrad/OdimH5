@@ -68,7 +68,7 @@ public class ModelVP {
         
 
         String dataDir = rb.hdf.createDirectory("data", verbose);
-        String dataFileName = dataDir + File.separator + rb.H5_DATA_N + ".dat";
+        String dataFileName = dataDir + File.separator + rb.H5_DATA_1 + ".dat";
         cont.setDataFileName(dataFileName);
         
      // Create XML document object

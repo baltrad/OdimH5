@@ -206,7 +206,9 @@ public class LocalFeeder extends Thread {
 
                         } catch (CopyStreamException e) {
 
-                            msgl.showMessage(fileNameH5 + " cannot be sent to "
+                            LogsHandler.saveProgramLogs(e.getMessage());
+                            msgl.showMessage(filePath.radarName + " "
+                                    + fileNameH5 + " cannot be sent to "
                                     + ftpOptions[i].getAddress()
                                     + " sending file again...", true);
 
@@ -215,12 +217,15 @@ public class LocalFeeder extends Thread {
 
                         } catch (IOException e) {
 
-                            e.printStackTrace();
                             LogsHandler.saveProgramLogs(e.getMessage());
 
-                            msgl.showMessage(filePath.radarName
-                                    + " file cannot be sent to "
-                                    + ftpOptions[i].getAddress(), true);
+                            msgl.showMessage(filePath.radarName + " "
+                                    + fileNameH5 + " cannot be sent to "
+                                    + ftpOptions[i].getAddress()
+                                    + " sending file again...", true);
+                            
+                            storeFileOnServer(ftpOptions[i], fileNameH5,
+                                    sendFileName);
 
                         }
                     }

@@ -255,7 +255,7 @@ public class ModelImage {
 
         } else {
             String dataDir = rb.hdf.createDirectory("data", verbose);
-            String dataFileName = dataDir + File.separator + rb.H5_DATA_N
+            String dataFileName = dataDir + File.separator + rb.H5_DATA_1
                     + ".dat";
             cont.setDataFileName(dataFileName);
 
