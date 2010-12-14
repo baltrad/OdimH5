@@ -55,7 +55,7 @@ public class CommandLineArgsParser {
     private final static String PLATFORM_DESCRIPTION = "processing software option\n"
             + "<arg>\n CASTOR: Météo France’s system\n EDGE: EEC Edge\n"
             + "FROG: Gamic FROG, MURAN...\n IRIS: Sigmet IRIS\n NORDRAD: NORDRAD\n"
-            + "RADARNET: UKMO’s system\n RAINBOW: Gematronik Rainbow\n RAINBOW531: Gematronik Rainbow ver 5.31";
+            + "RADARNET: UKMO’s system\n RAINBOW: Gematronik Rainbow";
 
     private final static String INPUT_FILE_DESCRIPTION = "input file option\n"
             + "<arg>\n input file's path";

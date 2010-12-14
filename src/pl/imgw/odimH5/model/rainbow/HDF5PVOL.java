@@ -3,10 +3,15 @@
  */
 package pl.imgw.odimH5.model.rainbow;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
@@ -15,6 +20,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import ncsa.hdf.object.Group;
@@ -45,6 +53,8 @@ public class HDF5PVOL {
     private String ver = "5.26.5";
     private String type = "vol";
     private String owner = "rainbow";
+    private String startangle = "startangle";
+    private static final String STOPANGLE = "360";
 
     private HashMap<String, String> volume;
     private HashMap<String, String> radarinfo;
@@ -216,7 +226,7 @@ public class HDF5PVOL {
             slices[i].slice.put(PVOL_Rainbow.STOPRANGE, String.valueOf(nbins));
             slices[i].slice
                     .put(PVOL_Rainbow.STARTANGLE, String.valueOf(rstart));
-            slices[i].slice.put(PVOL_Rainbow.STOPANGLE, String.valueOf(nrays));
+            slices[i].slice.put(PVOL_Rainbow.STOPANGLE, STOPANGLE);
             slices[i].slice.put(PVOL_Rainbow.RANGESTEP, String.valueOf(rscale));
             slices[i].slice.put(PVOL_Rainbow.RANGESAMP, "4");
 
@@ -237,6 +247,8 @@ public class HDF5PVOL {
                     + "/" + rb.H5_DATA;
             int[][] dataset = hdf.getHDF5Dataset(inputFile, path, nrays, nbins,
                     verbose);
+
+            dataset = hdf.transposeArray(dataset, nbins, nrays);
 
             slices[i].setDatasetFromHdf(dataset);
 
@@ -266,6 +278,7 @@ public class HDF5PVOL {
         rinfoTag
                 .setAttribute(PVOL_Rainbow.LAT, radarinfo.get(PVOL_Rainbow.LAT));
         rinfoTag.setAttribute(PVOL_Rainbow.ID, radarinfo.get(PVOL_Rainbow.ID));
+        rinfoTag.appendChild(rb.makeTag(PVOL_Rainbow.NAME, radarName, od));
         rinfoTag.appendChild(rb.makeTag(PVOL_Rainbow.BEAMWIDTH, radarinfo
                 .get(PVOL_Rainbow.BEAMWIDTH), od));
         rinfoTag.appendChild(rb.makeTag(PVOL_Rainbow.WAVELEN, radarinfo
@@ -308,6 +321,7 @@ public class HDF5PVOL {
             sliceDataTag.setAttribute(PVOL_Rainbow.DATE, date);
 
             Element rayinfoTag = od.createElement(PVOL_Rainbow.RAYINFO);
+            rayinfoTag.setAttribute(PVOL_Rainbow.REFID, startangle);
             rayinfoTag.setAttribute(PVOL_Rainbow.BLOBID, slices[i].rayinfo
                     .get(PVOL_Rainbow.BLOBID));
             rayinfoTag.setAttribute(PVOL_Rainbow.RAYS, slices[i].rayinfo
@@ -343,10 +357,10 @@ public class HDF5PVOL {
         rb.hdf.saveXMLFile(od, outputFileName, verbose);
 
         for (int i = 0; i < size; i++) {
-            saveData(outputFileName, makeRayinfoData(nrays[i]), i * 2, "None");
+            saveData(outputFileName, makeRayinfoData(nrays[i]), i * 2, "qt");
             saveData(outputFileName, getByteArray(
-                    slices[i].getDatasetFromHdf(), nrays[i], nbins[i]),
-                    i * 2 + 1, "None");
+                    slices[i].getDatasetFromHdf(), nbins[i], nrays[i]),
+                    i * 2 + 1, "qt");
 
         }
 
@@ -375,8 +389,39 @@ public class HDF5PVOL {
     private void saveData(String fileName, byte[] data, int blobNumber,
             String compresion) {
 
-        int size = data.length;
-        String beg = "<BLOB blobid=\"" + blobNumber + "\" size=\"" + size
+        // Create the compressor with highest level of compression
+        Deflater compressor = new Deflater();
+        compressor.setLevel(Deflater.BEST_COMPRESSION);
+        compresion = "qt";
+        // Give the compressor the data to compress
+        compressor.setInput(data);
+        compressor.finish();
+
+        // Create an expandable byte array to hold the compressed data.
+        // You cannot use an array that's the same size as the orginal because
+        // there is no guarantee that the compressed data will be smaller than
+        // the uncompressed data.
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
+        // Compress the data
+        byte[] buf = new byte[1024];
+
+        while (!compressor.finished()) {
+            int count = compressor.deflate(buf);
+            bos.write(buf, 0, count);
+        }
+        try {
+            bos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // Get the compressed data
+        byte[] compressedData = bos.toByteArray();
+
+        int orgsize = data.length;
+        int compsize = compressedData.length + 4;
+        // System.out.println("orgsize: " + orgsize);
+        // System.out.println("compsize: " + compsize);
+        String beg = "<BLOB blobid=\"" + blobNumber + "\" size=\"" + compsize
                 + "\" compression=\"" + compresion + "\">";
         String end = "</BLOB>";
 
@@ -385,26 +430,28 @@ public class HDF5PVOL {
             FileChannel fc = rf.getChannel();
             fc.position(fc.size());
             fc.write(ByteBuffer.wrap((beg + "\n").getBytes()));
-            fc.write(ByteBuffer.allocate(1).put((byte) 0x0a));
-            fc.write(ByteBuffer.wrap(data));
-            fc.write(ByteBuffer.allocate(1).put((byte) 0x0a));
+            byte[] bytes = ByteBuffer.allocate(4).putInt(orgsize).array();
+            fc.write(ByteBuffer.wrap(bytes));
+            fc.write(ByteBuffer.wrap(compressedData));
+            // fc.write(ByteBuffer.allocate(1).put((byte) 0x0a));
             fc.write(ByteBuffer.wrap(("\n" + end + "\n").getBytes()));
             fc.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
     }
 
     private byte[] makeRayinfoData(int size) {
         byte[] array = new byte[size * 2];
 
-        for (int i = 0; i < size; i += 182) {
-            byte[] bytes = ByteBuffer.allocate(2).putChar((char) i).array();
+        for (int i = 0; i < size; i++) {
+            int a = i * 182;
+            byte[] bytes = ByteBuffer.allocate(2).putShort((short) a).array();
             array[i * 2] = bytes[0];
             array[i * 2 + 1] = bytes[1];
         }
-        
         return array;
     }
 

@@ -798,8 +798,15 @@ public class RainbowModel {
     public String getRAINBOWGain(String min, String max, int res) {
         String gain = null;
 
-        double minVal = Double.parseDouble(min);
-        double maxVal = Double.parseDouble(max);
+        double minVal = 0;
+        double maxVal = 0;
+        try {
+            minVal = Double.parseDouble(min);
+            maxVal = Double.parseDouble(max);
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         double gainVal = (Math.abs(minVal) + Math.abs(maxVal))
                 / (Math.pow(2, res) - 2);
         gain = String.valueOf(round(gainVal, 3));
@@ -1127,6 +1134,7 @@ public class RainbowModel {
                 }
 
                 int buffLen = byteArray2Int(data_byte);
+                System.out.println("4bajty na poczatku to: " + buffLen);
                 DataBufferContainer dbc = new DataBufferContainer();
                 dbc.setDataBuffer(data_buf);
                 dbc.setDataBufferLength(buffLen);

@@ -11,7 +11,7 @@ import pl.imgw.odimH5.model.rainbow.RainbowModel;
 
 /**
  * 
- * Handles options for Baltrad Feeder
+ * Handles options' file
  * 
  * 
  * @author <a href="mailto:lukasz.wojtas@imgw.pl">Lukasz Wojtas</a>
