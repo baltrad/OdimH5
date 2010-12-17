@@ -44,7 +44,7 @@ public class RainbowPVOL {
     private String date = "";
     private String time = "";
     private String rangestep;
-    private String radarName = "";
+    private String source = "";
     private int shift = 0;
     private int size = 0;
     private String nray_new = "";
@@ -128,7 +128,7 @@ public class RainbowPVOL {
         // ============ set output file name ==================
         if (outputFileName.isEmpty()) {
             this.outputFileName = filePrefix + whatG.get(PVOL_H5.DATE)
-                    + whatG.get(PVOL_H5.TIME) + ".h5";
+                    + whatG.get(PVOL_H5.TIME) + ".hdf";
         } else {
             this.outputFileName = outputFileName;
         }
@@ -486,6 +486,9 @@ public class RainbowPVOL {
             System.out.println("version of the volume not supported");
             return null;
         }
+        
+        this.source = source;
+        String radarName = "";
 
         for (int i = 0; i < options.length; i++) {
             if (source.matches(options[i].getRadarName())) {
@@ -731,8 +734,7 @@ public class RainbowPVOL {
     }
 
     public String getRadarName() {
-        return radarName;
+        return source;
     }
 
-    
 }

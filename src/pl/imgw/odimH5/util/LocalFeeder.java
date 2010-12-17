@@ -122,6 +122,8 @@ public class LocalFeeder extends Thread {
                 || filePath.path.contains("HV")
                 || filePath.path.contains("ZDR")) {
 
+//            System.out.println("kasuje: " + filePath.path);
+
             new File(filePath.path).delete();
 
             return;
@@ -137,6 +139,7 @@ public class LocalFeeder extends Thread {
         File newFile = null;
         String newFileName = "";
         String radarName = "";
+        boolean sentOk = false;
 
         if (originalFile.getName().endsWith(".vol")) {
 
@@ -158,6 +161,7 @@ public class LocalFeeder extends Thread {
             radarName = vol.getRadarName();
             newFileName = vol.getOutputFileName();
             newFile = new File(newFileName);
+//            System.out.println("nowy plik: " + newFileName);
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
@@ -188,7 +192,8 @@ public class LocalFeeder extends Thread {
 
             if (bfh.handleBF(bf) == 1) {
 
-                msgl.showMessage(radarName + " file sent to BALTRAD", true);
+                msgl.showMessage(radarName + ": file " + newFileName
+                        + " sent to BALTRAD", true);
 
             } else {
                 System.out.println(radarName
@@ -203,6 +208,8 @@ public class LocalFeeder extends Thread {
                     continue;
 
                 for (int j = 0; j < ftpOptions[i].getRadars().length; j++) {
+                    
+                    
 
                     if (radarName.matches(ftpOptions[i].getRadars()[j])) {
 
@@ -220,8 +227,11 @@ public class LocalFeeder extends Thread {
 
                         try {
 
-                            storeFileOnServer(ftpOptions[i], newFileName,
-                                    sendFileName, remoteFolder);
+                            sentOk = storeFileOnServer(ftpOptions[i],
+                                    newFileName, sendFileName, remoteFolder);
+                            msgl.showMessage(radarName + ": " + "file "
+                                    + newFileName + " sent to "
+                                    + ftpOptions[i].getAddress(), sentOk);
 
                         } catch (CopyStreamException e) {
 
@@ -229,11 +239,14 @@ public class LocalFeeder extends Thread {
                             msgl.showMessage(radarName + " " + newFileName
                                     + " cannot be sent to "
                                     + ftpOptions[i].getAddress()
-                                    + " sending file again...", true);
+                                    + " sending file again...", verbose);
 
                             try {
-                                storeFileOnServer(ftpOptions[i], newFileName,
-                                        sendFileName, remoteFolder);
+                                sentOk = storeFileOnServer(ftpOptions[i],
+                                        newFileName, sendFileName, remoteFolder);
+                                msgl.showMessage(radarName + ": " + "file "
+                                        + newFileName + " sent to "
+                                        + ftpOptions[i].getAddress(), sentOk);
                             } catch (SocketException e1) {
                                 // TODO Auto-generated catch block
                                 e1.printStackTrace();
@@ -249,11 +262,14 @@ public class LocalFeeder extends Thread {
                             msgl.showMessage(radarName + " " + newFileName
                                     + " cannot be sent to "
                                     + ftpOptions[i].getAddress()
-                                    + " sending file again...", true);
+                                    + " sending file again...", verbose);
 
                             try {
-                                storeFileOnServer(ftpOptions[i], newFileName,
-                                        sendFileName, remoteFolder);
+                                sentOk = storeFileOnServer(ftpOptions[i],
+                                        newFileName, sendFileName, remoteFolder);
+                                msgl.showMessage(radarName + ": " + "file "
+                                        + newFileName + " sent to "
+                                        + ftpOptions[i].getAddress(), sentOk);
                             } catch (SocketException e1) {
                                 // TODO Auto-generated catch block
                                 e1.printStackTrace();
@@ -275,9 +291,9 @@ public class LocalFeeder extends Thread {
 
     }
 
-    private void storeFileOnServer(FTP_Options ftpOptions, String newFileName,
-            String sendFileName, String remoteFolder) throws SocketException,
-            IOException {
+    private boolean storeFileOnServer(FTP_Options ftpOptions,
+            String newFileName, String sendFileName, String remoteFolder)
+            throws SocketException, IOException {
 
         FTPClient ftp = new FTPClient();
 
@@ -293,7 +309,7 @@ public class LocalFeeder extends Thread {
         if (!FTPReply.isPositiveCompletion(reply)) {
             ftp.disconnect();
             System.err.println("FTP server refused connection.");
-            return;
+            return false;
         }
 
         ftp.login(ftpOptions.getLogin(), ftpOptions.getPassword());
@@ -316,10 +332,7 @@ public class LocalFeeder extends Thread {
 
         fis.close();
 
-        boolean sentOK = ftp.rename(sendFileName, newFileName);
-
-        msgl.showMessage("file " + newFileName + " sent to "
-                + ftpOptions.getAddress(), sentOK);
+        return ftp.rename(sendFileName, newFileName);
 
     }
 
@@ -386,7 +399,6 @@ public class LocalFeeder extends Thread {
                 // key to be reported again by the watch service
                 signalledKey.reset();
 
-
                 for (WatchEvent<?> e : list) {
                     String radarName = "";
                     if (e.kind() == StandardWatchEventKind.ENTRY_CREATE) {
@@ -403,7 +415,7 @@ public class LocalFeeder extends Thread {
                         radarOpt.path += context.toString();
 
                         msgl.showMessage(radarName + " new file: "
-                                + radarOpt.path, true);
+                                + radarOpt.path, verbose);
 
                         fileTimeMap.put(radarOpt, System.currentTimeMillis());
                     } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {
