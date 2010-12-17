@@ -1134,7 +1134,6 @@ public class RainbowModel {
                 }
 
                 int buffLen = byteArray2Int(data_byte);
-                System.out.println("4bajty na poczatku to: " + buffLen);
                 DataBufferContainer dbc = new DataBufferContainer();
                 dbc.setDataBuffer(data_buf);
                 dbc.setDataBufferLength(buffLen);

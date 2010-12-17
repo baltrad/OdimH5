@@ -29,6 +29,7 @@ public class OptionsHandler {
     public final static String PASSWORD = "password";
     public final static String DIRECTORY = "directory";
     public final static String NRAYS = "nrays";
+    public final static String FORMAT = "format";
     public final static String SERVER = "server";
     public final static String SENDER = "sender";
 
@@ -76,14 +77,17 @@ public class OptionsHandler {
             options[i].setRadarName(radarList.item(i).getAttributes()
                     .getNamedItem("name").getNodeValue());
 
-            options[i].setRadarWMOName(RainbowModel.getValueByName(radarList.item(i),
-                    WMO_ID, null));
-            options[i].setFileName(RainbowModel.getValueByName(radarList.item(i),
-                    FILE_NAME, null));
+            options[i].setRadarWMOName(RainbowModel.getValueByName(radarList
+                    .item(i), WMO_ID, null));
+            options[i].setFileName(RainbowModel.getValueByName(radarList
+                    .item(i), FILE_NAME, null));
             options[i].setDir(RainbowModel.getValueByName(radarList.item(i),
                     DIRECTORY, null));
-            options[i].setNrays(RainbowModel.getValueByName(radarList.item(i), NRAYS,
-                    null));
+            options[i].setNrays(RainbowModel.getValueByName(radarList.item(i),
+                    NRAYS, null));
+            options[i].setFormat(RainbowModel.getValueByName(radarList.item(i),
+                    FORMAT, null));
+
         }
         return options;
     }
@@ -104,10 +108,10 @@ public class OptionsHandler {
         }
         BaltradOptions options = new BaltradOptions();
 
-        options.setSender(RainbowModel.getValueByName(baltradList.item(0), SENDER,
-                null));
-        options.setServer(RainbowModel.getValueByName(baltradList.item(0), SERVER,
-                null));
+        options.setSender(RainbowModel.getValueByName(baltradList.item(0),
+                SENDER, null));
+        options.setServer(RainbowModel.getValueByName(baltradList.item(0),
+                SERVER, null));
 
         return options;
     }
@@ -129,19 +133,20 @@ public class OptionsHandler {
 
             options[i] = new FTP_Options();
 
-            String radars = RainbowModel.getValueByName(ftpList.item(i), RADARS, null);
+            String radars = RainbowModel.getValueByName(ftpList.item(i),
+                    RADARS, null);
 
             if (radars != null && !radars.isEmpty())
                 options[i].setRadars(radars.split(" "));
 
             options[i].setAddress(RainbowModel.getValueByName(ftpList.item(i),
                     ADDRESS, null));
-            options[i].setLogin(RainbowModel.getValueByName(ftpList.item(i), LOGIN,
-                    null));
+            options[i].setLogin(RainbowModel.getValueByName(ftpList.item(i),
+                    LOGIN, null));
             options[i].setPassword(RainbowModel.getValueByName(ftpList.item(i),
                     PASSWORD, null));
-            options[i].setDir(RainbowModel.getValueByName(ftpList.item(i), DIRECTORY,
-                    null));
+            options[i].setDir(RainbowModel.getValueByName(ftpList.item(i),
+                    DIRECTORY, null));
         }
         return options;
     }
@@ -198,6 +203,8 @@ public class OptionsHandler {
         System.out.println("        <" + DIRECTORY + ">LOCAL_DIR</" + DIRECTORY
                 + ">");
         System.out.println("        <" + NRAYS + ">number of rays</" + NRAYS
+                + ">");
+        System.out.println("        <" + FORMAT + ">file format</" + FORMAT
                 + ">");
         System.out.println("    </radar>");
         System.out.println("    <ftp>");

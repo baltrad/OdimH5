@@ -44,6 +44,7 @@ public class RainbowPVOL {
     private String date = "";
     private String time = "";
     private String rangestep;
+    private String radarName = "";
     private int shift = 0;
     private int size = 0;
     private String nray_new = "";
@@ -486,8 +487,6 @@ public class RainbowPVOL {
             return null;
         }
 
-        String radarName = "";
-
         for (int i = 0; i < options.length; i++) {
             if (source.matches(options[i].getRadarName())) {
                 radarName = options[i].getRadarWMOName();
@@ -731,4 +730,9 @@ public class RainbowPVOL {
         return outputFileName;
     }
 
+    public String getRadarName() {
+        return radarName;
+    }
+
+    
 }

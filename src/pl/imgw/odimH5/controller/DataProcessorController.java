@@ -146,7 +146,8 @@ public class DataProcessorController {
                             vol.makeH5();
                         else
                             vol.makeXML();
-                    } else if (fileNameIn.endsWith("h5")) {
+                    } else if (fileNameIn.endsWith("h5")
+                            || fileNameIn.endsWith("hdf")) {
 
                         HDF5PVOL hdf = new HDF5PVOL(fileNameOut, fileNameIn,
                                 verbose, rainbow, options);

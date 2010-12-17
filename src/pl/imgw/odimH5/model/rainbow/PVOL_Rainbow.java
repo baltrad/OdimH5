@@ -27,6 +27,13 @@ public class PVOL_Rainbow {
     public static final String NAME = "name";
     public static final String WAVELEN = "wavelen";
     public static final String BEAMWIDTH = "beamwidth";
+
+    
+    public static final String UNITID = "unitid";
+    
+    public static final String PARGROUP = "pargroup";
+    public static final String NUMELE = "numele";
+    public static final String SDFBASE = "sdfbase";
     
     public static final String SCAN = "scan";
     public static final String TIME = "time";

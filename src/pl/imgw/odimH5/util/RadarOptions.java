@@ -19,6 +19,7 @@ public class RadarOptions {
     private String fileName = "";
     private String dir = "";
     private String nrays = "";
+    private String format = "";
 
     public String getPlatform() {
         return platform;
@@ -66,6 +67,15 @@ public class RadarOptions {
 
     public void setNrays(String nrays) {
         this.nrays = nrays;
+    }
+    
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 
     /**

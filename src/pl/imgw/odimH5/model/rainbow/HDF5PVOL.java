@@ -3,17 +3,9 @@
  */
 package pl.imgw.odimH5.model.rainbow;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
@@ -21,9 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.zip.Deflater;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.h5.H5File;
@@ -32,12 +21,9 @@ import ncsa.hdf.object.h5.H5Group;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
-import pl.imgw.odimH5.util.DataBufferContainer;
 import pl.imgw.odimH5.util.RadarOptions;
 
 /**
@@ -55,6 +41,9 @@ public class HDF5PVOL {
     private String owner = "rainbow";
     private String startangle = "startangle";
     private static final String STOPANGLE = "360";
+    private static final double BMWIDTH_SBAND = 0.94;
+    private static final double WVLENGTH_SBAND = 0.05309;
+    private static final String UNITID_SI = "SI";
 
     private HashMap<String, String> volume;
     private HashMap<String, String> radarinfo;
@@ -66,7 +55,7 @@ public class HDF5PVOL {
 
     private String date;
     private String time;
-    private String radarName;
+    private String radarName = "";
     private int[] nbins;
     private int[] nrays;
 
@@ -163,6 +152,13 @@ public class HDF5PVOL {
         String source = hdf.getHDF5StringValue(rootHDF, rb.H5_WHAT,
                 PVOL_H5.SOURCE, verbose);
 
+        if (bmwidth == 0) {
+            bmwidth = BMWIDTH_SBAND;
+        }
+        if (wvlength == 0) {
+            wvlength = WVLENGTH_SBAND;
+        }
+
         for (int i = 0; i < options.length; i++) {
             if (source.contains(options[i].getRadarWMOName())) {
                 radarName = options[i].getRadarName();
@@ -221,9 +217,11 @@ public class HDF5PVOL {
                     rb.H5_DATA_1, rb.H5_WHAT, PVOL_H5.GAIN, verbose);
             double offset = hdf.getHDF5DoubleLeafValue(datasetG.get(i),
                     rb.H5_DATA_1, rb.H5_WHAT, PVOL_H5.OFFSET, verbose);
+            
+            double stoprange = nbins * rscale;
 
             slices[i].slice.put(PVOL_Rainbow.POSANGLE, String.valueOf(elangle));
-            slices[i].slice.put(PVOL_Rainbow.STOPRANGE, String.valueOf(nbins));
+            slices[i].slice.put(PVOL_Rainbow.STOPRANGE, String.valueOf(stoprange));
             slices[i].slice
                     .put(PVOL_Rainbow.STARTANGLE, String.valueOf(rstart));
             slices[i].slice.put(PVOL_Rainbow.STOPANGLE, STOPANGLE);
@@ -284,6 +282,7 @@ public class HDF5PVOL {
         rinfoTag.appendChild(rb.makeTag(PVOL_Rainbow.WAVELEN, radarinfo
                 .get(PVOL_Rainbow.WAVELEN), od));
         root.appendChild(rinfoTag);
+        
 
         // <scan>
         Element scanTag = od.createElement(PVOL_Rainbow.SCAN);
@@ -293,6 +292,14 @@ public class HDF5PVOL {
         scanTag.setAttribute(PVOL_Rainbow.DATE, date);
         root.appendChild(scanTag);
 
+        // <unitid>
+        scanTag.appendChild(rb.makeTag(PVOL_Rainbow.UNITID, UNITID_SI, od));
+        // <pargroup>
+        Element pargroup = od.createElement(PVOL_Rainbow.PARGROUP);
+        pargroup.setAttribute(PVOL_Rainbow.REFID, PVOL_Rainbow.SDFBASE);
+        pargroup.appendChild(rb.makeTag(PVOL_Rainbow.NUMELE, String.valueOf(size), od));
+        scanTag.appendChild(pargroup);
+        
         // <slice>
         for (int i = 0; i < size; i++) {
             Element sliceTag = od.createElement(PVOL_Rainbow.SLICE);
@@ -352,7 +359,7 @@ public class HDF5PVOL {
             scanTag.appendChild(sliceTag);
 
         }
-        Comment comment = od.createComment("END XML");
+        Comment comment = od.createComment(" END XML ");
         od.appendChild(comment);
         rb.hdf.saveXMLFile(od, outputFileName, verbose);
 
@@ -430,6 +437,7 @@ public class HDF5PVOL {
             FileChannel fc = rf.getChannel();
             fc.position(fc.size());
             fc.write(ByteBuffer.wrap((beg + "\n").getBytes()));
+
             byte[] bytes = ByteBuffer.allocate(4).putInt(orgsize).array();
             fc.write(ByteBuffer.wrap(bytes));
             fc.write(ByteBuffer.wrap(compressedData));
@@ -446,13 +454,28 @@ public class HDF5PVOL {
     private byte[] makeRayinfoData(int size) {
         byte[] array = new byte[size * 2];
 
+        int step = 182;
+        if (size < 360)
+            step = 65535 / size;
+
         for (int i = 0; i < size; i++) {
-            int a = i * 182;
-            byte[] bytes = ByteBuffer.allocate(2).putShort((short) a).array();
+
+            int a = (i % 360) * step + 1;
+            byte[] bytes = ByteBuffer.allocate(2).putChar((char) a).array();
             array[i * 2] = bytes[0];
             array[i * 2 + 1] = bytes[1];
         }
         return array;
     }
+
+    public String getOutputFileName() {
+        return outputFileName;
+    }
+
+    public String getRadarName() {
+        return radarName;
+    }
+    
+    
 
 }
