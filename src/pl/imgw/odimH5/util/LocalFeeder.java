@@ -200,8 +200,8 @@ public class LocalFeeder extends Thread {
                         + " sent to BALTRAD", true);
 
             } else {
-                System.out.println(radarName
-                        + " failed to send file to BALTRAD");
+                msgl.showMessage(radarName
+                        + " failed to send file to BALTRAD", true);
             }
         }
 

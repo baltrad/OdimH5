@@ -102,11 +102,11 @@ public class OptionsHandler {
     public static BaltradOptions getBaltrad(Document doc) {
 
         NodeList baltradList = doc.getElementsByTagName("baltrad");
+        BaltradOptions options = new BaltradOptions();
 
         if (baltradList.getLength() == 0) {
-            return null;
+            return options;
         }
-        BaltradOptions options = new BaltradOptions();
 
         options.setSender(RainbowModel.getValueByName(baltradList.item(0),
                 SENDER, null));
