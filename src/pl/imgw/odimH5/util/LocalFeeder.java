@@ -336,6 +336,7 @@ public class LocalFeeder extends Thread {
 
         boolean ok = false;
         
+        newFileName = sendFileName.replace("tmp", "hdf");
         ok = ftp.rename(sendFileName, newFileName);
         
         ftp.disconnect();

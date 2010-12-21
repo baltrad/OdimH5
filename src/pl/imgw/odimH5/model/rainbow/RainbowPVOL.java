@@ -126,9 +126,12 @@ public class RainbowPVOL {
         slices = makeSlices(sliceList);
 
         // ============ set output file name ==================
+        
         if (outputFileName.isEmpty()) {
-            this.outputFileName = filePrefix + whatG.get(PVOL_H5.DATE)
-                    + whatG.get(PVOL_H5.TIME) + ".hdf";
+            this.outputFileName = whatG.get(PVOL_H5.DATE)
+                    + whatG.get(PVOL_H5.TIME) + ".h5";
+            if(!filePrefix.isEmpty())
+                this.outputFileName = filePrefix + this.outputFileName;
         } else {
             this.outputFileName = outputFileName;
         }
