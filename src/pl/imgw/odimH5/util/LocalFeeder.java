@@ -122,7 +122,7 @@ public class LocalFeeder extends Thread {
                 || filePath.path.contains("HV")
                 || filePath.path.contains("ZDR")) {
 
-//            System.out.println("kasuje: " + filePath.path);
+            // System.out.println("kasuje: " + filePath.path);
 
             new File(filePath.path).delete();
 
@@ -161,7 +161,7 @@ public class LocalFeeder extends Thread {
             radarName = vol.getRadarName();
             newFileName = vol.getOutputFileName();
             newFile = new File(newFileName);
-//            System.out.println("nowy plik: " + newFileName);
+            // System.out.println("nowy plik: " + newFileName);
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
@@ -177,7 +177,11 @@ public class LocalFeeder extends Thread {
             return;
         }
 
-        if (newFile != null && !baltradOptions.isEmpty()) {
+        if (newFile != null && newFile.getName().endsWith("h5")
+                && !baltradOptions.isEmpty()) {
+
+//            System.out.println("sender: " + baltradOptions.getSender());
+//            System.out.println("server: " + baltradOptions.getServer());
 
             BaltradFrameHandler bfh = new BaltradFrameHandler(baltradOptions
                     .getServer());
@@ -186,11 +190,11 @@ public class LocalFeeder extends Thread {
                     baltradOptions.getSender(), radarName, newFileName);
 
             // System.out.println("BFDataHdr:");
-            // System.out.println(a);
+//            System.out.println(a);
 
             BaltradFrame bf = new BaltradFrame(a, newFileName);
 
-            if (bfh.handleBF(bf) == 1) {
+            if (bfh.handleBF(bf) == 0) {
 
                 msgl.showMessage(radarName + ": file " + newFileName
                         + " sent to BALTRAD", true);
@@ -208,8 +212,6 @@ public class LocalFeeder extends Thread {
                     continue;
 
                 for (int j = 0; j < ftpOptions[i].getRadars().length; j++) {
-                    
-                    
 
                     if (radarName.matches(ftpOptions[i].getRadars()[j])) {
 
@@ -239,47 +241,39 @@ public class LocalFeeder extends Thread {
                             msgl.showMessage(radarName + " " + newFileName
                                     + " cannot be sent to "
                                     + ftpOptions[i].getAddress()
-//                                    + " sending file again...", verbose);
-                            , true);
-/*
-                            try {
-                                sentOk = storeFileOnServer(ftpOptions[i],
-                                        newFileName, sendFileName, remoteFolder);
-                                msgl.showMessage(radarName + ": " + "file "
-                                        + newFileName + " sent to "
-                                        + ftpOptions[i].getAddress(), sentOk);
-                            } catch (SocketException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            } catch (IOException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            }
-*/
+                            // + " sending file again...", verbose);
+                                    , true);
+                            /*
+                             * try { sentOk = storeFileOnServer(ftpOptions[i],
+                             * newFileName, sendFileName, remoteFolder);
+                             * msgl.showMessage(radarName + ": " + "file " +
+                             * newFileName + " sent to " +
+                             * ftpOptions[i].getAddress(), sentOk); } catch
+                             * (SocketException e1) { // TODO Auto-generated
+                             * catch block e1.printStackTrace(); } catch
+                             * (IOException e1) { // TODO Auto-generated catch
+                             * block e1.printStackTrace(); }
+                             */
                         } catch (IOException e) {
-                            
+
                             LogsHandler.saveProgramLogs(e.getMessage());
 
                             msgl.showMessage(radarName + " " + newFileName
                                     + " cannot be sent to "
                                     + ftpOptions[i].getAddress()
-//                                    + " sending file again...", verbose);
-                            , true);
+                            // + " sending file again...", verbose);
+                                    , true);
                             /*
-                            try {
-                                sentOk = storeFileOnServer(ftpOptions[i],
-                                        newFileName, sendFileName, remoteFolder);
-                                msgl.showMessage(radarName + ": " + "file "
-                                        + newFileName + " sent to "
-                                        + ftpOptions[i].getAddress(), sentOk);
-                            } catch (SocketException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            } catch (IOException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            }
-*/
+                             * try { sentOk = storeFileOnServer(ftpOptions[i],
+                             * newFileName, sendFileName, remoteFolder);
+                             * msgl.showMessage(radarName + ": " + "file " +
+                             * newFileName + " sent to " +
+                             * ftpOptions[i].getAddress(), sentOk); } catch
+                             * (SocketException e1) { // TODO Auto-generated
+                             * catch block e1.printStackTrace(); } catch
+                             * (IOException e1) { // TODO Auto-generated catch
+                             * block e1.printStackTrace(); }
+                             */
                         }
                     }
                 }
@@ -335,12 +329,12 @@ public class LocalFeeder extends Thread {
         fis.close();
 
         boolean ok = false;
-        
+
         newFileName = sendFileName.replace("tmp", "hdf");
         ok = ftp.rename(sendFileName, newFileName);
-        
+
         ftp.disconnect();
-        
+
         return ok;
 
     }
