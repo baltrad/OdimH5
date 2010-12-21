@@ -24,7 +24,7 @@ public class RadarOptions {
     public String getPlatform() {
         return platform;
     }
-    
+
     public void setPlatform(String platform) {
         this.platform = platform;
     }
@@ -60,7 +60,7 @@ public class RadarOptions {
     public void setDir(String remoteDir) {
         this.dir = remoteDir;
     }
-    
+
     public String getNrays() {
         return nrays;
     }
@@ -68,7 +68,6 @@ public class RadarOptions {
     public void setNrays(String nrays) {
         this.nrays = nrays;
     }
-    
 
     public String getFormat() {
         return format;
@@ -85,13 +84,11 @@ public class RadarOptions {
      * @return
      */
     public boolean isEmpty() {
-        if(radarName == null || radarName.isEmpty())
+        if (radarName == null || radarName.isEmpty())
             return true;
-        if(radarWMOName == null || radarWMOName.isEmpty())
+        if (radarWMOName == null || radarWMOName.isEmpty())
             return true;
-        if(fileName == null || fileName.isEmpty())
-            return true;
-        if(dir == null || dir.isEmpty())
+        if (dir == null || dir.isEmpty())
             return true;
         return false;
     }
