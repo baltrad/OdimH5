@@ -65,7 +65,11 @@ public class LogsHandler {
                 fileStream = new FileOutputStream(pathName);
                 PrintWriter pw = new PrintWriter(fileStream, true);
                 pw.println("// Time zone: " + timeZone);
+                fileStream.close();
             } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

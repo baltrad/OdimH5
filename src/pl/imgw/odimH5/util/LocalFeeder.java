@@ -239,8 +239,9 @@ public class LocalFeeder extends Thread {
                             msgl.showMessage(radarName + " " + newFileName
                                     + " cannot be sent to "
                                     + ftpOptions[i].getAddress()
-                                    + " sending file again...", verbose);
-
+//                                    + " sending file again...", verbose);
+                            , true);
+/*
                             try {
                                 sentOk = storeFileOnServer(ftpOptions[i],
                                         newFileName, sendFileName, remoteFolder);
@@ -254,16 +255,17 @@ public class LocalFeeder extends Thread {
                                 // TODO Auto-generated catch block
                                 e1.printStackTrace();
                             }
-
+*/
                         } catch (IOException e) {
-
+                            
                             LogsHandler.saveProgramLogs(e.getMessage());
 
                             msgl.showMessage(radarName + " " + newFileName
                                     + " cannot be sent to "
                                     + ftpOptions[i].getAddress()
-                                    + " sending file again...", verbose);
-
+//                                    + " sending file again...", verbose);
+                            , true);
+                            /*
                             try {
                                 sentOk = storeFileOnServer(ftpOptions[i],
                                         newFileName, sendFileName, remoteFolder);
@@ -277,7 +279,7 @@ public class LocalFeeder extends Thread {
                                 // TODO Auto-generated catch block
                                 e1.printStackTrace();
                             }
-
+*/
                         }
                     }
                 }
@@ -332,7 +334,13 @@ public class LocalFeeder extends Thread {
 
         fis.close();
 
-        return ftp.rename(sendFileName, newFileName);
+        boolean ok = false;
+        
+        ok = ftp.rename(sendFileName, newFileName);
+        
+        ftp.disconnect();
+        
+        return ok;
 
     }
 
