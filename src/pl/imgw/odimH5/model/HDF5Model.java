@@ -1074,6 +1074,23 @@ public class HDF5Model {
     }
 
     /**
+     * Method closes HDF5 file
+     * 
+     * @param inputfile
+     *            Input file
+     */
+    public void closeHDF5File(H5File inputfile) {
+
+        try {
+            inputfile.close();
+        } catch (HDF5Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
      * Method opens HDF5 file and gets its root group
      * 
      * @param inputFile

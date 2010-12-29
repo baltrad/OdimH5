@@ -108,6 +108,8 @@ public class HDF5PVOL {
         makeRayinfoData(360);
 
         makeXMLHead();
+        
+        hdf.closeHDF5File(inputFile);
 
     }
 

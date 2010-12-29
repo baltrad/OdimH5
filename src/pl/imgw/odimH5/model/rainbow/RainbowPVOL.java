@@ -129,7 +129,7 @@ public class RainbowPVOL {
         
         if (outputFileName.isEmpty()) {
             this.outputFileName = whatG.get(PVOL_H5.DATE)
-                    + whatG.get(PVOL_H5.TIME) + ".h5";
+                    + whatG.get(PVOL_H5.TIME) + ".hdf";
             if(!filePrefix.isEmpty())
                 this.outputFileName = filePrefix + this.outputFileName;
         } else {
