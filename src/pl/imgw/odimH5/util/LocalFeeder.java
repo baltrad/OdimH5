@@ -158,7 +158,6 @@ public class LocalFeeder extends Thread {
             radarName = vol.getRadarName();
             newFileName = vol.getOutputFileName();
             newFile = new File(newFileName);
-            // System.out.println("nowy plik: " + newFileName);
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
@@ -173,34 +172,7 @@ public class LocalFeeder extends Thread {
             return;
         }
 
-        if (newFile != null
-                && (newFile.getName().endsWith("h5") || newFile.getName()
-                        .endsWith("hdf")) && !baltradOptions.isEmpty()) {
-
-            // System.out.println("sender: " + baltradOptions.getSender());
-            // System.out.println("server: " + baltradOptions.getServer());
-
-            BaltradFrameHandler bfh = new BaltradFrameHandler(baltradOptions
-                    .getServer());
-
-            String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
-                    baltradOptions.getSender(), radarName, newFileName);
-
-            // System.out.print("BFDataHdr: ");
-            // System.out.print(a + "\n");
-
-            BaltradFrame bf = new BaltradFrame(a, newFileName);
-
-            if (bfh.handleBF(bf) == 0) {
-
-                msgl.showMessage(radarName + ": file " + newFileName
-                        + " sent to BALTRAD", true);
-
-            } else {
-                msgl.showMessage(radarName + " failed to send file to BALTRAD",
-                        true);
-            }
-        }
+//        System.out.println("nowy plik: " + newFileName);
 
         if (newFile != null && ftpOptions != null) {
 
@@ -221,7 +193,8 @@ public class LocalFeeder extends Thread {
                             remoteFolder = radarName;
                         } else {
                             sendFileName = newFileName.replace("h5", "tmp");
-                            sendFileName = newFileName.replace("hdf", "tmp");
+//                            sendFileName = newFileName.replace("hdf", "tmp");
+//                            System.out.println("wyslac jako: " + sendFileName);
                         }
 
                         try {
@@ -232,7 +205,7 @@ public class LocalFeeder extends Thread {
                                     + ": "
                                     + "file "
                                     + newFileName.substring(0, newFileName
-                                            .indexOf(".")) + " sent to "
+                                            .indexOf(".")) + ".hdf sent to "
                                     + ftpOptions[i].getAddress(), sentOk);
 
                         } catch (CopyStreamException e) {
@@ -279,6 +252,34 @@ public class LocalFeeder extends Thread {
                 }
             }
 
+        }
+        if (newFile != null
+                && (newFile.getName().endsWith("h5") || newFile.getName()
+                        .endsWith("hdf")) && !baltradOptions.isEmpty()) {
+
+            // System.out.println("sender: " + baltradOptions.getSender());
+            // System.out.println("server: " + baltradOptions.getServer());
+
+            BaltradFrameHandler bfh = new BaltradFrameHandler(baltradOptions
+                    .getServer());
+
+            String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
+                    baltradOptions.getSender(), radarName, newFileName);
+
+            // System.out.print("BFDataHdr: ");
+            // System.out.print(a + "\n");
+
+            BaltradFrame bf = new BaltradFrame(a, newFileName);
+
+            if (bfh.handleBF(bf) == 0) {
+
+                msgl.showMessage(radarName + ": file " + newFileName
+                        + " sent to BALTRAD", true);
+
+            } else {
+                msgl.showMessage(radarName + " failed to send file to BALTRAD",
+                        true);
+            }
         }
 
         originalFile.delete();
@@ -333,6 +334,11 @@ public class LocalFeeder extends Thread {
         boolean ok = false;
 
         // newFileName = sendFileName.replace("tmp", "hdf");
+        
+//        String newName = sendFileName.replace("tmp", "hdf");
+//        System.out.println("wyslany jako: " + sendFileName);
+//        System.out.println("zmieniona nazwa na: " + newName);
+        
         ok = ftp.rename(sendFileName, sendFileName.replace("tmp", "hdf"));
 
         ftp.disconnect();
