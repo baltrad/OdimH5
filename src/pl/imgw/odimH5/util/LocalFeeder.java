@@ -136,6 +136,7 @@ public class LocalFeeder extends Thread {
         File newFile = null;
         String newFileName = "";
         String radarName = "";
+        String radarFullName = "";
         boolean sentOk = false;
 
         if (originalFile.getName().endsWith(".vol")) {
@@ -158,6 +159,7 @@ public class LocalFeeder extends Thread {
             radarName = vol.getRadarName();
             newFileName = vol.getOutputFileName();
             newFile = new File(newFileName);
+            radarFullName = vol.getRadarFullName();
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
@@ -257,17 +259,17 @@ public class LocalFeeder extends Thread {
                 && (newFile.getName().endsWith("h5") || newFile.getName()
                         .endsWith("hdf")) && !baltradOptions.isEmpty()) {
 
-            // System.out.println("sender: " + baltradOptions.getSender());
-            // System.out.println("server: " + baltradOptions.getServer());
+//             System.out.println("sender: " + baltradOptions.getSender());
+//             System.out.println("server: " + baltradOptions.getServer());
 
             BaltradFrameHandler bfh = new BaltradFrameHandler(baltradOptions
                     .getServer());
 
             String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
-                    baltradOptions.getSender(), radarName, newFileName);
+                    baltradOptions.getSender(), radarFullName, newFileName);
 
-            // System.out.print("BFDataHdr: ");
-            // System.out.print(a + "\n");
+//             System.out.print("BFDataHdr: ");
+//             System.out.println(a);
 
             BaltradFrame bf = new BaltradFrame(a, newFileName);
 

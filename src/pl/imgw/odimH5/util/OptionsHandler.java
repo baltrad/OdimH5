@@ -21,6 +21,8 @@ public class OptionsHandler {
 
     public final static String OPTION_XML_FILE = "options.xml";
 
+    public static final String NAME = "name";
+    public static final String LOCATION = "location";
     public final static String WMO_ID = "WMO_id";
     public final static String FILE_NAME = "file_name";
     public final static String RADARS = "radars";
@@ -32,6 +34,7 @@ public class OptionsHandler {
     public final static String FORMAT = "format";
     public final static String SERVER = "server";
     public final static String SENDER = "sender";
+
 
     /**
      * 
@@ -75,8 +78,10 @@ public class OptionsHandler {
             options[i] = new RadarOptions();
 
             options[i].setRadarName(radarList.item(i).getAttributes()
-                    .getNamedItem("name").getNodeValue());
-
+                    .getNamedItem(NAME).getNodeValue());
+            
+            options[i].setLocation(RainbowModel.getValueByName(radarList
+                    .item(i), LOCATION, null));
             options[i].setRadarWMOName(RainbowModel.getValueByName(radarList
                     .item(i), WMO_ID, null));
             options[i].setFileName(RainbowModel.getValueByName(radarList

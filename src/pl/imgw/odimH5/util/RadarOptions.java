@@ -13,7 +13,7 @@ package pl.imgw.odimH5.util;
  */
 public class RadarOptions {
 
-    private String platform = "";
+    private String location = "";
     private String radarName = "";
     private String radarWMOName = "";
     private String fileName = "";
@@ -21,13 +21,6 @@ public class RadarOptions {
     private String nrays = "";
     private String format = "";
 
-    public String getPlatform() {
-        return platform;
-    }
-
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
 
     public String getRadarName() {
         return radarName;
@@ -75,6 +68,15 @@ public class RadarOptions {
 
     public void setFormat(String format) {
         this.format = format;
+    }
+    
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     /**

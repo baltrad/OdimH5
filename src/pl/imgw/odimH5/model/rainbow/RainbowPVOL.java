@@ -45,10 +45,11 @@ public class RainbowPVOL {
     private String time = "";
     private String rangestep;
     private String source = "";
+    private String radarFullName = "";
     private int shift = 0;
     private int size = 0;
     private String nray_new = "";
-    private String nray_org = "";
+    private String nray_org[];
 
     private HashMap<String, String> whatG;
     private HashMap<String, String> howG;
@@ -263,7 +264,7 @@ public class RainbowPVOL {
 
             int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(s
                     .getDataBuff().getDataBuffer(), bins, Integer
-                    .parseInt(nray_org), verbose);
+                    .parseInt(nray_org[i]), verbose);
 
             infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins, Integer
                     .parseInt(s.dsWhere.get(PVOL_H5.A1GATE)));
@@ -441,9 +442,10 @@ public class RainbowPVOL {
 
             int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(s
                     .getDataBuff().getDataBuffer(), bins, Integer
-                    .parseInt(nray_org), verbose);
+                    .parseInt(nray_org[i]), verbose);
 
             // przesunac azymuty
+//            System.out.println(i + ": rays=" + rays + " bins=" + bins);
             infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins, Integer
                     .parseInt(s.dsWhere.get(PVOL_H5.A1GATE)));
 
@@ -474,16 +476,19 @@ public class RainbowPVOL {
 
         String source = "";
 
+        
         if (version.substring(0, 3).matches(VER52X)) {
 
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
             source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
+            radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name", verbose);
 
         } else if (version.substring(0, 3).matches(VER53X)) {
 
             nodeList = rb
                     .getRAINBOWNodesByName(inputDoc, "sensorinfo", verbose);
             source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
+            radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name", verbose);
 
         } else {
             System.out.println("version of the volume not supported");
@@ -499,6 +504,8 @@ public class RainbowPVOL {
                 filePrefix = options[i].getFileName();
                 if (options[i].getNrays() != null)
                     nray_new = options[i].getNrays();
+                if(options[i].getLocation() != null)
+                    radarFullName = options[i].getLocation();
                 break;
             }
         }
@@ -605,6 +612,7 @@ public class RainbowPVOL {
 
         PVOLSlicesCont slices[] = new PVOLSlicesCont[size];
 
+        nray_org = new String[size];
         for (int i = 0; i < size; i++) {
 
             slices[i] = new PVOLSlicesCont();
@@ -638,19 +646,20 @@ public class RainbowPVOL {
             if (srange == null) // default value is "0"
                 srange = "0";
 
-            nray_org = rb.getValueByName(sliceList.item(i), "rawdata", "rays");
+            
+            nray_org[i] = rb.getValueByName(sliceList.item(i), "rawdata", "rays");
 
             DataBufferContainer raysBuff = blobs.get(raysBlobNumber);
             byte[] infRaysBuff = rb.inflate1DRAINBOWDataSection(raysBuff
                     .getDataBuffer(), raysBuff.getDataBufferLength(), verbose);
             String a1gate = String.valueOf(startingAzimuthNumber(infRaysBuff,
-                    Integer.parseInt(nray_org)));
+                    Integer.parseInt(nray_org[i])));
 
             String rays = "";
             if (!nray_new.isEmpty())
                 rays = nray_new;
             else
-                rays = nray_org;
+                rays = nray_org[i];
 
             slices[i].dsWhere.put(PVOL_H5.ELANGLE, posangle);
             slices[i].dsWhere.put(PVOL_H5.NBINS, bins);
@@ -659,6 +668,8 @@ public class RainbowPVOL {
             slices[i].dsWhere.put(PVOL_H5.NRAYS, rays);
             slices[i].dsWhere.put(PVOL_H5.A1GATE, a1gate);
 
+//            System.out.println(i + ": rays=" + rays + " elangle=" + posangle);
+            
             // =============== data what group ============================
 
             String dataType = rb.getValueByName(sliceList.item(i), "rawdata",
@@ -738,6 +749,10 @@ public class RainbowPVOL {
 
     public String getRadarName() {
         return source;
+    }
+    
+    public String getRadarFullName() {
+        return radarFullName;
     }
 
 }
