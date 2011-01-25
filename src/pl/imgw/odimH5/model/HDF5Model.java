@@ -357,8 +357,11 @@ public class HDF5Model {
      */
     public void H5Acreate_any_wrap(int group_id, String attr_name,
             String attr_class, String attr_value, boolean verbose) {
-        @SuppressWarnings("unused")
-        int status = -1;
+        
+        if(attr_value == null || attr_value.isEmpty()) {
+            return;
+        }
+        
         int size = -1;
         int attribute_id = -1;
 
@@ -370,7 +373,7 @@ public class HDF5Model {
                     HDF5Constants.H5P_DEFAULT, verbose);
             long[] value = new long[1];
             value[0] = (long) Long.parseLong(attr_value);
-            status = H5Awrite_wrap(attribute_id, HDF5Constants.H5T_NATIVE_INT,
+            H5Awrite_wrap(attribute_id, HDF5Constants.H5T_NATIVE_INT,
                     value, verbose);
         }
         if (attr_class.equals("double")) {
@@ -379,7 +382,7 @@ public class HDF5Model {
                     HDF5Constants.H5P_DEFAULT, verbose);
             double[] value = new double[1];
             value[0] = (double) Double.parseDouble(attr_value);
-            status = H5Awrite_wrap(attribute_id,
+            H5Awrite_wrap(attribute_id,
                     HDF5Constants.H5T_NATIVE_DOUBLE, value, verbose);
         }
         if (attr_class.equals("string") || attr_class.equals("sequence")) {
@@ -396,9 +399,9 @@ public class HDF5Model {
             attribute_id = H5Acreate_string_wrap(group_id, attr_name,
                     dataset_id, dataspace_id, HDF5Constants.H5P_DEFAULT,
                     verbose);
-            status = H5Awrite_wrap(attribute_id, dataset_id, attr_buf, verbose);
+            H5Awrite_wrap(attribute_id, dataset_id, attr_buf, verbose);
         }
-        status = H5Aclose_wrap(attribute_id, verbose);
+        H5Aclose_wrap(attribute_id, verbose);
         H5Sclose_wrap(dataspace_id, verbose);
     }
 

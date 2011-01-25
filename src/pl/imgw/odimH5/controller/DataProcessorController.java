@@ -141,6 +141,10 @@ public class DataProcessorController {
                         RainbowPVOL vol = new RainbowPVOL(fileNameOut,
                                 fileBuff, verbose, rainbow, options);
 
+                        if (!vol.correct) {
+                            return;
+                        }
+                        
                         if (vol.getOutputFileName().endsWith("hdf")
                                 || vol.getOutputFileName().endsWith("h5"))
                             vol.makeH5();

@@ -18,6 +18,7 @@ import pl.imgw.odimH5.util.DataBufferContainer;
 public class PVOLSlicesCont {
 
     private DataBufferContainer dataBuff = null;
+    private DataBufferContainer qiBuff = null;
     private int[][] datasetFromHdf = null;
 
     
@@ -39,7 +40,15 @@ public class PVOLSlicesCont {
     public void setDataBuff(DataBufferContainer dataBuff) {
         this.dataBuff = dataBuff;
     }
-   
+    
+    public DataBufferContainer getQiBuff() {
+        return qiBuff;
+    }
+
+    public void setQiBuff(DataBufferContainer qiBuff) {
+        this.qiBuff = qiBuff;
+    }
+
     public int[][] getDatasetFromHdf() {
         return datasetFromHdf;
     }
