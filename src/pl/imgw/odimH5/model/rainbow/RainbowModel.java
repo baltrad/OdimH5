@@ -105,7 +105,7 @@ public class RainbowModel {
     public final String RHI = "RHI";
 
     protected final double FIRST_VALUE = 1.0;
-    protected final double RAINBOW_NO_DATA = 255.0;
+    protected final double RAINBOW_NO_DATA = 0.0;
     protected final double RAINBOW_UNDETECT = 0.0;
 
     // public static final String BRZ = "WMO:12568";
@@ -809,7 +809,7 @@ public class RainbowModel {
         }
         double gainVal = (Math.abs(minVal) + Math.abs(maxVal))
                 / (Math.pow(2, res) - 2);
-        gain = String.valueOf(round(gainVal, 3));
+        gain = String.valueOf(round(gainVal, 6));
         return gain;
     }
 
@@ -824,7 +824,7 @@ public class RainbowModel {
      * @return
      */
     public String getRAINBOWOffset(String min, String step) {
-
+        
         double offset = 0;
         double gain = 0;
         try {
@@ -841,6 +841,7 @@ public class RainbowModel {
 
         offset -= (gain * FIRST_VALUE);
 
+        
         return String.valueOf(offset);
     }
 

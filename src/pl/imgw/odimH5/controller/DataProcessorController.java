@@ -14,12 +14,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.HDF5Model;
-import pl.imgw.odimH5.model.rainbow.HDF5PVOL;
+import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.model.rainbow.ModelImage;
 import pl.imgw.odimH5.model.rainbow.ModelRHI;
 import pl.imgw.odimH5.model.rainbow.ModelVP;
-import pl.imgw.odimH5.model.rainbow.RainbowPVOL;
+import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
 import pl.imgw.odimH5.util.LocalFeeder;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.MessageLogger;
@@ -138,7 +138,7 @@ public class DataProcessorController {
                     // only input files with ".vol" extention will be accepted
                     if (fileNameIn.endsWith("vol")) {
 
-                        RainbowPVOL vol = new RainbowPVOL(fileNameOut,
+                        Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL(fileNameOut,
                                 fileBuff, verbose, rainbow, options);
 
                         if (!vol.correct) {
@@ -153,7 +153,7 @@ public class DataProcessorController {
                     } else if (fileNameIn.endsWith("h5")
                             || fileNameIn.endsWith("hdf")) {
 
-                        HDF5PVOL hdf = new HDF5PVOL(fileNameOut, fileNameIn,
+                        HDF2RainbowPVOL hdf = new HDF2RainbowPVOL(fileNameOut, fileNameIn,
                                 verbose, rainbow, options);
 
                     }

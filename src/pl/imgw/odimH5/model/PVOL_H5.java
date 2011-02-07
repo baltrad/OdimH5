@@ -66,6 +66,8 @@ public class PVOL_H5 {
     public static final String IM_VER = "IMAGE_VERSION";
 
     // quality index
+    public static final String QI_GAIN = "qi_gain";
+    public static final String QI_OFFSET = "qi_offset";
     public static final String QI_NBINS = "qi_nbins";
     public static final String QI_NRAYS = "qi_nrays";
     public static final String GEN_a = "GEN_a";
@@ -129,6 +131,8 @@ public class PVOL_H5 {
     public static final String SPEC_Grid = "SPEC_Grid";
     public static final String SPEC_Num = "SPEC_Num";
     public static final String SPEC_Step = "SPEC_Step";
+    public static final String PBB_QIOn = "PBB_QIOn";
+    public static final String PBB_QCOn = "PBB_QCOn";
     public static final String PBB_Max = "PBB_Max";
     public static final String PBB_QIUn = "PBB_QIUn";
     public static final String ATT_QCOn = "ATT_QCOn";

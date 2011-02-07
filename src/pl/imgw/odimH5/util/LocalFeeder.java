@@ -26,9 +26,9 @@ import org.apache.commons.net.io.CopyStreamException;
 import org.w3c.dom.Document;
 
 import pl.imgw.odimH5.model.HDF5Model;
-import pl.imgw.odimH5.model.rainbow.HDF5PVOL;
+import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
-import pl.imgw.odimH5.model.rainbow.RainbowPVOL;
+import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
 
@@ -154,7 +154,7 @@ public class LocalFeeder extends Thread {
                 e.printStackTrace();
             }
 
-            RainbowPVOL vol = new RainbowPVOL("", file_buf, verbose, rb,
+            Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose, rb,
                     radarOptions);
             vol.makeH5();
             radarName = vol.getRadarName();
@@ -164,7 +164,7 @@ public class LocalFeeder extends Thread {
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
-            HDF5PVOL hdf = new HDF5PVOL("", filePath, verbose, rb, radarOptions);
+            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", filePath, verbose, rb, radarOptions);
             radarName = hdf.getRadarName();
             toBeSentFileName = hdf.getOutputFileName();
             toBeSentFile = new File(toBeSentFileName);
