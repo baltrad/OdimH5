@@ -105,7 +105,7 @@ public class RainbowModel {
     public final String RHI = "RHI";
 
     protected final double FIRST_VALUE = 1.0;
-    protected final double RAINBOW_NO_DATA = 0.0;
+    protected final double RAINBOW_NO_DATA = 255.0;
     protected final double RAINBOW_UNDETECT = 0.0;
 
     // public static final String BRZ = "WMO:12568";
