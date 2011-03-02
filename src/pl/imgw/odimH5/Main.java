@@ -12,6 +12,7 @@ import pl.imgw.odimH5.controller.DataProcessorController;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
+import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
 
 /**
@@ -34,11 +35,14 @@ public class Main {
      */
     public static void main(String[] args) {
 
+        LogsHandler.saveProgramLogs("System starts");
+        
         HDF5Model proc = new HDF5Model();
         RainbowModel rainbow = new RainbowModel();
         CommandLineArgsParser cmd = new CommandLineArgsParser();
         MessageLogger msgl = new MessageLogger();
         DataProcessorController cont = new DataProcessorController();
+                
         rainbow.setHDFModel(proc);
         rainbow.setMessageLogger(msgl);
         proc.setMessageLogger(msgl);

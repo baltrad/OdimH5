@@ -108,7 +108,7 @@ public class HDF2RainbowPVOL {
         makeRayinfoData(360);
 
         makeXMLHead();
-        
+
         hdf.closeHDF5File(inputFile);
 
     }
@@ -219,11 +219,12 @@ public class HDF2RainbowPVOL {
                     rb.H5_DATA_1, rb.H5_WHAT, PVOL_H5.GAIN, verbose);
             double offset = hdf.getHDF5DoubleLeafValue(datasetG.get(i),
                     rb.H5_DATA_1, rb.H5_WHAT, PVOL_H5.OFFSET, verbose);
-            
+
             double stoprange = nbins * rscale;
 
             slices[i].slice.put(PVOL_Rainbow.POSANGLE, String.valueOf(elangle));
-            slices[i].slice.put(PVOL_Rainbow.STOPRANGE, String.valueOf(stoprange));
+            slices[i].slice.put(PVOL_Rainbow.STOPRANGE,
+                    String.valueOf(stoprange));
             slices[i].slice
                     .put(PVOL_Rainbow.STARTANGLE, String.valueOf(rstart));
             slices[i].slice.put(PVOL_Rainbow.STOPANGLE, STOPANGLE);
@@ -234,8 +235,8 @@ public class HDF2RainbowPVOL {
             slices[i].rayinfo.put(PVOL_Rainbow.RAYS, String.valueOf(nrays));
             slices[i].rayinfo.put(PVOL_Rainbow.DEPTH, "16");
 
-            slices[i].rawdata.put(PVOL_Rainbow.BLOBID, String
-                    .valueOf(i * 2 + 1));
+            slices[i].rawdata.put(PVOL_Rainbow.BLOBID,
+                    String.valueOf(i * 2 + 1));
             slices[i].rawdata.put(PVOL_Rainbow.RAYS, String.valueOf(nrays));
             slices[i].rawdata.put(PVOL_Rainbow.TYPE, "dBZ");
             slices[i].rawdata.put(PVOL_Rainbow.BINS, String.valueOf(nbins));
@@ -271,20 +272,16 @@ public class HDF2RainbowPVOL {
 
         // <radarinfo>
         Element rinfoTag = od.createElement(PVOL_Rainbow.RADARINFO);
-        rinfoTag
-                .setAttribute(PVOL_Rainbow.ALT, radarinfo.get(PVOL_Rainbow.ALT));
-        rinfoTag
-                .setAttribute(PVOL_Rainbow.LON, radarinfo.get(PVOL_Rainbow.LON));
-        rinfoTag
-                .setAttribute(PVOL_Rainbow.LAT, radarinfo.get(PVOL_Rainbow.LAT));
+        rinfoTag.setAttribute(PVOL_Rainbow.ALT, radarinfo.get(PVOL_Rainbow.ALT));
+        rinfoTag.setAttribute(PVOL_Rainbow.LON, radarinfo.get(PVOL_Rainbow.LON));
+        rinfoTag.setAttribute(PVOL_Rainbow.LAT, radarinfo.get(PVOL_Rainbow.LAT));
         rinfoTag.setAttribute(PVOL_Rainbow.ID, radarinfo.get(PVOL_Rainbow.ID));
         rinfoTag.appendChild(rb.makeTag(PVOL_Rainbow.NAME, radarName, od));
-        rinfoTag.appendChild(rb.makeTag(PVOL_Rainbow.BEAMWIDTH, radarinfo
-                .get(PVOL_Rainbow.BEAMWIDTH), od));
-        rinfoTag.appendChild(rb.makeTag(PVOL_Rainbow.WAVELEN, radarinfo
-                .get(PVOL_Rainbow.WAVELEN), od));
+        rinfoTag.appendChild(rb.makeTag(PVOL_Rainbow.BEAMWIDTH,
+                radarinfo.get(PVOL_Rainbow.BEAMWIDTH), od));
+        rinfoTag.appendChild(rb.makeTag(PVOL_Rainbow.WAVELEN,
+                radarinfo.get(PVOL_Rainbow.WAVELEN), od));
         root.appendChild(rinfoTag);
-        
 
         // <scan>
         Element scanTag = od.createElement(PVOL_Rainbow.SCAN);
@@ -299,9 +296,10 @@ public class HDF2RainbowPVOL {
         // <pargroup>
         Element pargroup = od.createElement(PVOL_Rainbow.PARGROUP);
         pargroup.setAttribute(PVOL_Rainbow.REFID, PVOL_Rainbow.SDFBASE);
-        pargroup.appendChild(rb.makeTag(PVOL_Rainbow.NUMELE, String.valueOf(size), od));
+        pargroup.appendChild(rb.makeTag(PVOL_Rainbow.NUMELE,
+                String.valueOf(size), od));
         scanTag.appendChild(pargroup);
-        
+
         // <slice>
         for (int i = 0; i < size; i++) {
             Element sliceTag = od.createElement(PVOL_Rainbow.SLICE);
@@ -331,29 +329,29 @@ public class HDF2RainbowPVOL {
 
             Element rayinfoTag = od.createElement(PVOL_Rainbow.RAYINFO);
             rayinfoTag.setAttribute(PVOL_Rainbow.REFID, startangle);
-            rayinfoTag.setAttribute(PVOL_Rainbow.BLOBID, slices[i].rayinfo
-                    .get(PVOL_Rainbow.BLOBID));
-            rayinfoTag.setAttribute(PVOL_Rainbow.RAYS, slices[i].rayinfo
-                    .get(PVOL_Rainbow.RAYS));
-            rayinfoTag.setAttribute(PVOL_Rainbow.DEPTH, slices[i].rayinfo
-                    .get(PVOL_Rainbow.DEPTH));
+            rayinfoTag.setAttribute(PVOL_Rainbow.BLOBID,
+                    slices[i].rayinfo.get(PVOL_Rainbow.BLOBID));
+            rayinfoTag.setAttribute(PVOL_Rainbow.RAYS,
+                    slices[i].rayinfo.get(PVOL_Rainbow.RAYS));
+            rayinfoTag.setAttribute(PVOL_Rainbow.DEPTH,
+                    slices[i].rayinfo.get(PVOL_Rainbow.DEPTH));
             sliceDataTag.appendChild(rayinfoTag);
 
             Element rawdataTag = od.createElement(PVOL_Rainbow.RAWDATA);
-            rawdataTag.setAttribute(PVOL_Rainbow.BLOBID, slices[i].rawdata
-                    .get(PVOL_Rainbow.BLOBID));
-            rawdataTag.setAttribute(PVOL_Rainbow.RAYS, slices[i].rawdata
-                    .get(PVOL_Rainbow.RAYS));
-            rawdataTag.setAttribute(PVOL_Rainbow.TYPE, slices[i].rawdata
-                    .get(PVOL_Rainbow.TYPE));
-            rawdataTag.setAttribute(PVOL_Rainbow.BINS, slices[i].rawdata
-                    .get(PVOL_Rainbow.BINS));
-            rawdataTag.setAttribute(PVOL_Rainbow.MIN, slices[i].rawdata
-                    .get(PVOL_Rainbow.MIN));
-            rawdataTag.setAttribute(PVOL_Rainbow.MAX, slices[i].rawdata
-                    .get(PVOL_Rainbow.MAX));
-            rawdataTag.setAttribute(PVOL_Rainbow.DEPTH, slices[i].rawdata
-                    .get(PVOL_Rainbow.DEPTH));
+            rawdataTag.setAttribute(PVOL_Rainbow.BLOBID,
+                    slices[i].rawdata.get(PVOL_Rainbow.BLOBID));
+            rawdataTag.setAttribute(PVOL_Rainbow.RAYS,
+                    slices[i].rawdata.get(PVOL_Rainbow.RAYS));
+            rawdataTag.setAttribute(PVOL_Rainbow.TYPE,
+                    slices[i].rawdata.get(PVOL_Rainbow.TYPE));
+            rawdataTag.setAttribute(PVOL_Rainbow.BINS,
+                    slices[i].rawdata.get(PVOL_Rainbow.BINS));
+            rawdataTag.setAttribute(PVOL_Rainbow.MIN,
+                    slices[i].rawdata.get(PVOL_Rainbow.MIN));
+            rawdataTag.setAttribute(PVOL_Rainbow.MAX,
+                    slices[i].rawdata.get(PVOL_Rainbow.MAX));
+            rawdataTag.setAttribute(PVOL_Rainbow.DEPTH,
+                    slices[i].rawdata.get(PVOL_Rainbow.DEPTH));
             sliceDataTag.appendChild(rawdataTag);
 
             sliceTag.appendChild(sliceDataTag);
@@ -367,9 +365,10 @@ public class HDF2RainbowPVOL {
 
         for (int i = 0; i < size; i++) {
             saveData(outputFileName, makeRayinfoData(nrays[i]), i * 2, "qt");
-            saveData(outputFileName, getByteArray(
-                    slices[i].getDatasetFromHdf(), nbins[i], nrays[i]),
-                    i * 2 + 1, "qt");
+            saveData(
+                    outputFileName,
+                    getByteArray(slices[i].getDatasetFromHdf(), nbins[i],
+                            nrays[i]), i * 2 + 1, "qt");
 
         }
 
@@ -456,6 +455,9 @@ public class HDF2RainbowPVOL {
     private byte[] makeRayinfoData(int size) {
         byte[] array = new byte[size * 2];
 
+        if (size == 0)
+            size = 360;
+
         int step = 182;
         if (size < 360)
             step = 65535 / size;
@@ -477,7 +479,5 @@ public class HDF2RainbowPVOL {
     public String getRadarName() {
         return radarName;
     }
-    
-    
 
 }

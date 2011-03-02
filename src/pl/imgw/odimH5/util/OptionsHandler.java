@@ -185,7 +185,7 @@ public class OptionsHandler {
      * @param argName
      * @return
      */
-    public static String getElementByName(Document doc, String argName) {
+    private static String getElementByName(Document doc, String argName) {
 
         NodeList nodeList = null;
         nodeList = doc.getElementsByTagName(argName);

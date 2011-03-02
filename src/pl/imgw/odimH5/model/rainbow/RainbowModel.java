@@ -1044,19 +1044,13 @@ public class RainbowModel {
     }
 
     /**
+     *
      * Function reads Rainbow data section from Rainbow file and puts it into an
-     * array
+     * DataBufferContainer
      * 
      * @param fileBuff
-     *            File buffer
-     * @param blobNumber
-     *            Number of the blob in the volume file (starting with 1)
-     * @param depth
-     *            Number of bits used to describe one pixel.
-     * @param firstBlob
-     *            Starting blob number
-     * 
-     * @return Byte array containing data section
+     * @param verbose
+     * @return DataBufferContainer
      */
     public HashMap<Integer, DataBufferContainer> getAllRainbowDataBlobs(
             byte[] fileBuff, boolean verbose) {

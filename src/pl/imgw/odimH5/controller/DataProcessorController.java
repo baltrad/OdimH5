@@ -22,6 +22,7 @@ import pl.imgw.odimH5.model.rainbow.ModelVP;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
 import pl.imgw.odimH5.util.LocalFeeder;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
+import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
 import pl.imgw.odimH5.util.OptionsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
@@ -192,7 +193,12 @@ public class DataProcessorController {
 
             LocalFeeder worker = new LocalFeeder(doc, rainbow, hdf, msgl,
                     verbose);
-            worker.start();
+            try {
+                worker.start();
+            } catch (Exception e) {
+                LogsHandler.saveProgramLogs(e.getMessage());
+                e.printStackTrace();
+            }
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
                 && cmd.hasArgument(cmd.ADDRESS_OPTION)

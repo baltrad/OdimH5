@@ -58,7 +58,7 @@ public class LogsHandler {
 
         File file = new File(pathName);
         if (!file.canRead()) {
-            new File(file.getParent()).mkdirs();
+            //new File(file.getParent()).mkdirs();
             FileOutputStream fileStream;
 
             try {
