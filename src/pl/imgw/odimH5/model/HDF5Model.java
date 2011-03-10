@@ -31,6 +31,7 @@ import ncsa.hdf.object.h5.H5File;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -63,8 +64,8 @@ public class HDF5Model {
     private static final String XML_VERSION = "1.0";
     private static final String XML_ENCODING = "UTF-8";
 
-    private static final String H5_CLASS = "class";
-    private static final String H5_IM_VER = "im_ver";
+    private static final String H5_CLASS = "CLASS";
+    private static final String H5_IM_VER = "IMAGE_VERSION";
 
     // Reference to MessageLogger object
     private MessageLogger msgl;
@@ -155,16 +156,22 @@ public class HDF5Model {
             // If current node has attributes and represents HDF5 attribute
             if (currentNode.hasAttributes()
                     && currentNode.getNodeName().equals(XML_ATTR)) {
+                try {
                 attributes = currentNode.getAttributes();
                 attr_name = attributes.getNamedItem(H5_OBJECT_NAME)
                         .getNodeValue();
                 attr_class = attributes.getNamedItem(H5_OBJECT_CLASS)
                         .getNodeValue();
-                attr_value = currentNode.getFirstChild().getNodeValue();
 
-                // Method creating HDF5 attributes of different types
+                attr_value = currentNode.getFirstChild().getNodeValue();
                 H5Acreate_any_wrap(cur_group_id, attr_name, attr_class,
                         attr_value, verbose);
+                } catch (NullPointerException e) {
+                    
+                }
+
+                // Method creating HDF5 attributes of different types
+
             }
             // If curent node has children and represents HDF5 dataset
             if (currentNode.hasAttributes()
@@ -173,16 +180,16 @@ public class HDF5Model {
                 attr_value = currentNode.getFirstChild().getNodeValue();
                 attr_name = attributes.getNamedItem(H5_DIMENSIONS)
                         .getNodeValue();
-                int dim_x = Integer.parseInt(attr_name.substring(0, attr_name
-                        .lastIndexOf("x")));
-                int dim_y = Integer.parseInt(attr_name.substring(attr_name
-                        .lastIndexOf("x") + 1, attr_name.length()));
+                int dim_x = Integer.parseInt(attr_name.substring(0,
+                        attr_name.lastIndexOf("x")));
+                int dim_y = Integer.parseInt(attr_name.substring(
+                        attr_name.lastIndexOf("x") + 1, attr_name.length()));
                 dataspace_id = H5Screate_simple_wrap(2, dim_x, dim_y, null,
                         verbose);
                 attr_name = attributes.getNamedItem(H5_DATA_CHUNK)
                         .getNodeValue();
-                int chunk = Integer.parseInt(attr_name.substring(0, attr_name
-                        .lastIndexOf("x")));
+                int chunk = Integer.parseInt(attr_name.substring(0,
+                        attr_name.lastIndexOf("x")));
                 attr_name = attributes.getNamedItem(H5_GZIP_LEVEL)
                         .getNodeValue();
                 int gZipLevel = Integer.parseInt(attr_name);
@@ -253,8 +260,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 error] Failed to create HDF5 file: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to create HDF5 file: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to create HDF5 file: " + e.getMessage(),
+                    verbose);
         }
         return file_id;
     }
@@ -275,11 +283,13 @@ public class HDF5Model {
             status = H5.H5Fclose(file_id);
             msgl.showMessage("Closing HDF5 file: ID=" + file_id, verbose);
         } catch (HDF5Exception hdf5e) {
-            msgl.showMessage("[HDF5 error] Failed to close HDF5 file: "
-                    + hdf5e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[HDF5 error] Failed to close HDF5 file: "
+                            + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error]Failed to close HDF5 file: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error]Failed to close HDF5 file: " + e.getMessage(),
+                    verbose);
         }
         return status;
     }
@@ -303,15 +313,15 @@ public class HDF5Model {
         int group_id = -1;
         try {
             group_id = H5.H5Gcreate(file_id, name, size_hint);
-            msgl
-                    .showMessage("Created HDF5 group: " + name + ", ID="
-                            + group_id, verbose);
+            msgl.showMessage(
+                    "Created HDF5 group: " + name + ", ID=" + group_id, verbose);
         } catch (HDF5Exception hdf5e) {
             msgl.showMessage("[HDF5 error] Failed to create HDF5 group: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to create HDF5 group: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to create HDF5 group: " + e.getMessage(),
+                    verbose);
         }
         return group_id;
     }
@@ -335,8 +345,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 error] Failed to close HDF5 group: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to close HDF5 group: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to close HDF5 group: " + e.getMessage(),
+                    verbose);
         }
         return status;
     }
@@ -357,11 +368,11 @@ public class HDF5Model {
      */
     public void H5Acreate_any_wrap(int group_id, String attr_name,
             String attr_class, String attr_value, boolean verbose) {
-        
-        if(attr_value == null || attr_value.isEmpty()) {
+
+        if (attr_value == null || attr_value.isEmpty()) {
             return;
         }
-        
+
         int size = -1;
         int attribute_id = -1;
 
@@ -373,8 +384,8 @@ public class HDF5Model {
                     HDF5Constants.H5P_DEFAULT, verbose);
             long[] value = new long[1];
             value[0] = (long) Long.parseLong(attr_value);
-            H5Awrite_wrap(attribute_id, HDF5Constants.H5T_NATIVE_INT,
-                    value, verbose);
+            H5Awrite_wrap(attribute_id, HDF5Constants.H5T_NATIVE_INT, value,
+                    verbose);
         }
         if (attr_class.equals("double")) {
             attribute_id = H5Acreate_numeric_wrap(group_id, attr_name,
@@ -382,8 +393,8 @@ public class HDF5Model {
                     HDF5Constants.H5P_DEFAULT, verbose);
             double[] value = new double[1];
             value[0] = (double) Double.parseDouble(attr_value);
-            H5Awrite_wrap(attribute_id,
-                    HDF5Constants.H5T_NATIVE_DOUBLE, value, verbose);
+            H5Awrite_wrap(attribute_id, HDF5Constants.H5T_NATIVE_DOUBLE, value,
+                    verbose);
         }
         if (attr_class.equals("string") || attr_class.equals("sequence")) {
 
@@ -425,8 +436,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 error] Failed to create HDF5 dataspace: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to create HDF5 dataspace: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to create HDF5 dataspace: "
+                            + e.getMessage(), verbose);
         }
         return dataspace_id;
     }
@@ -462,8 +474,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 error] Failed to create HDF5 dataspace: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to create HDF5 dataspace: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to create HDF5 dataspace: "
+                            + e.getMessage(), verbose);
         }
         return dataspace_id;
     }
@@ -488,8 +501,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 Error] Failed to close HDF5 dataspace: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to close HDF5 dataspace: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to close HDF5 dataspace: " + e.getMessage(),
+                    verbose);
         }
         return status;
     }
@@ -592,8 +606,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 Error] Failed to write HDF5 attribute: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to write HDF5 attribute: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to write HDF5 attribute: " + e.getMessage(),
+                    verbose);
         }
         return status;
     }
@@ -616,8 +631,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 Error] Failed to close HDF5 attribute: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to close HDF5 attribute: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to close HDF5 attribute: " + e.getMessage(),
+                    verbose);
         }
         return status;
     }
@@ -643,8 +659,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 Error] Failed to set HDF5 dataspace size: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to set HDF5 dataspace size: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to set HDF5 dataspace size: "
+                            + e.getMessage(), verbose);
         }
         return status;
     }
@@ -666,8 +683,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 Error] Failed to copy HDF5 datatype: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to copy HDF5 datatype: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to copy HDF5 datatype: " + e.getMessage(),
+                    verbose);
         }
         return dataset_id;
     }
@@ -715,8 +733,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 Error] Failed to create HDF5 dataset: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to create HDF5 dataset: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to create HDF5 dataset: " + e.getMessage(),
+                    verbose);
         }
         return dataset_id;
     }
@@ -750,8 +769,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 Error] Failed to write HDF5 dataset: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[Error] Failed to write HDF5 dataset: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[Error] Failed to write HDF5 dataset: " + e.getMessage(),
+                    verbose);
         }
         return status;
     }
@@ -774,8 +794,9 @@ public class HDF5Model {
             msgl.showMessage("[HDF5 Error] Failed to close HDF5 dataset: "
                     + hdf5e.getMessage(), verbose);
         } catch (Exception e) {
-            msgl.showMessage("[HDF5 Error] Failed to close HDF5 dataset: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "[HDF5 Error] Failed to close HDF5 dataset: "
+                            + e.getMessage(), verbose);
         }
         return status;
     }
@@ -869,9 +890,8 @@ public class HDF5Model {
             fis.close();
             msgl.showMessage("Reading input data file: " + fileName, verbose);
         } catch (IOException e) {
-            msgl
-                    .showMessage("Error while reading input data file: "
-                            + fileName, verbose);
+            msgl.showMessage(
+                    "Error while reading input data file: " + fileName, verbose);
         }
         return file_buf;
     }
@@ -892,8 +912,9 @@ public class HDF5Model {
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.newDocument();
         } catch (ParserConfigurationException e) {
-            msgl.showMessage("Error while creating XML document object: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "Error while creating XML document object: "
+                            + e.getMessage(), verbose);
         }
         return doc;
     }
@@ -1145,10 +1166,9 @@ public class HDF5Model {
                 }
             }
         } catch (Exception e) {
-            msgl
-                    .showMessage(
-                            "I/O error: Error while retrieving HDF5 string attribute value",
-                            verbose);
+            msgl.showMessage(
+                    "I/O error: Error while retrieving HDF5 string attribute value",
+                    verbose);
         }
         if (ret == null)
             return "";
@@ -1188,10 +1208,9 @@ public class HDF5Model {
                 }
             }
         } catch (Exception e) {
-            msgl
-                    .showMessage(
-                            "I/O error: Error while retrieving HDF5 integer attribute value",
-                            verbose);
+            msgl.showMessage(
+                    "I/O error: Error while retrieving HDF5 integer attribute value",
+                    verbose);
         }
         if (ret == null)
             return 0;
@@ -1231,10 +1250,9 @@ public class HDF5Model {
                 }
             }
         } catch (Exception e) {
-            msgl
-                    .showMessage(
-                            "I/O error: Error while retrieving HDF5 double attribute value",
-                            verbose);
+            msgl.showMessage(
+                    "I/O error: Error while retrieving HDF5 double attribute value",
+                    verbose);
         }
 
         if (ret == null)
@@ -1276,10 +1294,9 @@ public class HDF5Model {
                 }
             }
         } catch (Exception e) {
-            msgl
-                    .showMessage(
-                            "I/O error: Error while retrieving HDF5 float attribute value",
-                            verbose);
+            msgl.showMessage(
+                    "I/O error: Error while retrieving HDF5 float attribute value",
+                    verbose);
         }
 
         if (ret == null)
@@ -1337,10 +1354,9 @@ public class HDF5Model {
                 }
             }
         } catch (Exception e) {
-            msgl
-                    .showMessage(
-                            "I/O error: Error while retrieving HDF5 string attribute value",
-                            verbose);
+            msgl.showMessage(
+                    "I/O error: Error while retrieving HDF5 string attribute value",
+                    verbose);
         }
         if (ret == null)
             return null;
@@ -1396,10 +1412,9 @@ public class HDF5Model {
             }
         } catch (Exception e) {
             // e.printStackTrace();
-            msgl
-                    .showMessage(
-                            "I/O error: Error while retrieving HDF5 float attribute value",
-                            verbose);
+            msgl.showMessage(
+                    "I/O error: Error while retrieving HDF5 float attribute value",
+                    verbose);
         }
         if (ret == null)
             return 0;
@@ -1455,10 +1470,9 @@ public class HDF5Model {
             }
         } catch (Exception e) {
             // e.printStackTrace();
-            msgl
-                    .showMessage(
-                            "I/O error: Error while retrieving HDF5 integer attribute value",
-                            verbose);
+            msgl.showMessage(
+                    "I/O error: Error while retrieving HDF5 integer attribute value",
+                    verbose);
         }
         if (ret == null)
             return 0;
@@ -1514,10 +1528,9 @@ public class HDF5Model {
             }
         } catch (Exception e) {
             // e.printStackTrace();
-            msgl
-                    .showMessage(
-                            "I/O error: Error while retrieving HDF5 double attribute value",
-                            verbose);
+            msgl.showMessage(
+                    "I/O error: Error while retrieving HDF5 double attribute value",
+                    verbose);
         }
         if (ret == null)
             return getHDF5FloatLeafValue(grp, grpName, leafGrpName,

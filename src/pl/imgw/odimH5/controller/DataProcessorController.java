@@ -79,7 +79,7 @@ public class DataProcessorController {
                 && !cmd.hasArgument(cmd.PLATFORM_OPTION)) {
 
             msgl.showMessage("Conversion from xml descriptor mode selected",
-                    verbose);
+                    true);
 
             // HDF5 file identifier
             int file_id = -1;

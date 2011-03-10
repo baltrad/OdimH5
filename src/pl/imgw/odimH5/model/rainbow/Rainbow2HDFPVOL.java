@@ -229,7 +229,7 @@ public class Rainbow2HDFPVOL {
                     .get(PVOL_H5.STARTDATE), od, rb.H5_STRING));
             dataset_what.appendChild(rb.makeAttr(PVOL_H5.STARTTIME, s.dsWhat
                     .get(PVOL_H5.STARTTIME), od, rb.H5_STRING));
-            dataset_what.appendChild(rb.makeAttr(PVOL_H5.ENDDATE, s.dsdWhat
+            dataset_what.appendChild(rb.makeAttr(PVOL_H5.ENDDATE, s.dsWhat
                     .get(PVOL_H5.ENDDATE), od, rb.H5_STRING));
             dataset_what.appendChild(rb.makeAttr(PVOL_H5.ENDTIME, s.dsWhat
                     .get(PVOL_H5.ENDTIME), od, rb.H5_STRING));
