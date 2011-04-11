@@ -114,7 +114,7 @@ public class LocalFeeder extends Thread {
      * 
      * @param filePath
      */
-    private void convertAndSendFile(String filePath) {
+    private void convertAndSendFile(String filePath) throws Exception{
 
         if (filePath.contains("KDP") || filePath.contains("PhiDP")
                 || filePath.contains("HV") || filePath.contains("ZDR")) {
@@ -129,6 +129,9 @@ public class LocalFeeder extends Thread {
 
         File originalFile = new File(filePath);
 
+        if(!originalFile.canRead())
+            return;
+        
         if (originalFile.getName().startsWith(".")) {
             return;
         }
@@ -171,7 +174,8 @@ public class LocalFeeder extends Thread {
 
         } else {
 
-            System.out.println("Format not supported");
+            System.out.println("Format of " + originalFile.getName()
+                    + "not supported");
             return;
         }
 
@@ -399,11 +403,17 @@ public class LocalFeeder extends Thread {
                 while (itr.hasNext()) {
                     String key = itr.next();
                     time = fileTimeMap.get(key);
-                    if ((timeNow - time) > 3000) {
+                    if ((timeNow - time) > 1000) {
                         fileTimeMap.remove(key);
                         itr = fileTimeMap.keySet().iterator();
-                        msgl.showMessage(key + " download finished", verbose);
-                        convertAndSendFile(key);
+                        msgl.showMessage(key + " download finished", true);
+                        try {
+                            convertAndSendFile(key);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                            LogsHandler.saveProgramLogs("convertAndSendFile", e.getLocalizedMessage());
+                        }
                     }
                 }
                 if (fileTimeMap.isEmpty()) {
@@ -434,6 +444,11 @@ public class LocalFeeder extends Thread {
                     String radarName = "";
                     if (e.kind() == StandardWatchEventKind.ENTRY_CREATE) {
                         Path context = (Path) e.context();
+                        
+                        if(context.toString().startsWith(".")) {
+                            continue;
+                        }
+                            
 
                         String path = "";
                         path = pathMap.get(signalledKey).getDir();
@@ -451,7 +466,11 @@ public class LocalFeeder extends Thread {
                         fileTimeMap.put(path, System.currentTimeMillis());
                     } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {
                         Path context = (Path) e.context();
-
+                        
+                        if(context.toString().startsWith(".")) {
+                            continue;
+                        }
+                        
                         String path = "";
                         path = pathMap.get(signalledKey).getDir();
                         radarName = pathMap.get(signalledKey).getRadarName();

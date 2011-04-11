@@ -17,6 +17,7 @@ import org.w3c.dom.Text;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
 import pl.imgw.odimH5.util.DataBufferContainer;
+import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
 
 /**
@@ -72,8 +73,10 @@ public class Rainbow2HDFPVOL {
      */
 
     public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff, boolean verbose,
-            RainbowModel rb, RadarOptions[] options) {
+            RainbowModel rb, RadarOptions[] options) throws Exception{
 
+        
+        
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.VOLUME, verbose);
 
         Document inputDoc = rb.parseRAINBOWMetadataBuffer(hdrBuff, verbose);
@@ -149,10 +152,10 @@ public class Rainbow2HDFPVOL {
         }
 
         correct = true;
-
+        
     }
 
-    public void makeXML() {
+    public void makeXML() throws Exception{
 
         HDF5Model proc = rb.getHDFModel();
 
@@ -317,7 +320,7 @@ public class Rainbow2HDFPVOL {
         rb.hdf.saveXMLFile(od, outputFileName, verbose);
     }
 
-    public void makeH5() {
+    public void makeH5() throws Exception{
 
         HDF5Model proc = rb.getHDFModel();
 

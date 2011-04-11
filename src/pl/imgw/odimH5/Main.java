@@ -59,7 +59,13 @@ public class Main {
         cont.setCmdParser(cmd);
         cont.setHDFModel(proc);
         cont.setRAINBOWModel(rainbow);
-        cont.startProcessor(args);
+        try {
+            cont.startProcessor(args);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            LogsHandler.saveProgramLogs("DataProcessorController.startProcessor", e.getLocalizedMessage());
+        }
 
     }
 

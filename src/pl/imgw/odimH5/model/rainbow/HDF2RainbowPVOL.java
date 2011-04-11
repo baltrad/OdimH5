@@ -75,7 +75,7 @@ public class HDF2RainbowPVOL {
      * @param options
      */
     public HDF2RainbowPVOL(String outputFileName, String inputFileName,
-            boolean verbose, RainbowModel rb, RadarOptions[] options) {
+            boolean verbose, RainbowModel rb, RadarOptions[] options) throws Exception {
 
         this.rb = rb;
         this.options = options;
