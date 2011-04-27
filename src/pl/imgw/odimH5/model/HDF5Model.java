@@ -26,6 +26,7 @@ import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
+import ncsa.hdf.object.h5.H5CompoundDS;
 import ncsa.hdf.object.h5.H5File;
 
 import org.apache.xerces.parsers.DOMParser;
@@ -157,17 +158,19 @@ public class HDF5Model {
             if (currentNode.hasAttributes()
                     && currentNode.getNodeName().equals(XML_ATTR)) {
                 try {
-                attributes = currentNode.getAttributes();
-                attr_name = attributes.getNamedItem(H5_OBJECT_NAME)
-                        .getNodeValue();
-                attr_class = attributes.getNamedItem(H5_OBJECT_CLASS)
-                        .getNodeValue();
+                    attributes = currentNode.getAttributes();
+                    attr_name = attributes.getNamedItem(H5_OBJECT_NAME)
+                            .getNodeValue();
+                    if (attr_name.startsWith("/"))
+                        attr_name = attr_name.substring(1);
+                    attr_class = attributes.getNamedItem(H5_OBJECT_CLASS)
+                            .getNodeValue();
 
-                attr_value = currentNode.getFirstChild().getNodeValue();
-                H5Acreate_any_wrap(cur_group_id, attr_name, attr_class,
-                        attr_value, verbose);
+                    attr_value = currentNode.getFirstChild().getNodeValue();
+                    H5Acreate_any_wrap(cur_group_id, attr_name, attr_class,
+                            attr_value, verbose);
                 } catch (NullPointerException e) {
-                    
+
                 }
 
                 // Method creating HDF5 attributes of different types
@@ -188,8 +191,11 @@ public class HDF5Model {
                         verbose);
                 attr_name = attributes.getNamedItem(H5_DATA_CHUNK)
                         .getNodeValue();
-                int chunk = Integer.parseInt(attr_name.substring(0,
+                long chunk[] = new long[2];
+                chunk[0] = Long.parseLong(attr_name.substring(0,
                         attr_name.lastIndexOf("x")));
+                chunk[1] = Long.parseLong(attr_name.substring(attr_name
+                        .lastIndexOf("x") + 1));
                 attr_name = attributes.getNamedItem(H5_GZIP_LEVEL)
                         .getNodeValue();
                 int gZipLevel = Integer.parseInt(attr_name);
@@ -253,7 +259,14 @@ public class HDF5Model {
             int access_id, boolean verbose) {
         int file_id = -1;
         try {
-            file_id = H5.H5Fcreate(filename, access_mode, create_id, access_id);
+            int propId = H5.H5Pcreate(HDF5Constants.H5P_FILE_CREATE);
+            
+            H5.H5Pset_userblock(propId, 0);
+            H5.H5Pset_sizes(propId, 4, 4);
+            H5.H5Pset_sym_k(propId, 1, 1);
+            H5.H5Pset_istore_k(propId, 1);
+            
+            file_id = H5.H5Fcreate(filename, access_mode, propId, access_id);
             msgl.showMessage("Created new HDF5 file: " + filename + ", ID="
                     + file_id, verbose);
         } catch (HDF5Exception hdf5e) {
@@ -710,33 +723,44 @@ public class HDF5Model {
      * @return Dataset identifier
      */
     public int H5Dcreate_wrap(int file_id, String group_name, int datatype_id,
-            int dataspace_id, int chunk, int gZipLevel, boolean verbose) {
+            int dataspace_id, long[] chunk, int gZipLevel, boolean verbose) {
         @SuppressWarnings("unused")
         int status = -1;
         int dataset_id = -1;
-        long[] cdims = new long[2];
-        cdims[0] = (long) chunk;
-        cdims[1] = (long) chunk;
+
+        // chunk[0] = 128;
+        // chunk[1] = 128;
 
         try {
-            int create_plist_id = H5
-                    .H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
-            status = H5.H5Pset_chunk(create_plist_id, 2, cdims);
+            int plist_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
 
-            status = H5.H5Pset_deflate(create_plist_id, gZipLevel);
+            // status = H5.H5Pset_meta_block_size(plist_id, 0);
+
+            status = H5.H5Pset_deflate(plist_id, gZipLevel);
+            status = H5.H5Pset_layout(plist_id, HDF5Constants.H5D_CHUNKED);
+            status = H5.H5Pset_chunk(plist_id, 2, chunk);
+//            status = H5.H5Pset_sym_k(plist_id, 1, 1);
             // Create the dataset
             dataset_id = H5.H5Dcreate(file_id, group_name, datatype_id,
-                    dataspace_id, create_plist_id);
+                    dataspace_id, plist_id);
             msgl.showMessage("Creating HDF5 dataset: ID=" + dataset_id
                     + ", datatype ID=" + datatype_id, verbose);
+
+            // status = H5.H5Pset_userblock(plist, 0);
+            // status = H5.H5Pset_sizes(plist, 4, 4);
+            // status = H5.H5Pset_sym_k(plist, 1, 1);
+            // status = H5.H5Pset_istore_k(plist, 1);
+
         } catch (HDF5Exception hdf5e) {
             msgl.showMessage("[HDF5 Error] Failed to create HDF5 dataset: "
-                    + hdf5e.getMessage(), verbose);
+                    + hdf5e.getMessage(), true);
+
         } catch (Exception e) {
             msgl.showMessage(
                     "[Error] Failed to create HDF5 dataset: " + e.getMessage(),
-                    verbose);
+                    true);
         }
+
         return dataset_id;
     }
 
@@ -762,6 +786,7 @@ public class HDF5Model {
             int file_space_id, int xfer_plist_id, Object buf, boolean verbose) {
         int status = -1;
         try {
+
             status = H5.H5Dwrite(dataset_id, mem_type_id, mem_space_id,
                     file_space_id, xfer_plist_id, buf);
             msgl.showMessage("Writing HDF5 dataset: ID=" + dataset_id, verbose);

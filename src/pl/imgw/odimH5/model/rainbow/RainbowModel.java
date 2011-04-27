@@ -56,6 +56,7 @@ public class RainbowModel {
     // Constants
 
     protected final String H5_ROOT = "/";
+    protected final String H5_CONV = "ODIM_H5/V2_0";
     protected final String H5_GROUP = "group";
     protected final String H5_OBJECT_NAME = "name";
     protected final String H5_OBJECT_CLASS = "class";
@@ -75,7 +76,7 @@ public class RainbowModel {
     protected final String H5_SEQUENCE = "sequence";
 
     protected final String IMAGE_VER = "1.2";
-    protected final String H5_DATA_CHUNK = "20";
+    protected final String H5_DATA_CHUNK = "64";
     protected final String H5_GZIP_LEVEL = "6";
 
     protected final String EARTH_RAD = "6371000";
@@ -468,7 +469,7 @@ public class RainbowModel {
 
         return attribute;
     }
-    
+
     /**
      * Method creates XML tag element with given name and value.
      * 
@@ -482,7 +483,7 @@ public class RainbowModel {
         Text text = od.createTextNode(value);
         tag.appendChild(text);
         return tag;
-        
+
     }
 
     /**
@@ -754,14 +755,14 @@ public class RainbowModel {
     public String convertTimeInterval(String interval) {
         int i = 0;
         i = interval.indexOf("@", i) + 1;
-        int minutes = Integer.parseInt(interval.substring(i++, interval
-                .indexOf(" d"))) * 24 * 60;
+        int minutes = Integer.parseInt(interval.substring(i++,
+                interval.indexOf(" d"))) * 24 * 60;
         i = interval.indexOf("@", i) + 1;
-        minutes += Integer.parseInt(interval.substring(i++, interval
-                .indexOf(" h"))) * 60;
+        minutes += Integer.parseInt(interval.substring(i++,
+                interval.indexOf(" h"))) * 60;
         i = interval.indexOf("@", i) + 1;
-        minutes += Integer.parseInt(interval.substring(i, interval
-                .indexOf(" m")));
+        minutes += Integer.parseInt(interval.substring(i,
+                interval.indexOf(" m")));
 
         return String.valueOf(minutes);
     }
@@ -824,7 +825,7 @@ public class RainbowModel {
      * @return
      */
     public String getRAINBOWOffset(String min, String step) {
-        
+
         double offset = 0;
         double gain = 0;
         try {
@@ -841,7 +842,6 @@ public class RainbowModel {
 
         offset -= (gain * FIRST_VALUE);
 
-        
         return String.valueOf(offset);
     }
 
@@ -886,8 +886,9 @@ public class RainbowModel {
             proj = ProjectionFactory.fromPROJ4Specification(projectionParms);
             proj.initialize();
         } catch (ProjectionException e) {
-            msgl.showMessage("Error while initializing projection: "
-                    + e.getMessage(), verbose);
+            msgl.showMessage(
+                    "Error while initializing projection: " + e.getMessage(),
+                    verbose);
         }
         return proj;
     }
@@ -1044,13 +1045,13 @@ public class RainbowModel {
     }
 
     /**
-     *
+     * 
      * Function reads Rainbow data section from Rainbow file and puts it into an
      * DataBufferContainer
      * 
      * @param fileBuff
      * @param verbose
-     * @return DataBufferContainer
+     * @return hash map containing blob number and data buffer container
      */
     public HashMap<Integer, DataBufferContainer> getAllRainbowDataBlobs(
             byte[] fileBuff, boolean verbose) {

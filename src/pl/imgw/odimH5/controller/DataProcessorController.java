@@ -103,7 +103,7 @@ public class DataProcessorController {
             // Close HDF5 file
             status = hdf.H5Fclose_wrap(file_id, verbose);
 
-            msgl.showMessage("Conversion completed.", verbose);
+            msgl.showMessage("Conversion completed.", true);
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
                 && cmd.hasArgument(cmd.FILE_OBJECT_OPTION)
@@ -117,7 +117,7 @@ public class DataProcessorController {
             // else
             // fileName = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + ".h5";
 
-            msgl.showMessage("Conversion mode selected", verbose);
+            msgl.showMessage("Conversion mode selected", true);
 
             if (doc == null) {
                 OptionsHandler.exampleOptionXML();
@@ -179,8 +179,9 @@ public class DataProcessorController {
 
             // Other platforms will come here at a later time...
             if (!fileNameOut.isEmpty())
-                msgl.showMessage("Descriptor preparation completed.", verbose);
-
+                msgl.showMessage("Descriptor preparation completed.", true);
+            
+            
         } else if (cmd.hasArgument(cmd.CONTINOUOS_OPTION)) {
 
             msgl.showMessage("Operational feeder mode selected", true);
@@ -206,7 +207,7 @@ public class DataProcessorController {
                 && cmd.hasArgument(cmd.SENDER_OPTION)
                 && cmd.hasArgument(cmd.RADAR_OPTION)) {
 
-            msgl.showMessage("Sending file to server", verbose);
+            msgl.showMessage("Sending file to server", true);
 
             BaltradFrameHandler bfh = new BaltradFrameHandler(cmd
                     .getArgumentValue(cmd.ADDRESS_OPTION));

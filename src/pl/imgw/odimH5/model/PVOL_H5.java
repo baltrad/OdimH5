@@ -13,6 +13,10 @@ package pl.imgw.odimH5.model;
  */
 public class PVOL_H5 {
 
+    // root
+    public static final String CONVENTIONS = "conventions";
+    
+    
     // what
     public static final String OBJECT = "object";
     public static final String DATE = "date";

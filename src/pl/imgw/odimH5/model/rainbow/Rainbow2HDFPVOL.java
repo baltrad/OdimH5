@@ -65,6 +65,8 @@ public class Rainbow2HDFPVOL {
 
     /**
      * 
+     * Collecting mandatory data from fileBuff for further processing.
+     * 
      * @param outputFileName
      * @param fileBuff
      * @param verbose
@@ -72,11 +74,10 @@ public class Rainbow2HDFPVOL {
      * @param options
      */
 
-    public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff, boolean verbose,
-            RainbowModel rb, RadarOptions[] options) throws Exception{
+    public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff,
+            boolean verbose, RainbowModel rb, RadarOptions[] options)
+            throws Exception {
 
-        
-        
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.VOLUME, verbose);
 
         Document inputDoc = rb.parseRAINBOWMetadataBuffer(hdrBuff, verbose);
@@ -152,10 +153,10 @@ public class Rainbow2HDFPVOL {
         }
 
         correct = true;
-        
+
     }
 
-    public void makeXML() throws Exception{
+    public void makeXML() throws Exception {
 
         HDF5Model proc = rb.getHDFModel();
 
@@ -167,14 +168,14 @@ public class Rainbow2HDFPVOL {
         od.appendChild(comment);
         Element root = od.createElement(rb.H5_GROUP);
         root.setAttribute(rb.H5_OBJECT_NAME, rb.H5_ROOT);
+        root.appendChild(rb.makeAttr(PVOL_H5.CONVENTIONS, rb.H5_CONV, od,
+                rb.H5_STRING));
         od.appendChild(root);
 
         // what group
         Element what = od.createElement(rb.H5_GROUP);
         what.setAttribute(rb.H5_OBJECT_NAME, rb.H5_WHAT);
-        what
-                .appendChild(rb.makeAttr(PVOL_H5.OBJECT, rb.PVOL, od,
-                        rb.H5_STRING));
+        what.appendChild(rb.makeAttr(PVOL_H5.OBJECT, rb.PVOL, od, rb.H5_STRING));
         what.appendChild(rb.makeAttr(PVOL_H5.VERSION, rb.VERSION, od,
                 rb.H5_STRING));
         what.appendChild(rb.makeAttr(PVOL_H5.DATE, whatG.get(PVOL_H5.DATE), od,
@@ -192,27 +193,27 @@ public class Rainbow2HDFPVOL {
                 rb.H5_DOUBLE));
         where.appendChild(rb.makeAttr(PVOL_H5.LAT, whereG.get(PVOL_H5.LAT), od,
                 rb.H5_DOUBLE));
-        where.appendChild(rb.makeAttr(PVOL_H5.HEIGHT, whereG
-                .get(PVOL_H5.HEIGHT), od, rb.H5_DOUBLE));
+        where.appendChild(rb.makeAttr(PVOL_H5.HEIGHT,
+                whereG.get(PVOL_H5.HEIGHT), od, rb.H5_DOUBLE));
         root.appendChild(where);
 
         // how group
         Element how = od.createElement(rb.H5_GROUP);
         how.setAttribute(rb.H5_OBJECT_NAME, rb.H5_HOW);
-        how.appendChild(rb.makeAttr(PVOL_H5.STARTEPOCHS, howG
-                .get(PVOL_H5.STARTEPOCHS), od, rb.H5_LONG));
-        how.appendChild(rb.makeAttr(PVOL_H5.ENDEPOCHS, howG
-                .get(PVOL_H5.ENDEPOCHS), od, rb.H5_LONG));
+        how.appendChild(rb.makeAttr(PVOL_H5.STARTEPOCHS,
+                howG.get(PVOL_H5.STARTEPOCHS), od, rb.H5_LONG));
+        how.appendChild(rb.makeAttr(PVOL_H5.ENDEPOCHS,
+                howG.get(PVOL_H5.ENDEPOCHS), od, rb.H5_LONG));
         how.appendChild(rb.makeAttr(PVOL_H5.SYSTEM, rb.RAINBOW_SYSTEM, od,
                 rb.H5_STRING));
         how.appendChild(rb.makeAttr(PVOL_H5.SOFTWARE, rb.RAINBOW_SOFTWARE, od,
                 rb.H5_STRING));
-        how.appendChild(rb.makeAttr(PVOL_H5.SW_VERSION, howG
-                .get(PVOL_H5.SW_VERSION), od, rb.H5_STRING));
-        how.appendChild(rb.makeAttr(PVOL_H5.BEAMWIDTH, howG
-                .get(PVOL_H5.BEAMWIDTH), od, rb.H5_DOUBLE));
-        how.appendChild(rb.makeAttr(PVOL_H5.WAVELENGTH, howG
-                .get(PVOL_H5.WAVELENGTH), od, rb.H5_DOUBLE));
+        how.appendChild(rb.makeAttr(PVOL_H5.SW_VERSION,
+                howG.get(PVOL_H5.SW_VERSION), od, rb.H5_STRING));
+        how.appendChild(rb.makeAttr(PVOL_H5.BEAMWIDTH,
+                howG.get(PVOL_H5.BEAMWIDTH), od, rb.H5_DOUBLE));
+        how.appendChild(rb.makeAttr(PVOL_H5.WAVELENGTH,
+                howG.get(PVOL_H5.WAVELENGTH), od, rb.H5_DOUBLE));
         root.appendChild(how);
 
         for (int i = 0; i < size; i++) {
@@ -228,32 +229,32 @@ public class Rainbow2HDFPVOL {
             dataset_what.setAttribute(rb.H5_OBJECT_NAME, rb.H5_WHAT);
             dataset_what.appendChild(rb.makeAttr(PVOL_H5.PRODUCT,
                     rb.RAINBOW_SCAN, od, rb.H5_STRING));
-            dataset_what.appendChild(rb.makeAttr(PVOL_H5.STARTDATE, s.dsWhat
-                    .get(PVOL_H5.STARTDATE), od, rb.H5_STRING));
-            dataset_what.appendChild(rb.makeAttr(PVOL_H5.STARTTIME, s.dsWhat
-                    .get(PVOL_H5.STARTTIME), od, rb.H5_STRING));
-            dataset_what.appendChild(rb.makeAttr(PVOL_H5.ENDDATE, s.dsWhat
-                    .get(PVOL_H5.ENDDATE), od, rb.H5_STRING));
-            dataset_what.appendChild(rb.makeAttr(PVOL_H5.ENDTIME, s.dsWhat
-                    .get(PVOL_H5.ENDTIME), od, rb.H5_STRING));
+            dataset_what.appendChild(rb.makeAttr(PVOL_H5.STARTDATE,
+                    s.dsWhat.get(PVOL_H5.STARTDATE), od, rb.H5_STRING));
+            dataset_what.appendChild(rb.makeAttr(PVOL_H5.STARTTIME,
+                    s.dsWhat.get(PVOL_H5.STARTTIME), od, rb.H5_STRING));
+            dataset_what.appendChild(rb.makeAttr(PVOL_H5.ENDDATE,
+                    s.dsWhat.get(PVOL_H5.ENDDATE), od, rb.H5_STRING));
+            dataset_what.appendChild(rb.makeAttr(PVOL_H5.ENDTIME,
+                    s.dsWhat.get(PVOL_H5.ENDTIME), od, rb.H5_STRING));
             dataset.appendChild(dataset_what);
 
             // where
             Element dataset_where = od.createElement(rb.H5_GROUP);
             dataset_where.setAttribute(rb.H5_OBJECT_NAME, rb.H5_WHERE);
 
-            dataset_where.appendChild(rb.makeAttr(PVOL_H5.ELANGLE, s.dsWhere
-                    .get(PVOL_H5.ELANGLE), od, rb.H5_DOUBLE));
-            dataset_where.appendChild(rb.makeAttr(PVOL_H5.NBINS, s.dsWhere
-                    .get(PVOL_H5.NBINS), od, rb.H5_LONG));
-            dataset_where.appendChild(rb.makeAttr(PVOL_H5.RSTART, s.dsWhere
-                    .get(PVOL_H5.RSTART), od, rb.H5_DOUBLE));
-            dataset_where.appendChild(rb.makeAttr(PVOL_H5.RSCALE, s.dsWhere
-                    .get(PVOL_H5.RSCALE), od, rb.H5_DOUBLE));
-            dataset_where.appendChild(rb.makeAttr(PVOL_H5.NRAYS, s.dsWhere
-                    .get(PVOL_H5.NRAYS), od, rb.H5_LONG));
-            dataset_where.appendChild(rb.makeAttr(PVOL_H5.A1GATE, s.dsWhere
-                    .get(PVOL_H5.A1GATE), od, rb.H5_LONG));
+            dataset_where.appendChild(rb.makeAttr(PVOL_H5.ELANGLE,
+                    s.dsWhere.get(PVOL_H5.ELANGLE), od, rb.H5_DOUBLE));
+            dataset_where.appendChild(rb.makeAttr(PVOL_H5.NBINS,
+                    s.dsWhere.get(PVOL_H5.NBINS), od, rb.H5_LONG));
+            dataset_where.appendChild(rb.makeAttr(PVOL_H5.RSTART,
+                    s.dsWhere.get(PVOL_H5.RSTART), od, rb.H5_DOUBLE));
+            dataset_where.appendChild(rb.makeAttr(PVOL_H5.RSCALE,
+                    s.dsWhere.get(PVOL_H5.RSCALE), od, rb.H5_DOUBLE));
+            dataset_where.appendChild(rb.makeAttr(PVOL_H5.NRAYS,
+                    s.dsWhere.get(PVOL_H5.NRAYS), od, rb.H5_LONG));
+            dataset_where.appendChild(rb.makeAttr(PVOL_H5.A1GATE,
+                    s.dsWhere.get(PVOL_H5.A1GATE), od, rb.H5_LONG));
             dataset.appendChild(dataset_where);
 
             // data1 what
@@ -261,16 +262,17 @@ public class Rainbow2HDFPVOL {
             data1.setAttribute(rb.H5_OBJECT_NAME, rb.H5_DATA + "1");
             Element data_what = od.createElement(rb.H5_GROUP);
             data_what.setAttribute(rb.H5_OBJECT_NAME, rb.H5_WHAT);
-            data_what.appendChild(rb.makeAttr(PVOL_H5.QUANTITY, s.dsdWhat.get(
-                    PVOL_H5.QUANTITY).toUpperCase(), od, rb.H5_STRING));
-            data_what.appendChild(rb.makeAttr(PVOL_H5.GAIN, s.dsdWhat
-                    .get(PVOL_H5.GAIN), od, rb.H5_DOUBLE));
-            data_what.appendChild(rb.makeAttr(PVOL_H5.OFFSET, s.dsdWhat
-                    .get(PVOL_H5.OFFSET), od, rb.H5_DOUBLE));
-            data_what.appendChild(rb.makeAttr(PVOL_H5.NODATA, String
-                    .valueOf(rb.RAINBOW_NO_DATA), od, rb.H5_DOUBLE));
-            data_what.appendChild(rb.makeAttr(PVOL_H5.UNDETECT, String
-                    .valueOf(rb.RAINBOW_UNDETECT), od, rb.H5_DOUBLE));
+            data_what.appendChild(rb.makeAttr(PVOL_H5.QUANTITY,
+                    s.dsdWhat.get(PVOL_H5.QUANTITY).toUpperCase(), od,
+                    rb.H5_STRING));
+            data_what.appendChild(rb.makeAttr(PVOL_H5.GAIN,
+                    s.dsdWhat.get(PVOL_H5.GAIN), od, rb.H5_DOUBLE));
+            data_what.appendChild(rb.makeAttr(PVOL_H5.OFFSET,
+                    s.dsdWhat.get(PVOL_H5.OFFSET), od, rb.H5_DOUBLE));
+            data_what.appendChild(rb.makeAttr(PVOL_H5.NODATA,
+                    String.valueOf(rb.RAINBOW_NO_DATA), od, rb.H5_DOUBLE));
+            data_what.appendChild(rb.makeAttr(PVOL_H5.UNDETECT,
+                    String.valueOf(rb.RAINBOW_UNDETECT), od, rb.H5_DOUBLE));
             data1.appendChild(data_what);
 
             // dataset
@@ -282,22 +284,23 @@ public class Rainbow2HDFPVOL {
                     .getDataBuff().getDataBuffer(), bins, Integer
                     .parseInt(nray_org[i]), verbose);
 
-            infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins, Integer
-                    .parseInt(s.dsWhere.get(PVOL_H5.A1GATE)));
+            infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins,
+                    Integer.parseInt(s.dsWhere.get(PVOL_H5.A1GATE)));
 
             infDataBuff = proc.transposeArray(infDataBuff, rays, bins);
             Element dataset1 = od.createElement(rb.H5_DATASET);
             dataset1.setAttribute(rb.H5_OBJECT_NAME, rb.H5_DATA);
 
             dataset1.setAttribute(PVOL_H5.DATA_TYPE, rb.H5_INTEGER);
-            dataset1.setAttribute(PVOL_H5.DATA_SIZE, s.dsdData
-                    .get(PVOL_H5.DATA_SIZE));
-            dataset1.setAttribute(PVOL_H5.CHUNK, rb.H5_DATA_CHUNK + "x"
-                    + rb.H5_DATA_CHUNK);
-
-            dataset1.setAttribute(PVOL_H5.DIMENSIONS, s.dsWhere
-                    .get(PVOL_H5.NRAYS)
+            dataset1.setAttribute(PVOL_H5.DATA_SIZE,
+                    s.dsdData.get(PVOL_H5.DATA_SIZE));
+            dataset1.setAttribute(PVOL_H5.CHUNK, s.dsWhere.get(PVOL_H5.NRAYS)
                     + "x" + s.dsWhere.get(PVOL_H5.NBINS));
+
+            dataset1.setAttribute(
+                    PVOL_H5.DIMENSIONS,
+                    s.dsWhere.get(PVOL_H5.NRAYS) + "x"
+                            + s.dsWhere.get(PVOL_H5.NBINS));
             dataset1.setAttribute(PVOL_H5.GZIP_LEVEL, rb.H5_GZIP_LEVEL);
 
             dataset1.setAttribute(PVOL_H5.CLASS, rb.IMAGE);
@@ -320,7 +323,7 @@ public class Rainbow2HDFPVOL {
         rb.hdf.saveXMLFile(od, outputFileName, verbose);
     }
 
-    public void makeH5() throws Exception{
+    public void makeH5() throws Exception {
 
         HDF5Model proc = rb.getHDFModel();
 
@@ -332,6 +335,10 @@ public class Rainbow2HDFPVOL {
         file_id = proc.H5Fcreate_wrap(outputFileName,
                 HDF5Constants.H5F_ACC_TRUNC, HDF5Constants.H5P_DEFAULT,
                 HDF5Constants.H5P_DEFAULT, verbose);
+
+        // ========================== root =================================
+        proc.H5Acreate_any_wrap(file_id, PVOL_H5.CONVENTIONS, rb.H5_STRING,
+                rb.H5_CONV, verbose);
 
         // ======================= what group ==============================
         child_group_id = proc.H5Gcreate_wrap(file_id, "/what", 0, verbose);
@@ -379,7 +386,7 @@ public class Rainbow2HDFPVOL {
             makeQIfields(proc, child_group_id);
 
         proc.H5Gclose_wrap(child_group_id, verbose);
-        
+
         for (int i = 0; i < size; i++) {
 
             PVOLSlicesCont s = slices[i];
@@ -461,10 +468,13 @@ public class Rainbow2HDFPVOL {
             int dataspace_id = proc.H5Screate_simple_wrap(2, rays, bins, null,
                     verbose);
 
+            long chunk[] = new long[2];
+            chunk[0] = rays;
+            chunk[1] = bins;
+
             grandgrandchild_group_id = proc.H5Dcreate_wrap(grandchild_group_id,
-                    "data", HDF5Constants.H5T_STD_U8BE, dataspace_id, Integer
-                            .parseInt(rb.H5_DATA_CHUNK), Integer
-                            .parseInt(rb.H5_GZIP_LEVEL), verbose);
+                    "data", HDF5Constants.H5T_STD_U8BE, dataspace_id, chunk,
+                    Integer.parseInt(rb.H5_GZIP_LEVEL), verbose);
 
             proc.H5Acreate_any_wrap(grandgrandchild_group_id, PVOL_H5.CLASS,
                     rb.H5_STRING, rb.IMAGE, verbose);
@@ -477,8 +487,8 @@ public class Rainbow2HDFPVOL {
 
             // przesunac azymuty
             // System.out.println(i + ": rays=" + rays + " bins=" + bins);
-            infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins, Integer
-                    .parseInt(s.dsWhere.get(PVOL_H5.A1GATE)));
+            infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins,
+                    Integer.parseInt(s.dsWhere.get(PVOL_H5.A1GATE)));
 
             infDataBuff = proc.transposeArray(infDataBuff, rays, bins);
 
@@ -499,34 +509,40 @@ public class Rainbow2HDFPVOL {
                 int qi_children_group_id = -1;
                 qi_group_id = proc.H5Gcreate_wrap(grandchild_group_id,
                         "quality1", 0, verbose);
-               
-                //quantity/what
+
+                // quantity/what
                 qi_children_group_id = proc.H5Gcreate_wrap(qi_group_id, "what",
                         0, verbose);
-                
+
                 proc.H5Acreate_any_wrap(qi_children_group_id, PVOL_H5.GAIN,
                         rb.H5_DOUBLE, s.dsdWhat.get(PVOL_H5.QI_GAIN), verbose);
                 proc.H5Acreate_any_wrap(qi_children_group_id, PVOL_H5.OFFSET,
                         rb.H5_DOUBLE, s.dsdWhat.get(PVOL_H5.QI_OFFSET), verbose);
                 proc.H5Acreate_any_wrap(qi_children_group_id, PVOL_H5.NODATA,
-                        rb.H5_DOUBLE, String.valueOf(rb.RAINBOW_NO_DATA), verbose);
+                        rb.H5_DOUBLE, String.valueOf(rb.RAINBOW_NO_DATA),
+                        verbose);
                 proc.H5Acreate_any_wrap(qi_children_group_id, PVOL_H5.UNDETECT,
-                        rb.H5_DOUBLE, String.valueOf(rb.RAINBOW_UNDETECT), verbose);
-                
+                        rb.H5_DOUBLE, String.valueOf(rb.RAINBOW_UNDETECT),
+                        verbose);
+
                 proc.H5Gclose_wrap(qi_children_group_id, verbose);
 
                 int qi_dataspace_id = proc.H5Screate_simple_wrap(2, qiRays,
                         qiBins, null, verbose);
+
+                long qi_chunk[] = new long[2];
+                qi_chunk[0] = qiRays;
+                qi_chunk[1] = qiBins;
+
                 qi_children_group_id = proc.H5Dcreate_wrap(qi_group_id, "data",
-                        HDF5Constants.H5T_STD_U8BE, qi_dataspace_id, Integer
-                                .parseInt(rb.H5_DATA_CHUNK), Integer
-                                .parseInt(rb.H5_GZIP_LEVEL), verbose);
+                        HDF5Constants.H5T_STD_U8BE, qi_dataspace_id, qi_chunk,
+                        Integer.parseInt(rb.H5_GZIP_LEVEL), verbose);
 
                 proc.H5Acreate_any_wrap(qi_children_group_id, PVOL_H5.CLASS,
                         rb.H5_STRING, rb.IMAGE, verbose);
                 proc.H5Acreate_any_wrap(qi_children_group_id, PVOL_H5.IM_VER,
                         rb.H5_STRING, rb.IMAGE_VER, verbose);
-                
+
                 infQiBuff = rb.inflate2DRAINBOWDataSection(s.getQiBuff()
                         .getDataBuffer(), qiBins, qiRays, verbose);
 
@@ -568,7 +584,7 @@ public class Rainbow2HDFPVOL {
                 qiG.get(PVOL_H5.SYS_QCOn), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SYS_QIOn, rb.H5_LONG,
                 qiG.get(PVOL_H5.SYS_QIOn), verbose);
-        
+
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SYS_Freq, rb.H5_DOUBLE,
                 qiG.get(PVOL_H5.SYS_Freq), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SYS_QIFreq,
@@ -802,10 +818,10 @@ public class Rainbow2HDFPVOL {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "wavelen", verbose);
         String wavelength = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
 
-        how.put(PVOL_H5.STARTEPOCHS, rb.convertRAINBOWDate2Epoch(date, time,
-                verbose));
-        how.put(PVOL_H5.ENDEPOCHS, rb.convertRAINBOWDate2Epoch(date, time,
-                verbose));
+        how.put(PVOL_H5.STARTEPOCHS,
+                rb.convertRAINBOWDate2Epoch(date, time, verbose));
+        how.put(PVOL_H5.ENDEPOCHS,
+                rb.convertRAINBOWDate2Epoch(date, time, verbose));
         how.put(PVOL_H5.SYSTEM, rb.RAINBOW_SYSTEM);
         how.put(PVOL_H5.SOFTWARE, rb.RAINBOW_SOFTWARE);
         how.put(PVOL_H5.SW_VERSION, version);
@@ -961,7 +977,7 @@ public class Rainbow2HDFPVOL {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.AH_QCOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.AH_QCOn, value);
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.AH_QIOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.AH_QIOn, value);
@@ -974,16 +990,14 @@ public class Rainbow2HDFPVOL {
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.AH_QI1, value);
 
-
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.AV_QCOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.AV_QCOn, value);
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.AV_QIOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.AV_QIOn, value);
 
-        
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.AV_QI0, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.AV_QI0, value);
@@ -992,16 +1006,14 @@ public class Rainbow2HDFPVOL {
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.AV_QI1, value);
 
-
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.GC_QCOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.AH_QCOn, value);
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.GC_QIOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.GC_QIOn, value);
 
-        
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.GC_QI, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.GC_QI, value);
@@ -1015,14 +1027,16 @@ public class Rainbow2HDFPVOL {
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.GC_MinPbb, value);
 
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SPIKE_QCOn, verbose);
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SPIKE_QCOn,
+                verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.SPIKE_QCOn, value);
-        
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SPIKE_QIOn, verbose);
+
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SPIKE_QIOn,
+                verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.SPIKE_QIOn, value);
-        
+
         nodeList = rb
                 .getRAINBOWNodesByName(inputDoc, PVOL_H5.SPIKE_QI, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
@@ -1053,14 +1067,16 @@ public class Rainbow2HDFPVOL {
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.SPIKE_Perc, value);
 
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.RSPEC_QCOn, verbose);
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.RSPEC_QCOn,
+                verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.RSPEC_QCOn, value);
-        
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.RSPEC_QIOn, verbose);
+
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.RSPEC_QIOn,
+                verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.RSPEC_QIOn, value);
-        
+
         nodeList = rb
                 .getRAINBOWNodesByName(inputDoc, PVOL_H5.RSPEC_QI, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
@@ -1086,14 +1102,16 @@ public class Rainbow2HDFPVOL {
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.RSPEC_Step, value);
 
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SPEC_QCOn, verbose);
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SPEC_QCOn,
+                verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.SPEC_QCOn, value);
-        
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SPEC_QIOn, verbose);
+
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SPEC_QIOn,
+                verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.SPEC_QIOn, value);
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SPEC_QI, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.SPEC_QI, value);
@@ -1118,14 +1136,16 @@ public class Rainbow2HDFPVOL {
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.SPEC_Step, value);
 
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.PBB_QCOn, verbose);
+        nodeList = rb
+                .getRAINBOWNodesByName(inputDoc, PVOL_H5.PBB_QCOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.PBB_QCOn, value);
-        
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.PBB_QIOn, verbose);
+
+        nodeList = rb
+                .getRAINBOWNodesByName(inputDoc, PVOL_H5.PBB_QIOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.PBB_QIOn, value);
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.PBB_Max, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.PBB_Max, value);
@@ -1135,14 +1155,16 @@ public class Rainbow2HDFPVOL {
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.PBB_QIUn, value);
 
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.ATT_QCOn, verbose);
+        nodeList = rb
+                .getRAINBOWNodesByName(inputDoc, PVOL_H5.ATT_QCOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.ATT_QCOn, value);
-        
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.ATT_QIOn, verbose);
+
+        nodeList = rb
+                .getRAINBOWNodesByName(inputDoc, PVOL_H5.ATT_QIOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.ATT_QIOn, value);
-        
+
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.ATT_a, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.ATT_a, value);
@@ -1177,14 +1199,16 @@ public class Rainbow2HDFPVOL {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.ATT_Sum, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.ATT_Sum, value);
-        
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SUM_QCOn, verbose);
+
+        nodeList = rb
+                .getRAINBOWNodesByName(inputDoc, PVOL_H5.SUM_QCOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.SUM_QCOn, value);
-        
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SUM_QIOn, verbose);
+
+        nodeList = rb
+                .getRAINBOWNodesByName(inputDoc, PVOL_H5.SUM_QIOn, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
-        qi.put(PVOL_H5.SUM_QIOn, value);        
+        qi.put(PVOL_H5.SUM_QIOn, value);
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SUM_QI0, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
@@ -1193,7 +1217,7 @@ public class Rainbow2HDFPVOL {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, PVOL_H5.SUM_QI1, verbose);
         value = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         qi.put(PVOL_H5.SUM_QI1, value);
-        
+
         return qi;
 
     }
@@ -1269,10 +1293,10 @@ public class Rainbow2HDFPVOL {
 
             slices[i] = new PVOLSlicesCont();
 
-            int raysBlobNumber = Integer.parseInt(rb.getValueByName(sliceList
-                    .item(i), "rayinfo", "blobid"));
-            int dataBlobNumber = Integer.parseInt(rb.getValueByName(sliceList
-                    .item(i), "rawdata", "blobid"));
+            int raysBlobNumber = Integer.parseInt(rb.getValueByName(
+                    sliceList.item(i), "rayinfo", "blobid"));
+            int dataBlobNumber = Integer.parseInt(rb.getValueByName(
+                    sliceList.item(i), "rawdata", "blobid"));
             String qi = rb
                     .getValueByName(sliceList.item(i), "QIdata", "blobid");
             int qiBlobNumber = -1;
@@ -1280,17 +1304,19 @@ public class Rainbow2HDFPVOL {
                 qiBlobNumber = Integer.parseInt(qi);
 
             // =============== what group =================================
-            String date = (rb.parseRAINBOWDate(rb.getValueByName(sliceList
-                    .item(i), "slicedata", "date"), verbose));
-            String time = (rb.parseRAINBOWTime(rb.getValueByName(sliceList
-                    .item(i), "slicedata", "time"), verbose));
+            String date = (rb.parseRAINBOWDate(
+                    rb.getValueByName(sliceList.item(i), "slicedata", "date"),
+                    verbose));
+            String time = (rb.parseRAINBOWTime(
+                    rb.getValueByName(sliceList.item(i), "slicedata", "time"),
+                    verbose));
 
             slices[i].dsWhat.put(PVOL_H5.PRODUCT, PRODUCT);
             slices[i].dsWhat.put(PVOL_H5.STARTDATE, date);
             slices[i].dsWhat.put(PVOL_H5.STARTTIME, time);
             slices[i].dsWhat.put(PVOL_H5.ENDDATE, date);
-            slices[i].dsWhat.put(PVOL_H5.ENDTIME, rb.parseRAINBOWTime(time,
-                    shift, verbose));
+            slices[i].dsWhat.put(PVOL_H5.ENDTIME,
+                    rb.parseRAINBOWTime(time, shift, verbose));
 
             // =============== where group ================================
             String posangle = rb.getValueByName(sliceList.item(i), "posangle",
@@ -1303,24 +1329,24 @@ public class Rainbow2HDFPVOL {
             // =============== quality index prefs =========================
             String qiBins = rb.getValueByName(sliceList.item(i), "QIdata",
                     "bins");
-            
+
             String qiRays = rb.getValueByName(sliceList.item(i), "QIdata",
                     "rays");
-            
+
             String dataDepth = rb.getValueByName(sliceList.item(i), "QIdata",
-            "depth");
+                    "depth");
             String min = rb.getValueByName(sliceList.item(i), "QIdata", "min");
             String max = rb.getValueByName(sliceList.item(i), "QIdata", "max");
             String gain = null;
-            
-            if(min != null && max != null) {
-            
-            gain = rb.getRAINBOWGain(min, max, Integer
-                    .parseInt(dataDepth));
-            slices[i].dsdWhat.put(PVOL_H5.QI_GAIN, gain);
-            slices[i].dsdWhat.put(PVOL_H5.QI_OFFSET, rb
-                    .getRAINBOWOffset(min, gain));
-//            System.out.println("min=" + min + " max=" + max + " depth=" + dataDepth + " gain=" + gain);
+
+            if (min != null && max != null) {
+
+                gain = rb.getRAINBOWGain(min, max, Integer.parseInt(dataDepth));
+                slices[i].dsdWhat.put(PVOL_H5.QI_GAIN, gain);
+                slices[i].dsdWhat.put(PVOL_H5.QI_OFFSET,
+                        rb.getRAINBOWOffset(min, gain));
+                // System.out.println("min=" + min + " max=" + max + " depth=" +
+                // dataDepth + " gain=" + gain);
             }
 
             if (srange == null) // default value is "0"
@@ -1330,8 +1356,9 @@ public class Rainbow2HDFPVOL {
                     "rays");
 
             DataBufferContainer raysBuff = blobs.get(raysBlobNumber);
-            byte[] infRaysBuff = rb.inflate1DRAINBOWDataSection(raysBuff
-                    .getDataBuffer(), raysBuff.getDataBufferLength(), verbose);
+            byte[] infRaysBuff = rb.inflate1DRAINBOWDataSection(
+                    raysBuff.getDataBuffer(), raysBuff.getDataBufferLength(),
+                    verbose);
             String a1gate = String.valueOf(startingAzimuthNumber(infRaysBuff,
                     Integer.parseInt(nray_org[i])));
 
@@ -1365,17 +1392,16 @@ public class Rainbow2HDFPVOL {
                 dataType = "PHIDP";
             }
 
-            dataDepth = rb.getValueByName(sliceList.item(i), "rawdata",
-                    "depth");
+            dataDepth = rb
+                    .getValueByName(sliceList.item(i), "rawdata", "depth");
             min = rb.getValueByName(sliceList.item(i), "rawdata", "min");
             max = rb.getValueByName(sliceList.item(i), "rawdata", "max");
-            gain = rb.getRAINBOWGain(min, max, Integer
-                    .parseInt(dataDepth));
+            gain = rb.getRAINBOWGain(min, max, Integer.parseInt(dataDepth));
 
             slices[i].dsdWhat.put(PVOL_H5.QUANTITY, dataType);
             slices[i].dsdWhat.put(PVOL_H5.GAIN, gain);
-            slices[i].dsdWhat.put(PVOL_H5.OFFSET, rb
-                    .getRAINBOWOffset(min, gain));
+            slices[i].dsdWhat.put(PVOL_H5.OFFSET,
+                    rb.getRAINBOWOffset(min, gain));
 
             // =============== data dataset ================================
             DataBufferContainer dataBuff = blobs.get(dataBlobNumber);
