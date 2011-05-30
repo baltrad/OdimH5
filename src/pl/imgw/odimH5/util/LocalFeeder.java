@@ -6,7 +6,9 @@ package pl.imgw.odimH5.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -114,7 +116,7 @@ public class LocalFeeder extends Thread {
      * 
      * @param filePath
      */
-    private void convertAndSendFile(String filePath) throws Exception{
+    private void convertAndSendFile(String filePath) throws Exception {
 
         if (filePath.contains("KDP") || filePath.contains("PhiDP")
                 || filePath.contains("HV") || filePath.contains("ZDR")) {
@@ -129,9 +131,9 @@ public class LocalFeeder extends Thread {
 
         File originalFile = new File(filePath);
 
-        if(!originalFile.canRead())
+        if (!originalFile.canRead())
             return;
-        
+
         if (originalFile.getName().startsWith(".")) {
             return;
         }
@@ -157,8 +159,8 @@ public class LocalFeeder extends Thread {
                 e.printStackTrace();
             }
 
-            Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose, rb,
-                    radarOptions);
+            Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose,
+                    rb, radarOptions);
             vol.makeH5();
             radarName = vol.getRadarName();
             toBeSentFileName = vol.getOutputFileName();
@@ -167,7 +169,8 @@ public class LocalFeeder extends Thread {
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
-            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", filePath, verbose, rb, radarOptions);
+            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", filePath, verbose,
+                    rb, radarOptions);
             radarName = hdf.getRadarName();
             toBeSentFileName = hdf.getOutputFileName();
             toBeSentFile = new File(toBeSentFileName);
@@ -214,24 +217,29 @@ public class LocalFeeder extends Thread {
                             sentOk = storeFileOnServer(ftpOptions[i],
                                     toBeSentFileName, toBeSentFileTempName,
                                     remoteFolder, extension);
-                            msgl.showMessage(radarName
-                                    + ": "
-                                    + "file "
-                                    + toBeSentFileName.substring(0,
-                                            toBeSentFileName.indexOf(".") + 1)
-                                    + extension + " sent to "
-                                    + ftpOptions[i].getAddress(), sentOk);
+                            msgl.showMessage(
+                                    radarName
+                                            + ": "
+                                            + "file "
+                                            + toBeSentFileName.substring(0,
+                                                    toBeSentFileName
+                                                            .indexOf(".") + 1)
+                                            + extension + " sent to "
+                                            + ftpOptions[i].getAddress(),
+                                    sentOk);
 
                         } catch (CopyStreamException e) {
 
                             LogsHandler.saveProgramLogs(e.getMessage());
-                            msgl.showMessage(radarName
-                                    + ": "
-                                    + toBeSentFileName.substring(0,
-                                            toBeSentFileName.indexOf(".") + 1)
-                                    + extension + " cannot be sent to "
-                                    + ftpOptions[i].getAddress()
-                            // + " sending file again...", verbose);
+                            msgl.showMessage(
+                                    radarName
+                                            + ": "
+                                            + toBeSentFileName.substring(0,
+                                                    toBeSentFileName
+                                                            .indexOf(".") + 1)
+                                            + extension + " cannot be sent to "
+                                            + ftpOptions[i].getAddress()
+                                    // + " sending file again...", verbose);
                                     , true);
                             /*
                              * try { sentOk = storeFileOnServer(ftpOptions[i],
@@ -248,13 +256,15 @@ public class LocalFeeder extends Thread {
 
                             LogsHandler.saveProgramLogs(e.getMessage());
 
-                            msgl.showMessage(radarName
-                                    + ": "
-                                    + toBeSentFileName.substring(0,
-                                            toBeSentFileName.indexOf(".") + 1)
-                                    + extension + " cannot be sent to "
-                                    + ftpOptions[i].getAddress()
-                            // + " sending file again...", verbose);
+                            msgl.showMessage(
+                                    radarName
+                                            + ": "
+                                            + toBeSentFileName.substring(0,
+                                                    toBeSentFileName
+                                                            .indexOf(".") + 1)
+                                            + extension + " cannot be sent to "
+                                            + ftpOptions[i].getAddress()
+                                    // + " sending file again...", verbose);
                                     , true);
                             /*
                              * try { sentOk = storeFileOnServer(ftpOptions[i],
@@ -281,8 +291,8 @@ public class LocalFeeder extends Thread {
             // System.out.println("sender: " + baltradOptions.getSender());
             // System.out.println("server: " + baltradOptions.getServer());
 
-            BaltradFrameHandler bfh = new BaltradFrameHandler(baltradOptions
-                    .getServer());
+            BaltradFrameHandler bfh = new BaltradFrameHandler(
+                    baltradOptions.getServer());
 
             String a = bfh
                     .createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
@@ -313,11 +323,19 @@ public class LocalFeeder extends Thread {
 
     private boolean storeFileOnServer(FTP_Options ftpOptions,
             String toBeSentFileName, String sendFileTempName,
-            String remoteFolder, String extension) throws SocketException, IOException {
+            String remoteFolder, String extension) throws IOException,
+            UnknownHostException {
+
+        UtSocketFactory utSocketFactory = new
+        UtSocketFactory();
+        utSocketFactory.setConnectTimeout(5000);
 
         FTPClient ftp = new FTPClient();
-
+        ftp.setSocketFactory(utSocketFactory);
+       
+        
         int reply;
+
         ftp.connect(ftpOptions.getAddress());
 
         // System.out.println(newFileName + " jako " + sendFileName);
@@ -361,7 +379,7 @@ public class LocalFeeder extends Thread {
         // String newName = sendFileName.replace("tmp", "hdf");
         // System.out.println("wyslany jako: " + sendFileName);
         // System.out.println("zmieniona nazwa na: " + newName);
-        if(toBeSentFileName.endsWith("h5"))
+        if (toBeSentFileName.endsWith("h5"))
             toBeSentFileName = toBeSentFileName.replace("h5", "hdf");
 
         ok = ftp.rename(sendFileTempName, toBeSentFileName);
@@ -412,7 +430,8 @@ public class LocalFeeder extends Thread {
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
-                            LogsHandler.saveProgramLogs("convertAndSendFile", e.getLocalizedMessage());
+                            LogsHandler.saveProgramLogs("convertAndSendFile",
+                                    e.getLocalizedMessage());
                         }
                     }
                 }
@@ -444,11 +463,10 @@ public class LocalFeeder extends Thread {
                     String radarName = "";
                     if (e.kind() == StandardWatchEventKind.ENTRY_CREATE) {
                         Path context = (Path) e.context();
-                        
-                        if(context.toString().startsWith(".")) {
+
+                        if (context.toString().startsWith(".")) {
                             continue;
                         }
-                            
 
                         String path = "";
                         path = pathMap.get(signalledKey).getDir();
@@ -459,18 +477,17 @@ public class LocalFeeder extends Thread {
 
                         path += context.toString();
 
-                        msgl
-                                .showMessage(radarName + ": new file: " + path,
-                                        true);
+                        msgl.showMessage(radarName + ": new file: " + path,
+                                true);
 
                         fileTimeMap.put(path, System.currentTimeMillis());
                     } else if (e.kind() == StandardWatchEventKind.ENTRY_MODIFY) {
                         Path context = (Path) e.context();
-                        
-                        if(context.toString().startsWith(".")) {
+
+                        if (context.toString().startsWith(".")) {
                             continue;
                         }
-                        
+
                         String path = "";
                         path = pathMap.get(signalledKey).getDir();
                         radarName = pathMap.get(signalledKey).getRadarName();

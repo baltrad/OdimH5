@@ -715,7 +715,7 @@ public class HDF5Model {
      * @param dataspace_id
      *            Dataspace identifier
      * @param chunk
-     *            Data chunk size
+     *            A 2-D array containing the size of each chunk
      * @param gZipLevel
      *            Gzip compression level
      * @param verbose

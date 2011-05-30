@@ -17,12 +17,18 @@
 
 package pl.imgw.odimH5;
 
+import java.io.IOException;
+import java.net.SocketException;
+
+import org.apache.commons.net.ftp.FTPClient;
+
 import pl.imgw.odimH5.controller.DataProcessorController;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
+import pl.imgw.odimH5.util.UtSocketFactory;
 
 /**
  * Main class containing the main() function called by the operating system upon
@@ -43,7 +49,7 @@ public class Main {
      *            the command line arguments
      */
     public static void main(String[] args) {
-
+        
         LogsHandler.saveProgramLogs("System starts");
 
         HDF5Model proc = new HDF5Model();
