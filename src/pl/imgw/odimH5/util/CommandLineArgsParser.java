@@ -38,7 +38,8 @@ public class CommandLineArgsParser {
     public final static String VERBOSE_OPTION = "v";
     public final static String HELP_OPTION = "h";
     public final static String CONTINOUOS_OPTION = "c";
-    public final static String ADDRESS_OPTION = "a";
+    public final static String HOST_ADDRESS_OPTION = "a";
+    public final static String PORT_NUMBER_OPTION = "n";
     public final static String SENDER_OPTION = "s";
     public final static String RADAR_OPTION = "r";
 
@@ -65,8 +66,11 @@ public class CommandLineArgsParser {
 
     private final static String CONTINOUOS_DESCRIPTION = "Baltrad feeder continuous work mode\n";
 
-    private final static String ADDRESS_DESCRIPTION = "send file to http server\n"
-            + "<arg>\n server address\n";
+    private final static String HOST_ADDRESS_DESCRIPTION = "send file to server\n"
+            + "<arg>\n server address, e.g. 127.0.0.1, baltrad.imgw.pl ...\n";
+
+    private final static String PORT_NUMBER_DESCRIPTION = "send file to server\n"
+            + "<arg>\n port number, e.g. 8443\n";
 
     private final static String SENDER_DESCRIPTION = "sender\n"
             + "<arg>\n sender name\n";
@@ -107,9 +111,13 @@ public class CommandLineArgsParser {
                 .withDescription(CONTINOUOS_DESCRIPTION).create(
                         CONTINOUOS_OPTION);
 
-        Option address = OptionBuilder.withArgName(ADDRESS_OPTION).withArgName(
-                "arg").hasArg().withDescription(ADDRESS_DESCRIPTION).create(
-                ADDRESS_OPTION);
+        Option address = OptionBuilder.withArgName(HOST_ADDRESS_OPTION).withArgName(
+                "arg").hasArg().withDescription(HOST_ADDRESS_DESCRIPTION).create(
+                HOST_ADDRESS_OPTION);
+
+        Option port = OptionBuilder.withArgName(PORT_NUMBER_OPTION).withArgName(
+                "arg").hasArg().withDescription(PORT_NUMBER_DESCRIPTION).create(
+                PORT_NUMBER_OPTION);
 
         Option sender = OptionBuilder.withArgName(SENDER_OPTION).withArgName(
                 "arg").hasArg().withDescription(SENDER_DESCRIPTION).create(
@@ -134,6 +142,7 @@ public class CommandLineArgsParser {
         options.addOption(output_file);
         options.addOption(continuous);
         options.addOption(address);
+        options.addOption( port );
         options.addOption(sender);
         options.addOption(radar);
         options.addOption(verbose);
@@ -171,7 +180,8 @@ public class CommandLineArgsParser {
 
                 || cmd.hasOption(CONTINOUOS_OPTION)
 
-        || cmd.hasOption(ADDRESS_OPTION) && cmd.hasOption(SENDER_OPTION)
+        || cmd.hasOption(HOST_ADDRESS_OPTION) && cmd.hasOption( PORT_NUMBER_OPTION ) &&
+                cmd.hasOption(SENDER_OPTION)
                 && cmd.hasOption(RADAR_OPTION))) {
             printHelpAndExit(1, START_COMMAND, options);
         }

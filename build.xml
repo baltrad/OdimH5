@@ -88,7 +88,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 	<target name="run" depends="dist">
 		<java fork="true" classname="${main.class}">
 			<classpath>
-				<path refid="project.classpath" />
+				<path refid="lib.path" />
 				<path location="${dist.dir}/${app.name}.jar" />
 			</classpath>
 		</java>

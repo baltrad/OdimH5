@@ -13,6 +13,7 @@ import ncsa.hdf.hdf5lib.HDF5Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import pl.imgw.odimH5.Main;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
@@ -28,6 +29,8 @@ import pl.imgw.odimH5.util.OptionsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
+
+import java.io.File;
 
 /**
  * Controller class for data processing routines.
@@ -203,14 +206,17 @@ public class DataProcessorController {
             }
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
-                && cmd.hasArgument(cmd.ADDRESS_OPTION)
+                && cmd.hasArgument( cmd.HOST_ADDRESS_OPTION )
+                && cmd.hasArgument( cmd.PORT_NUMBER_OPTION )
                 && cmd.hasArgument(cmd.SENDER_OPTION)
                 && cmd.hasArgument(cmd.RADAR_OPTION)) {
 
             msgl.showMessage("Sending file to server", true);
 
-            BaltradFrameHandler bfh = new BaltradFrameHandler(cmd
-                    .getArgumentValue(cmd.ADDRESS_OPTION));
+            BaltradFrameHandler bfh = new BaltradFrameHandler( Main.SCHEME, cmd.getArgumentValue(
+                    cmd.HOST_ADDRESS_OPTION ), Integer.parseInt( cmd.getArgumentValue(
+                    cmd.PORT_NUMBER_OPTION ) ), Main.APP_CTX, Main.ENTRY_ADDRESS, Main.SO_TIMEOUT,
+                    Main.CONN_TIMEOUT );
 
             String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
                     cmd.getArgumentValue(cmd.SENDER_OPTION), cmd
@@ -220,8 +226,9 @@ public class DataProcessorController {
             // System.out.println("BFDataHdr:");
             // System.out.println(a);
 
-            BaltradFrame bf = new BaltradFrame(a, cmd
-                    .getArgumentValue(cmd.INPUT_FILE_OPTION));
+            BaltradFrame bf = new BaltradFrame( Main.ADDR_SEPARATOR + Main.APP_CTX +
+                    Main.ADDR_SEPARATOR + Main.ENTRY_ADDRESS, a, new File( cmd.getArgumentValue(
+                    cmd.INPUT_FILE_OPTION ) ) );
 
             bfh.handleBF(bf);
 
