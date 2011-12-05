@@ -24,13 +24,25 @@ Installation of OdimH5 software is performed by calling specified target within
 ant script. Typicall installation procedure is realized by issuing the following
 command:
 
-ant install
+$ ant install
 
-In this case the software will be installed in the default directory /opt. 
+In this case the software will be installed with 64-bit Unix libraries in 
+the default directory /opt.
+For other operating systems use one of the following parameter:
+
+* 32-bit Unix
+$ ant -Dversion=32 install
+
+* 32-bit Windows
+$ ant -Dversion=win32 install
+
+* 64-bit Windows
+$ ant -Dversion=win64 install 
+ 
 In order to override installation in default directory, you can provide 
 a paramater for the ant installation script:
 
-ant -Dprefix=/my/install/dir install
+$ ant -Dprefix=/my/install/dir install
 
 The prefix denotes target installation directory.
 
