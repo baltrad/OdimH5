@@ -95,10 +95,10 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 				</fileset>
 			</copy>
 			<chmod file="${prefix}/${app.name}/${app.name}.jar" perm="755" />
-			<echo file="${app.name}">#!/bin/sh
-	java -Djava.library.path=${prefix}/${app.name}/lib/ -jar ${prefix}/${app.name}/${app.name}.jar $@</echo>
-			<chmod file="${app.name}" perm="755" />
-			<copy file="${app.name}" todir="/usr/bin"/>
+			<echo file="${prefix}/${app.name}/${app.name}">#!/bin/sh
+java -Djava.library.path=${prefix}/${app.name}/lib/ -jar ${prefix}/${app.name}/${app.name}.jar $@</echo>
+			<chmod file="${prefix}/${app.name}/${app.name}" perm="755" />
+			<copy file="${prefix}/${app.name}/${app.name}" todir="/usr/bin"/>
 			<chmod file="/usr/bin/${app.name}" perm="755" />
 			<echo message="==========================" />
 			<echo message="Installation completed" />
