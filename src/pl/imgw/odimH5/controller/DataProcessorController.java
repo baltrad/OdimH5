@@ -15,13 +15,13 @@ import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
-import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.model.rainbow.ModelImage;
 import pl.imgw.odimH5.model.rainbow.ModelRHI;
 import pl.imgw.odimH5.model.rainbow.ModelVP;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
-import pl.imgw.odimH5.util.LocalFeeder;
+import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
+import pl.imgw.odimH5.util.LocalFeeder;
 import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
 import pl.imgw.odimH5.util.OptionsHandler;
@@ -58,7 +58,7 @@ public class DataProcessorController {
      * 
      * @param args
      *            Command line arguments
-     * @throws Exception 
+     * @throws Exception
      */
     @SuppressWarnings("static-access")
     public void startProcessor(String[] args) throws Exception {
@@ -94,8 +94,8 @@ public class DataProcessorController {
             // Append root path to top-level nodes
             hdf.appendRootPath(topLevelNodes);
             // Create new HDF5 file
-            file_id = hdf.H5Fcreate_wrap(cmd
-                    .getArgumentValue(cmd.OUTPUT_FILE_OPTION),
+            file_id = hdf.H5Fcreate_wrap(
+                    cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION),
                     HDF5Constants.H5F_ACC_TRUNC, HDF5Constants.H5P_DEFAULT,
                     HDF5Constants.H5P_DEFAULT, verbose);
             // Create HDF5 file based on XML descriptor
@@ -128,8 +128,9 @@ public class DataProcessorController {
 
             RadarOptions[] options = OptionsHandler.getRadarOptions(doc);
             // Read input file
-            byte[] fileBuff = hdf.readDataFile(cmd
-                    .getArgumentValue(cmd.INPUT_FILE_OPTION), verbose);
+            byte[] fileBuff = hdf.readDataFile(
+                    cmd.getArgumentValue(cmd.INPUT_FILE_OPTION), verbose);
+
             // Data processing depending on platform type
             if (cmd.getArgumentValue(cmd.PLATFORM_OPTION).equals(
                     RAINBOW_PLATFORM)) {
@@ -146,7 +147,7 @@ public class DataProcessorController {
                         if (!vol.correct) {
                             return;
                         }
-                        
+
                         if (vol.getOutputFileName().endsWith("hdf")
                                 || vol.getOutputFileName().endsWith("h5"))
                             vol.makeH5();
@@ -155,8 +156,9 @@ public class DataProcessorController {
                     } else if (fileNameIn.endsWith("h5")
                             || fileNameIn.endsWith("hdf")) {
 
-                        HDF2RainbowPVOL hdf = new HDF2RainbowPVOL(fileNameOut, fileNameIn,
-                                verbose, rainbow, options);
+                        //no single convertion from hdf to vol handle so far
+                        HDF2RainbowPVOL hdf = new HDF2RainbowPVOL(fileNameOut,
+                                fileNameIn, verbose, rainbow, options);
 
                     }
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
@@ -180,8 +182,7 @@ public class DataProcessorController {
             // Other platforms will come here at a later time...
             if (!fileNameOut.isEmpty())
                 msgl.showMessage("Descriptor preparation completed.", true);
-            
-            
+
         } else if (cmd.hasArgument(cmd.CONTINOUOS_OPTION)) {
 
             msgl.showMessage("Operational feeder mode selected", true);
@@ -209,19 +210,19 @@ public class DataProcessorController {
 
             msgl.showMessage("Sending file to server", true);
 
-            BaltradFrameHandler bfh = new BaltradFrameHandler(cmd
-                    .getArgumentValue(cmd.ADDRESS_OPTION));
+            BaltradFrameHandler bfh = new BaltradFrameHandler(
+                    cmd.getArgumentValue(cmd.ADDRESS_OPTION));
 
             String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
-                    cmd.getArgumentValue(cmd.SENDER_OPTION), cmd
-                            .getArgumentValue(cmd.RADAR_OPTION), cmd
-                            .getArgumentValue(cmd.INPUT_FILE_OPTION));
+                    cmd.getArgumentValue(cmd.SENDER_OPTION),
+                    cmd.getArgumentValue(cmd.RADAR_OPTION),
+                    cmd.getArgumentValue(cmd.INPUT_FILE_OPTION));
 
             // System.out.println("BFDataHdr:");
             // System.out.println(a);
 
-            BaltradFrame bf = new BaltradFrame(a, cmd
-                    .getArgumentValue(cmd.INPUT_FILE_OPTION));
+            BaltradFrame bf = new BaltradFrame(a,
+                    cmd.getArgumentValue(cmd.INPUT_FILE_OPTION));
 
             bfh.handleBF(bf);
 

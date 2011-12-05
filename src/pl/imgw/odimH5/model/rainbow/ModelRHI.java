@@ -91,20 +91,20 @@ public class ModelRHI {
         String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
 
         String radarName = "";
-        for(int i = 0; i < options.length; i++) {
-            if (source.matches(options[i].getRadarName())){
+        for (int i = 0; i < options.length; i++) {
+            if (source.matches(options[i].getRadarName())) {
                 radarName = options[i].getRadarWMOName();
                 break;
             }
         }
 
-        if(radarName.isEmpty()) {
+        if (radarName.isEmpty()) {
             System.out.println("Add " + source + " to options.xml");
             System.exit(0);
         } else {
             source = "WMO:" + radarName;
         }
-        
+
         cont.setSource(source);
 
         cont.setXsize(xsize);
@@ -172,17 +172,16 @@ public class ModelRHI {
         int flagBlobNumber = Integer.parseInt(rb.getRAINBOWMetadataElement(
                 nodeList, "blobid", verbose));
         int firstBlob = rb.getMin(flagBlobNumber, dataBlobNumber);
-        
+
         DataBufferContainer dataBuff = rb.getRainbowDataSection(fileBuff,
                 dataBlobNumber, firstBlob, verbose);
         DataBufferContainer maskBuff = rb.getRainbowDataSection(fileBuff,
                 flagBlobNumber, firstBlob, verbose);
 
         // Inflate radar data section and mask section
-        int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(dataBuff
-                .getDataBuffer(), width, height, verbose);
-        byte[] infMaskBuff = rb.inflate1DRAINBOWDataSection(maskBuff
-                .getDataBuffer(), maskBuff.getDataBufferLength(), verbose);
+        int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(dataBuff, width,
+                height, verbose);
+        byte[] infMaskBuff = rb.inflate1DRAINBOWDataSection(maskBuff, verbose);
         // Create range mask
 
         infDataBuff = rb.createRAINBOWMask(infDataBuff, width, height,

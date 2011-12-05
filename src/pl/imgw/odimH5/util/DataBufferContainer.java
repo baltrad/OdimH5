@@ -23,6 +23,7 @@ public class DataBufferContainer {
         private byte[] dataBuff = {0};
         // Number of bits used to describe one pixel
 //        private int depth = 0;
+        private int compression = 0;
         
 
         
@@ -64,5 +65,19 @@ public class DataBufferContainer {
         public void setDataBuffer( byte[ ] dataBuff ) {
             this.dataBuff = dataBuff;
         }
+        
+        /**
+         * @return the compression
+         */
+        public int getCompression() {
+            return compression;
+        }
+        /**
+         * @param compression the compression to set
+         */
+        public void setCompression(int compression) {
+            this.compression = compression;
+        }
+        
 
 }

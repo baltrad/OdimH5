@@ -6,8 +6,6 @@ package pl.imgw.odimH5.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,15 +20,17 @@ import name.pachler.nio.file.WatchEvent;
 import name.pachler.nio.file.WatchKey;
 import name.pachler.nio.file.WatchService;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.io.CopyStreamException;
 import org.w3c.dom.Document;
 
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
-import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
+import pl.imgw.odimH5.model.rainbow.RainbowModel;
+
+import com.enterprisedt.net.ftp.FTPException;
+import com.enterprisedt.net.ftp.FTPTransferType;
+import com.enterprisedt.net.ftp.FileTransferClient;
+
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
 
@@ -149,6 +149,7 @@ public class LocalFeeder extends Thread {
 
             int file_len = (int) originalFile.length();
             byte[] file_buf = new byte[file_len];
+            
 
             try {
                 FileInputStream fis = new FileInputStream(originalFile);
@@ -175,10 +176,11 @@ public class LocalFeeder extends Thread {
             toBeSentFileName = hdf.getOutputFileName();
             toBeSentFile = new File(toBeSentFileName);
 
+
         } else {
 
-            System.out.println("Format of " + originalFile.getName()
-                    + "not supported");
+            System.out.println("Format " + originalFile.getName()
+                    + " not supported");
             return;
         }
 
@@ -228,30 +230,6 @@ public class LocalFeeder extends Thread {
                                             + ftpOptions[i].getAddress(),
                                     sentOk);
 
-                        } catch (CopyStreamException e) {
-
-                            LogsHandler.saveProgramLogs(e.getMessage());
-                            msgl.showMessage(
-                                    radarName
-                                            + ": "
-                                            + toBeSentFileName.substring(0,
-                                                    toBeSentFileName
-                                                            .indexOf(".") + 1)
-                                            + extension + " cannot be sent to "
-                                            + ftpOptions[i].getAddress()
-                                    // + " sending file again...", verbose);
-                                    , true);
-                            /*
-                             * try { sentOk = storeFileOnServer(ftpOptions[i],
-                             * newFileName, sendFileName, remoteFolder);
-                             * msgl.showMessage(radarName + ": " + "file " +
-                             * newFileName + " sent to " +
-                             * ftpOptions[i].getAddress(), sentOk); } catch
-                             * (SocketException e1) { // TODO Auto-generated
-                             * catch block e1.printStackTrace(); } catch
-                             * (IOException e1) { // TODO Auto-generated catch
-                             * block e1.printStackTrace(); }
-                             */
                         } catch (IOException e) {
 
                             LogsHandler.saveProgramLogs(e.getMessage());
@@ -277,6 +255,19 @@ public class LocalFeeder extends Thread {
                              * (IOException e1) { // TODO Auto-generated catch
                              * block e1.printStackTrace(); }
                              */
+                        } catch (FTPException e) {
+                            LogsHandler.saveProgramLogs(e.getMessage());
+
+                            msgl.showMessage(
+                                    radarName
+                                            + ": "
+                                            + toBeSentFileName.substring(0,
+                                                    toBeSentFileName
+                                                            .indexOf(".") + 1)
+                                            + extension + " cannot be sent to "
+                                            + ftpOptions[i].getAddress()
+                                    // + " sending file again...", verbose);
+                                    , true);
                         }
                     }
                 }
@@ -316,63 +307,57 @@ public class LocalFeeder extends Thread {
         }
 
         originalFile.delete();
-        if (toBeSentFile != null)
+        if (toBeSentFile != null) {
+            
             toBeSentFile.delete();
+                
+        }
 
     }
 
     private boolean storeFileOnServer(FTP_Options ftpOptions,
             String toBeSentFileName, String sendFileTempName,
             String remoteFolder, String extension) throws IOException,
-            UnknownHostException {
+            UnknownHostException, FTPException {
 
         UtSocketFactory utSocketFactory = new
         UtSocketFactory();
         utSocketFactory.setConnectTimeout(5000);
-
-        FTPClient ftp = new FTPClient();
-        ftp.setSocketFactory(utSocketFactory);
-       
         
-        int reply;
+        FileTransferClient ftp = new FileTransferClient();
+        
+        System.out.print("Connecting... ");
+        
+        ftp.setRemoteHost(ftpOptions.getAddress());
 
-        ftp.connect(ftpOptions.getAddress());
-
+        System.out.print("Connected! ");
+        
         // System.out.println(newFileName + " jako " + sendFileName);
 
         // After connection attempt, you should check the
         // reply code
         // to verify
         // success.
-        reply = ftp.getReplyCode();
 
-        if (!FTPReply.isPositiveCompletion(reply)) {
-            ftp.disconnect();
-            System.err.println("FTP server refused connection.");
-            return false;
-        }
+        ftp.setUserName(ftpOptions.getLogin());
+        ftp.setPassword(ftpOptions.getPassword());
+        ftp.connect();
+        
+        System.out.print("Logged in. ");
 
-        ftp.login(ftpOptions.getLogin(), ftpOptions.getPassword());
-
-        ftp.changeWorkingDirectory(ftpOptions.getDir());
+        if(ftpOptions.getDir() != null)
+            ftp.changeDirectory(ftpOptions.getDir());
+    
+        System.out.print("Directory changed. ");
 
         if (!remoteFolder.isEmpty())
-            ftp.changeWorkingDirectory(remoteFolder);
+            ftp.changeDirectory(remoteFolder);
 
-        ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+        ftp.setContentType(FTPTransferType.BINARY);
 
-        // ftp
-        // .setFileTransferMode(FTPClient.PASSIVE_REMOTE_DATA_CONNECTION_MODE);
+        System.out.print("File type set.\n");
 
-        // transfer files
-        FileInputStream fis = null;
-        fis = new FileInputStream(toBeSentFileName);
-
-        ftp.storeFile(sendFileTempName, fis);
-
-        fis.close();
-
-        boolean ok = false;
+        ftp.uploadFile(toBeSentFileName, sendFileTempName);
 
         // newFileName = sendFileName.replace("tmp", "hdf");
 
@@ -381,12 +366,12 @@ public class LocalFeeder extends Thread {
         // System.out.println("zmieniona nazwa na: " + newName);
         if (toBeSentFileName.endsWith("h5"))
             toBeSentFileName = toBeSentFileName.replace("h5", "hdf");
-
-        ok = ftp.rename(sendFileTempName, toBeSentFileName);
+        
+        ftp.rename(sendFileTempName, toBeSentFileName);
 
         ftp.disconnect();
 
-        return ok;
+        return true;
 
     }
 

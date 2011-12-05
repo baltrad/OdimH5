@@ -17,96 +17,96 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 -->
-<project name="OdimH5" default="dist" basedir=".">
+<project name="OdimH5" default="main" basedir=".">
+		<!-- Sets variables which can later be used. -->
+		<!-- The value of a property is accessed via ${} -->
+		<property name="version" value="64" />
+		<property name="app.name" value="odimH5" />
+		<property name="main.class" value="pl.imgw.odimH5.Main" />
+		<property name="src.dir" location="src" />
+		<property name="lib.dir" location="lib" />
+		<property name="lib.version.dir" location="lib${version}" />
+		<property name="lib.native.dir" location="lib${version}/native" />
+		<property name="build.dir" location="build" />
+		<property name="dist.dir" location="dist" />
+		<property name="doc.dir" location="doc" />
 
-	<property name="app.name" value="OdimH5" />
-	<property name="main.class" value="pl.imgw.odimH5.Main" />
-	<property name="src.dir" value="${basedir}/src" />
-	<property name="lib.dir" value="${basedir}/lib" />
-	<property name="build.dir" value="${basedir}/build" />
-	<property name="build.classes.dir" value="${build.dir}/classes" />
-	<property name="dist.dir" value="${basedir}/dist" />
-	<property name="etc.dir" value="${basedir}/etc" />
-	<property name="options.file" value="options.xml" />
-	<property name="options.file.init" value="options.xml.init" />
+		<property name="prefix" value="/opt" />
 
-	<property name="prefix" value="/opt" />
+		<!-- Library path -->
+		<path id="lib.path">
+			<fileset dir="${lib.dir}" includes="**/*.jar"/>
+			<fileset dir="${lib.version.dir}" includes="**/*.jar" />
+		</path>
 
-	<!-- Library path -->
-	<path id="lib.path">
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-	</path>
+		<!-- Deletes the existing build, doc and dist directory-->
+		<target name="clean">
+			<delete dir="${build.dir}" />
+			<delete dir="${doc.dir}" />
+			<delete dir="${dist.dir}" />
+		</target>
 
-	<!-- Initialize build process -->
-	<target name="init">
-		<mkdir dir="${build.dir}" />
-		<mkdir dir="${dist.dir}" />
-		<mkdir dir="${build.classes.dir}" />
-	</target>
+		<target name="init">
+			<mkdir dir="${build.dir}" />
+			<mkdir dir="${dist.dir}" />
+			<mkdir dir="${doc.dir}" />
+		</target>
 
-	<!-- Delete build and dist directories -->
-	<target name="clean">
-		<delete>
-			<fileset dir="${build.dir}">
-				<include name="**/*~" />
-			</fileset>
-		</delete>
-		<delete>
-			<fileset dir="${dist.dir}">
-				<include name="**/*.jar" />
-			</fileset>
-		</delete>
-		<delete dir="${build.classes.dir}" />
-		<delete dir="${build.dir}" />
-		<delete dir="${dist.dir}" />
-	</target>
+		<!-- Compiles the java code (including the usage of library for JUnit -->
+		<target name="compile" depends="clean, init">
+			<javac encoding="UTF-8" deprecation="on" srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+				<include name="**/*.java" />
+				<classpath refid="lib.path" />
+			</javac>
+		</target>
 
-	<!-- Compile source files -->
-	<target name="compile" depends="init">
-		<javac encoding="UTF-8" srcdir="${src.dir}" deprecation="on" destdir="${build.classes.dir}">
-			<include name="**/*.java" />
-			<classpath refid="lib.path" />
-		</javac>
-	</target>
+		<!-- Creates Javadoc -->
+		<target name="doc" depends="compile">
+			<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${doc.dir}">
+				<!-- Define which files / directory should get included, we include all -->
+				<fileset dir="${src.dir}">
+					<include name="**" />
+				</fileset>
+				<classpath refid="lib.path" />
+			</javadoc>
+		</target>
 
-	<!-- Creates the deliverables -->
-	<target name="dist" depends="init, compile">
-		<manifestclasspath property="mf.classpath" jarfile="${basedir}/${app.name}.jar">
-			<classpath refid="lib.path" />
-		</manifestclasspath>
-		<jar jarfile="${dist.dir}/${app.name}.jar" basedir="${build.classes.dir}">
-			<manifest>
-				<attribute name="Main-Class" value="${main.class}" />
-				<attribute name="Class-Path" value="${mf.classpath}" />
-			</manifest>
-		</jar>
-	</target>
+		<!--Creates the deployable jar file  -->
+		<target name="jar" depends="compile">
+			<jar destfile="${dist.dir}\${app.name}.jar" basedir="${build.dir}">
+				<zipgroupfileset dir="${lib.dir}" includes="**/*.jar" />
+				<zipgroupfileset dir="${lib.version.dir}" includes="**/*.jar" />
+				<manifest>
+					<attribute name="Main-Class" value="${main.class}" />
+				</manifest>
+			</jar>
+		</target>
 
-	<!-- Runs the application -->
-	<target name="run" depends="dist">
-		<java fork="true" classname="${main.class}">
-			<classpath>
-				<path refid="project.classpath" />
-				<path location="${dist.dir}/${app.name}.jar" />
-			</classpath>
-		</java>
-	</target>
+		<target name="install" depends="jar">
+			<mkdir dir="${prefix}/${app.name}" />
+			<copy todir="${prefix}/${app.name}" flatten="true">
+				<fileset dir="${dist.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+			</copy>
+			<copy todir="${prefix}/${app.name}/lib" flatten="true">
+				<fileset dir="${lib.native.dir}">
+					<include name="**/*.so" />
+				</fileset>
+			</copy>
+			<chmod file="${prefix}/${app.name}/${app.name}.jar" perm="755" />
+			<echo file="${app.name}">#!/bin/sh
+	java -Djava.library.path=${prefix}/${app.name}/lib/ -jar ${prefix}/${app.name}/${app.name}.jar $@</echo>
+			<chmod file="${app.name}" perm="755" />
+			<copy file="${app.name}" todir="/usr/bin"/>
+			<chmod file="/usr/bin/${app.name}" perm="755" />
+			<echo message="==========================" />
+			<echo message="Installation completed" />
+			<echo message="run program by typing ${app.name}" />
+		</target>
 
-	<!-- Installs OdimH5 in default directory -->
-	<target name="install" depends="dist">
-		<mkdir dir="${prefix}/${app.name}" />
-		<mkdir dir="${prefix}/${app.name}/lib" />
-		<copy todir="${prefix}/${app.name}" flatten="true">
-			<fileset dir="${dist.dir}">
-				<include name="**/*.jar" />
-			</fileset>
-		</copy>
-		<copy todir="${prefix}/${app.name}/lib" flatten="false">
-			<fileset dir="${lib.dir}" />
-		</copy>
-		<copy tofile="${prefix}/${app.name}/${options.file}" file="${etc.dir}/${options.file.init}" flatten="true" />
-	</target>
+		<target name="main" depends="compile, jar, doc">
+			<description>Main target</description>
+		</target>
 
-</project>
+	</project>

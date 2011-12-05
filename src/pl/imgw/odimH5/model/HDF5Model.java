@@ -10,6 +10,7 @@ package pl.imgw.odimH5.model;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
@@ -21,6 +22,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import ncsa.hdf.hdf5lib.H5;
 import ncsa.hdf.hdf5lib.HDF5Constants;
 import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
+import ncsa.hdf.hdflib.HDFConstants;
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.FileFormat;
@@ -428,6 +430,51 @@ public class HDF5Model {
         H5Aclose_wrap(attribute_id, verbose);
         H5Sclose_wrap(dataspace_id, verbose);
     }
+    /**
+     * Helper method for creating and writing HDF5 attribute of given type.
+     * 
+     * @param group_id
+     *            Group identifier
+     * @param attr_name
+     *            HDF5 attribute name
+     * @param attr_class
+     *            HDF5 attribute data type
+     * @param attr_value
+     *            HDF5 attribute value
+     * @param verbose
+     *            Verbose mode toggle
+     */
+    public void H5Acreate_double_array(int group_id, String attr_name,
+            double[] attr_value, boolean verbose) {
+
+        int rank = 1;
+        long dims[] = { attr_value.length, 1 };
+        long maxdims[] = { attr_value.length, 1 };
+
+        if (attr_value == null) {
+            return;
+        }
+        int attribute_id = -1;
+
+        int dataspace_id = H5Screate_wrap(HDF5Constants.H5S_SIMPLE, verbose);
+        try {
+            H5.H5Sset_extent_simple(dataspace_id, rank, dims, maxdims);
+            attribute_id = H5.H5Acreate(group_id, attr_name,
+                    HDF5Constants.H5T_NATIVE_DOUBLE, dataspace_id,
+                    HDF5Constants.H5P_DEFAULT);
+            H5.H5Awrite(attribute_id, HDF5Constants.H5T_NATIVE_DOUBLE,
+                    attr_value);
+        } catch (NullPointerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (HDF5Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        H5Aclose_wrap(attribute_id, verbose);
+        H5Sclose_wrap(dataspace_id, verbose);
+    }
 
     /**
      * Helper method creating HDF5 dataspace.
@@ -455,6 +502,7 @@ public class HDF5Model {
         }
         return dataspace_id;
     }
+
 
     /**
      * Helper method for creating HDF5 simple dataspace
@@ -960,8 +1008,10 @@ public class HDF5Model {
             format.setEncoding(XML_ENCODING);
             format.setIndenting(true);
             XMLSerializer serializer = new XMLSerializer(format);
-            serializer.setOutputCharStream(new java.io.FileWriter(fileName));
+            FileWriter fw = new java.io.FileWriter(fileName);
+            serializer.setOutputCharStream(fw);
             serializer.serialize(doc);
+            fw.close();
         } catch (Exception e) {
             msgl.showMessage("Error while saving XML file: " + e.getMessage(),
                     verbose);
@@ -1600,6 +1650,43 @@ public class HDF5Model {
         return (dataArray2D);
     }
 
+    /**
+     * Method retrieves HDF5 dataset. Dataset is converted from byte array to
+     * integer array.
+     * 
+     * @param inputFile
+     *            Reference to open HDF5 file
+     * @param datasetPath
+     *            Absolute HDF5 path to dataset
+     * @param width
+     *            Dataset width
+     * @param height
+     *            Dataset height
+     * @param verbose
+     * @return Dataset as integer array
+     */
+    public int[][] getHDF5DoubleDataset(H5File inputFile, String datasetPath,
+            int width, int height, boolean verbose) {
+        int[][] dataArray2D = new int[width][height];
+        try {
+            Dataset dataset = (Dataset) inputFile.get(datasetPath);
+            double[] dataArray = (double[]) dataset.read();
+            int count = 0;
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    count = y * width + x;
+                    dataArray2D[x][y] = (int) dataArray[count];
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            msgl.showMessage("I/O error: Error while retrieving HDF5 dataset",
+                    verbose);
+        }
+        return (dataArray2D);
+    }
+    
     /**
      * Method converts HDF5 date format into desired format.
      * 

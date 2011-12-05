@@ -371,6 +371,7 @@ public class HDF2RainbowPVOL {
                             nrays[i]), i * 2 + 1, "qt");
 
         }
+        
 
     }
 
@@ -445,6 +446,7 @@ public class HDF2RainbowPVOL {
             // fc.write(ByteBuffer.allocate(1).put((byte) 0x0a));
             fc.write(ByteBuffer.wrap(("\n" + end + "\n").getBytes()));
             fc.close();
+            rf.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

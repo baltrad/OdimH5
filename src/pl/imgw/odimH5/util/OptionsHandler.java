@@ -5,6 +5,8 @@ package pl.imgw.odimH5.util;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
@@ -35,6 +37,26 @@ public class OptionsHandler {
     public final static String SERVER = "server";
     public final static String SENDER = "sender";
 
+    public final static String SIMULATED = "simulated";
+    public final static String PULSEWIDTH = "pulsewidth";
+    public final static String RXBANDWIDTH = "RXbandwidth";
+    public final static String TXLOSS = "TXloss";
+    public final static String RXLOSS = "RXloss";
+    public final static String RADOMELOSS = "radomeloss";
+    public final static String ANTGAIN = "antgain";
+    public final static String GASATTN = "gasattn";
+    public final static String RADCONSTH = "radconstH";
+    public final static String RADCONSTV = "radconstV";
+    public final static String NOMTXPOWER = "nomTXpower";
+    public final static String TXPOWER = "TXpower";
+    public final static String VSAMPLES = "Vsamples";
+    public final static String AZMETHOD = "azmethod";
+    public final static String BINMETHOD = "binmethod";
+    public final static String MALFUNC = "malfunc";
+    public final static String NEZ = "NEZ";
+    public final static String RAC ="RAC";
+    public final static String PAC = "PAC";
+    public final static String S2N = "S2N";
 
     /**
      * 
@@ -92,6 +114,48 @@ public class OptionsHandler {
                     NRAYS, null));
             options[i].setFormat(RainbowModel.getValueByName(radarList.item(i),
                     FORMAT, null));
+            
+            // attributes '/how' group in ODIM H5 2.1
+            options[i].setSimulated(RainbowModel.getValueByName(radarList.item(i),
+                    SIMULATED, null));
+            options[i].setPulsewidth(RainbowModel.getValueByName(radarList.item(i),
+                    PULSEWIDTH, null));
+            options[i].setRXbandwidth(RainbowModel.getValueByName(radarList.item(i),
+                    RXBANDWIDTH, null));
+            options[i].setTXloss(RainbowModel.getValueByName(radarList.item(i),
+                    TXLOSS, null));
+            options[i].setRXloss(RainbowModel.getValueByName(radarList.item(i),
+                    RXLOSS, null));
+            options[i].setRadomeloss(RainbowModel.getValueByName(radarList.item(i),
+                    RADOMELOSS, null));
+            options[i].setAntgain(RainbowModel.getValueByName(radarList.item(i),
+                    ANTGAIN, null));
+            options[i].setGasattn(RainbowModel.getValueByName(radarList.item(i),
+                    GASATTN, null));
+            options[i].setRadconstH(RainbowModel.getValueByName(radarList.item(i),
+                    RADCONSTH, null));
+            options[i].setRadconstV(RainbowModel.getValueByName(radarList.item(i),
+                    RADCONSTV, null));
+            options[i].setNomTXpower(RainbowModel.getValueByName(radarList.item(i),
+                    NOMTXPOWER, null));
+            options[i].setTXpower(RainbowModel.getValueByName(radarList.item(i),
+                    TXPOWER, null));
+            options[i].setVsamples(RainbowModel.getValueByName(radarList.item(i),
+                    VSAMPLES, null));
+            options[i].setAzmethod(RainbowModel.getValueByName(radarList.item(i),
+                    AZMETHOD, null));
+            options[i].setBinmethod(RainbowModel.getValueByName(radarList.item(i),
+                    BINMETHOD, null));
+            options[i].setMalfunc(RainbowModel.getValueByName(radarList.item(i),
+                    MALFUNC, null));
+            options[i].setNEZ(RainbowModel.getValueByName(radarList.item(i),
+                    NEZ, null));
+            options[i].setRAC(RainbowModel.getValueByName(radarList.item(i),
+                    RAC, null));
+            options[i].setPAC(RainbowModel.getValueByName(radarList.item(i),
+                    PAC, null));
+            options[i].setS2N(RainbowModel.getValueByName(radarList.item(i),
+                    S2N, null));
 
         }
         return options;

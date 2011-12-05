@@ -53,9 +53,33 @@ public class ModelImage {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "data", verbose);
         String date = rb.getRAINBOWMetadataElement(nodeList, "date", verbose);
         String time = rb.getRAINBOWMetadataElement(nodeList, "time", verbose);
+        
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, "product", verbose);
+        String version = rb.getRAINBOWMetadataElement(nodeList, "version",
+                verbose);
+        
+        String source = "";
+        // String radarFullName = "";
+        if (version.substring(0, 3).matches(rb.VER51X)
+                || version.substring(0, 3).matches(rb.VER52X)) {
 
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
-        String source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
+            nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
+            source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
+            // radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
+            // verbose);
+
+        } else if (version.substring(0, 3).matches(rb.VER53X)) {
+
+            nodeList = rb
+                    .getRAINBOWNodesByName(inputDoc, "sensorinfo", verbose);
+            source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
+            // radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
+            // verbose);
+
+        } else {
+            System.out.println("version of the volume not supported");
+            return null;
+        }
 
         String radarName = "";
         for (int i = 0; i < options.length; i++) {
@@ -77,8 +101,8 @@ public class ModelImage {
         int datasetSize = pictureList.getLength();
         Node radarPicture = null;
         for (int i = 0; i < datasetSize; i++) {
-            String placeid = pictureList.item(i).getAttributes().getNamedItem(
-                    "placeid").getNodeValue();
+            String placeid = pictureList.item(i).getAttributes()
+                    .getNamedItem("placeid").getNodeValue();
             if (placeid.matches("top") || placeid.matches("etop")) {
                 radarPicture = pictureList.item(i);
                 break;
@@ -232,10 +256,9 @@ public class ModelImage {
                 flagBlobNumber, firstBlob, verbose);
 
         // Inflate radar data section and mask section
-        int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(dataBuff
-                .getDataBuffer(), width, height, verbose);
-        byte[] infMaskBuff = rb.inflate1DRAINBOWDataSection(maskBuff
-                .getDataBuffer(), maskBuff.getDataBufferLength(), verbose);
+        int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(dataBuff, width,
+                height, verbose);
+        byte[] infMaskBuff = rb.inflate1DRAINBOWDataSection(maskBuff, verbose);
         // Create range mask
 
         infDataBuff = rb.createRAINBOWMask(infDataBuff, width, height,
@@ -244,12 +267,11 @@ public class ModelImage {
         // =============================================================
         // Create XML document object
 
-        
         if (isDirect) {
 
-            if(fileNameOut.isEmpty())
-                fileNameOut = cont.getTime() + cont.getType() + ".h5";
-            
+            if (fileNameOut.isEmpty())
+                fileNameOut = cont.getDate() + cont.getTime() + ".h5";
+
             ModelImageH5.createDescriptor(cont, rb, fileNameOut, infDataBuff,
                     verbose);
 

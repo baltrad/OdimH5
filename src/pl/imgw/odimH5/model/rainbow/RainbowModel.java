@@ -32,6 +32,7 @@ import org.xml.sax.InputSource;
 
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.util.DataBufferContainer;
+import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
 
 import com.jcraft.jzlib.JZlib;
@@ -56,7 +57,7 @@ public class RainbowModel {
     // Constants
 
     protected final String H5_ROOT = "/";
-    protected final String H5_CONV = "ODIM_H5/V2_0";
+    protected final String H5_CONV = "ODIM_H5/V2_1";
     protected final String H5_GROUP = "group";
     protected final String H5_OBJECT_NAME = "name";
     protected final String H5_OBJECT_CLASS = "class";
@@ -105,9 +106,17 @@ public class RainbowModel {
     public final String VP = "VP";
     public final String RHI = "RHI";
 
+    private final String blobid = "blobid";
+    private final String size = "size";
+    private final String compression = "compression";
+
     protected final double FIRST_VALUE = 1.0;
     protected final double RAINBOW_NO_DATA = 255.0;
     protected final double RAINBOW_UNDETECT = 0.0;
+    
+    public static final String VER51X = "5.1";
+    public static final String VER52X = "5.2";
+    public static final String VER53X = "5.3";
 
     // public static final String BRZ = "WMO:12568";
     // public static final String GDA = "WMO:12151";
@@ -805,8 +814,7 @@ public class RainbowModel {
             minVal = Double.parseDouble(min);
             maxVal = Double.parseDouble(max);
         } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LogsHandler.saveProgramLogs("RainbowModel", e.getMessage());
         }
         double gainVal = (Math.abs(minVal) + Math.abs(maxVal))
                 / (Math.pow(2, res) - 2);
@@ -950,34 +958,46 @@ public class RainbowModel {
      *            Verbose mode toggle
      * @return Inflated data section as an array of integers
      */
-    public int[][] inflate2DRAINBOWDataSection(byte[] input_buf, int rays,
-            int bins, boolean verbose) {
+    public int[][] inflate2DRAINBOWDataSection(DataBufferContainer dbc,
+            int rays, int bins, boolean verbose) {
+        byte[] input_buf = dbc.getDataBuffer();
         msgl.showMessage("Inflating RAINBOW 2D data section", verbose);
         int[][] output_buf = new int[rays][bins];
         int len = rays * bins;
         byte[] byte_buf = new byte[len];
 
-        // Inflate input stream
-        ZStream defStream = new ZStream();
-        defStream.next_in = input_buf;
-        defStream.next_in_index = 0;
-        defStream.next_out = byte_buf;
-        defStream.next_out_index = 0;
-        int err = defStream.inflateInit();
-        checkErr(defStream, err, "Inflation initialization error", verbose);
-        int a = 0;
-        while (defStream.total_out < len
-                && defStream.total_in < input_buf.length) {
-            defStream.avail_in = defStream.avail_out = 1;
-            err = defStream.inflate(JZlib.Z_NO_FLUSH);
-            if (err == JZlib.Z_STREAM_END)
-                break;
-            a++;
-            checkErr(defStream, err, "Inflation error", verbose);
+        if (dbc.getCompression() == 0) {
+            if (rays * bins != dbc.getDataBufferLength()) {
+                msgl.showMessage("Incorrect data size!!", true);
+                return null;
+            }
+
+            byte_buf = dbc.getDataBuffer();
+        } else {
+
+            // Inflate input stream
+            ZStream defStream = new ZStream();
+            defStream.next_in = input_buf;
+            defStream.next_in_index = 0;
+            defStream.next_out = byte_buf;
+            defStream.next_out_index = 0;
+            int err = defStream.inflateInit();
+            checkErr(defStream, err, "Inflation initialization error", verbose);
+            int a = 0;
+            while (defStream.total_out < len
+                    && defStream.total_in < input_buf.length) {
+                defStream.avail_in = defStream.avail_out = 1;
+                err = defStream.inflate(JZlib.Z_NO_FLUSH);
+                if (err == JZlib.Z_STREAM_END)
+                    break;
+                a++;
+                checkErr(defStream, err, "Inflation error", verbose);
+            }
+            // System.out.println(a);
+            err = defStream.inflateEnd();
+            checkErr(defStream, err, "Inflation end error", verbose);
         }
-        // System.out.println(a);
-        err = defStream.inflateEnd();
-        checkErr(defStream, err, "Inflation end error", verbose);
+
         // Convert byte array into integer array
         int count = 0;
         for (int x = 0; x < rays; x++) {
@@ -998,8 +1018,12 @@ public class RainbowModel {
      *            Verbose mode toggle
      * @return Inflated data section as byte array
      */
-    public byte[] inflate1DRAINBOWDataSection(byte[] dataBuff, int length,
+    public byte[] inflate1DRAINBOWDataSection(DataBufferContainer dbc,
             boolean verbose) {
+
+        int length = dbc.getDataBufferLength();
+        byte[] dataBuff = dbc.getDataBuffer();
+
         msgl.showMessage("Inflating RAINBOW 1D data section", verbose);
         byte[] output_buf = new byte[length];
         ZStream defStream = new ZStream();
@@ -1076,10 +1100,12 @@ public class RainbowModel {
         int end_bin = 0;
         // Seek for data section
 
-        int blobNumber = 0;
+        int currentBlob = 0;
+        HashMap<String, Integer> header = null;
 
         int current = -1;
         while (offset < fileBuff.length) {
+            String xmlHeader = "";
             try {
                 while (offset < fileBuff.length) {
                     // Data section start
@@ -1093,11 +1119,13 @@ public class RainbowModel {
                     }
                     if (start_bin_seq.matches(START_BIN)) {
                         while ((char) fileBuff[offset] != '>') {
+                            xmlHeader += (char) fileBuff[offset];
                             offset++;
                         }
                         start_bin = offset;
                         current++;
                     }
+
                     // Data section end
                     end_bin_buf[7] = fileBuff[offset];
                     for (int i = 1; i <= 7; i++) {
@@ -1106,7 +1134,7 @@ public class RainbowModel {
                     for (int i = 0; i < 7; i++) {
                         end_bin_seq += (char) end_bin_buf[i];
                     }
-                    if (end_bin_seq.matches(END_BIN) && current == blobNumber) {
+                    if (end_bin_seq.matches(END_BIN) && current == currentBlob) {
                         end_bin = offset;
                         break;
                     }
@@ -1114,14 +1142,30 @@ public class RainbowModel {
                     end_bin_seq = "";
                     offset++;
                 }
-                // Read 4 bytes representing data length
-                byte[] data_byte = new byte[4];
-                for (int i = 0; i < 4; i++) {
-                    data_byte[i] = fileBuff[start_bin + i + 2];
+                
+                if(xmlHeader.isEmpty())
+                    continue;
+                
+                header = getHeader(xmlHeader);
+                xmlHeader = "";
+                int buffLen = 0;
+                if (header.get(compression) == 1) {
+
+                    // Read 4 bytes representing data length
+                    // only when compression is set to "qt"
+                    byte[] data_byte = new byte[4];
+                    for (int i = 0; i < 4; i++) {
+                        data_byte[i] = fileBuff[start_bin + i + 2];
+                    }
+                    buffLen = byteArray2Int(data_byte);
+                    start_bin += 4;
+
+                } else {
+                    buffLen = header.get(size);
                 }
-                // Read data into data array
-                start_bin += 6;
+                start_bin += 2;
                 end_bin -= 6;
+                // Read data into data array
                 int bin_count = 0;
                 data_buf = new byte[end_bin - start_bin];
                 for (int i = start_bin; i < end_bin; i++) {
@@ -1129,23 +1173,59 @@ public class RainbowModel {
                     bin_count++;
                 }
 
-                int buffLen = byteArray2Int(data_byte);
                 DataBufferContainer dbc = new DataBufferContainer();
                 dbc.setDataBuffer(data_buf);
                 dbc.setDataBufferLength(buffLen);
+                dbc.setCompression(header.get(compression));
 
-                blobs.put(blobNumber, dbc);
+                blobs.put(header.get(blobid), dbc);
                 msgl.showMessage("Reading RAINBOW data section from BLOB "
-                        + blobNumber, verbose);
-                blobNumber++;
+                        + header.get(blobid), verbose);
+                currentBlob++;
 
             } catch (Exception e) {
                 msgl.showMessage(
                         "Error while reading RAINBOW data section from BLOB "
-                                + blobNumber, verbose);
+                                + header.get(blobid), verbose);
             }
         }
         return blobs;
+    }
+
+    /**
+     * 
+     * Helper method. Gets blob parameter from xml header.
+     * 
+     * @param xmlHeader
+     * @return
+     */
+    private HashMap<String, Integer> getHeader(String xmlHeader) {
+        HashMap<String, Integer> header = new HashMap<String, Integer>();
+
+        header.put(blobid, getAttribute(blobid, xmlHeader));
+        header.put(size, getAttribute(size, xmlHeader));
+        header.put(compression, getAttribute(compression, xmlHeader));
+
+        return header;
+    }
+
+    private int getAttribute(String word, String sentance) {
+
+        int start = 0, stop = 0;
+
+        start = sentance.indexOf(word) + word.length() + 2;
+        stop = sentance.indexOf("\"", start);
+        int value = 0;
+        try {
+            value = Integer.valueOf(sentance.substring(start, stop));
+        } catch (NumberFormatException e) {
+            if (sentance.substring(start, stop).equals("qt"))
+                return 1;
+            else
+                return 0;
+        }
+        return value;
+
     }
 
     /**
@@ -1187,6 +1267,8 @@ public class RainbowModel {
         // Seek for data section
 
         int current = firstBlob - 1;
+        HashMap<String, Integer> header = null;
+        String xmlHeader = "";
         try {
             while (offset < fileBuff.length) {
                 // Data section start
@@ -1200,11 +1282,13 @@ public class RainbowModel {
                 }
                 if (start_bin_seq.matches(START_BIN)) {
                     while ((char) fileBuff[offset] != '>') {
+                        xmlHeader += (char) fileBuff[offset];
                         offset++;
                     }
                     start_bin = offset;
                     current++;
                 }
+
                 // Data section end
                 end_bin_buf[7] = fileBuff[offset];
                 for (int i = 1; i <= 7; i++) {
@@ -1221,14 +1305,26 @@ public class RainbowModel {
                 end_bin_seq = "";
                 offset++;
             }
-            // Read 4 bytes representing data length
-            byte[] data_byte = new byte[4];
-            for (int i = 0; i < 4; i++) {
-                data_byte[i] = fileBuff[start_bin + i + 2];
+            header = getHeader(xmlHeader);
+            xmlHeader = "";
+            int buffLen = 0;
+            if (header.get(compression) == 1) {
+
+                // Read 4 bytes representing data length
+                // only when compression is set to "qt"
+                byte[] data_byte = new byte[4];
+                for (int i = 0; i < 4; i++) {
+                    data_byte[i] = fileBuff[start_bin + i + 2];
+                }
+                buffLen = byteArray2Int(data_byte);
+                start_bin += 4;
+
+            } else {
+                buffLen = header.get(size);
             }
-            // Read data into data array
-            start_bin += 6;
+            start_bin += 2;
             end_bin -= 6;
+            // Read data into data array
             int bin_count = 0;
             data_buf = new byte[end_bin - start_bin];
             for (int i = start_bin; i < end_bin; i++) {
@@ -1236,18 +1332,16 @@ public class RainbowModel {
                 bin_count++;
             }
 
-            int buffLen = byteArray2Int(data_byte);
             dbc.setDataBuffer(data_buf);
             dbc.setDataBufferLength(buffLen);
-            // dbc.setDepth(depth);
+            dbc.setCompression(header.get(compression));
 
-            msgl.showMessage("Reading RAINBOW data section from BLOB "
-                    + blobNumber, verbose);
+
 
         } catch (Exception e) {
             msgl.showMessage(
                     "Error while reading RAINBOW data section from BLOB "
-                            + blobNumber, verbose);
+                            + header.get(blobid), verbose);
         }
 
         return dbc;

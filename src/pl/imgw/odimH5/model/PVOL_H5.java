@@ -30,6 +30,7 @@ public class PVOL_H5 {
     public static final String HEIGHT = "height";
 
     // how
+    public static final String TASK = "task";
     public static final String STARTEPOCHS = "startepochs";
     public static final String ENDEPOCHS = "endepochs";
     public static final String SYSTEM = "system";
@@ -37,7 +38,44 @@ public class PVOL_H5 {
     public static final String SW_VERSION = "sw_version";
     public static final String BEAMWIDTH = "beamwidth";
     public static final String WAVELENGTH = "wavelength";
-
+    public static final String SIMULATED = "simulated";
+    public static final String RPM = "rpm";
+    public static final String PULSEWIDTH = "pulsewidth";
+    public static final String RXBANDWIDTH = "RXbandwidth";
+    public static final String LOWPRF = "lowprf";
+    public static final String HIGHPRF = "highprf";
+    public static final String TXLOSS = "TXloss";
+    public static final String RXLOSS = "RXloss";
+    public static final String RADOMELOSS = "radomeloss";
+    public static final String ANTGAIN = "antgain";
+    public static final String BEAMWH = "beamwH";
+    public static final String BEAMWV = "beamwV";
+    public static final String GASATTN = "gasattn";
+    public static final String RADCONSTH = "radconstH";
+    public static final String RADCONSTV = "radconstV";
+    public static final String NOMTXPOWER = "nomTXpower";
+    public static final String TXPOWER = "TXpower";
+    public static final String NI = "NI";
+    public static final String VSAMPLES = "Vsamples";
+    public static final String AZMETHOD = "azmethod";
+    public static final String BINMETHOD = "binmethod";
+    public static final String ELANGLES = "elangles";
+    public static final String STARTAZA = "startazA";
+    public static final String STOPAZA = "stopazA";
+    public static final String STARTAZT = "startazT";
+    public static final String STOPAZT = "stopazT";
+    public static final String MALFUNC = "malfunc";
+    public static final String RADAR_MSG = "radar_msg";
+    public static final String NEZ = "NEZ";
+    public static final String DCLUTTER = "Dclutter";
+    public static final String SQI = "SQI";
+    public static final String CSR = "CSR";
+    public static final String LOG = "LOG";
+    public static final String RAC = "RAC";
+    public static final String PAC = "PAC";
+    public static final String S2N = "S2N";
+    public static final String POLARIZATION = "polarization";
+    
     // dataset what
     public static final String PRODUCT = "product";
     public static final String STARTDATE = "startdate";

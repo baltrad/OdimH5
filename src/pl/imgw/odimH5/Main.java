@@ -17,18 +17,12 @@
 
 package pl.imgw.odimH5;
 
-import java.io.IOException;
-import java.net.SocketException;
-
-import org.apache.commons.net.ftp.FTPClient;
-
 import pl.imgw.odimH5.controller.DataProcessorController;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
-import pl.imgw.odimH5.util.UtSocketFactory;
 
 /**
  * Main class containing the main() function called by the operating system upon
@@ -40,7 +34,7 @@ import pl.imgw.odimH5.util.UtSocketFactory;
  */
 public class Main {
 
-    public static final String VERSION = "2.14a";
+    public static final String VERSION = "2.14b_linux64";
 
     /**
      * Main method creating

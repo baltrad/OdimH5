@@ -17,7 +17,6 @@ import org.w3c.dom.Text;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
 import pl.imgw.odimH5.util.DataBufferContainer;
-import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
 
 /**
@@ -30,14 +29,19 @@ import pl.imgw.odimH5.util.RadarOptions;
  */
 public class Rainbow2HDFPVOL {
 
-    private static final String VER51X = "5.1";
-    private static final String VER52X = "5.2";
-    private static final String VER53X = "5.3";
+
     private static final String PRODUCT = "SCAN";
 
     private boolean verbose;
     private RainbowModel rb;
     private RadarOptions[] options;
+    private int rIndex = 0;
+    private double antSpeed = 1;
+    private String highprf = "";
+    private String lowprf = "";
+    private String csr = "";
+    private String log = "";
+    private String sqi = "";
 
     private String version;
     // private String radarName = "";
@@ -112,18 +116,6 @@ public class Rainbow2HDFPVOL {
 
         NodeList sliceList = inputDoc.getElementsByTagName("slice");
         size = sliceList.getLength();
-
-        nodeList = rb.getRAINBOWNodesByName(inputDoc, "antspeed", verbose);
-        double antSpeed = 1;
-        try {
-            antSpeed = Double.parseDouble(rb.getRAINBOWMetadataElement(
-                    nodeList, "", verbose));
-        } catch (NumberFormatException e) {
-            System.out.println("<antspeed> is missing or is not a number");
-            // return;
-        }
-
-        shift = (int) (360.0 / antSpeed);
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "rangestep", verbose);
         rangestep = (rb.getRAINBOWMetadataElement(nodeList, "", verbose));
@@ -201,9 +193,9 @@ public class Rainbow2HDFPVOL {
         Element how = od.createElement(rb.H5_GROUP);
         how.setAttribute(rb.H5_OBJECT_NAME, rb.H5_HOW);
         how.appendChild(rb.makeAttr(PVOL_H5.STARTEPOCHS,
-                howG.get(PVOL_H5.STARTEPOCHS), od, rb.H5_LONG));
+                howG.get(PVOL_H5.STARTEPOCHS), od, rb.H5_DOUBLE));
         how.appendChild(rb.makeAttr(PVOL_H5.ENDEPOCHS,
-                howG.get(PVOL_H5.ENDEPOCHS), od, rb.H5_LONG));
+                howG.get(PVOL_H5.ENDEPOCHS), od, rb.H5_DOUBLE));
         how.appendChild(rb.makeAttr(PVOL_H5.SYSTEM, rb.RAINBOW_SYSTEM, od,
                 rb.H5_STRING));
         how.appendChild(rb.makeAttr(PVOL_H5.SOFTWARE, rb.RAINBOW_SOFTWARE, od,
@@ -280,9 +272,9 @@ public class Rainbow2HDFPVOL {
             int rays = Integer.parseInt(s.dsWhere.get(PVOL_H5.NRAYS));
             int bins = Integer.parseInt(s.dsWhere.get(PVOL_H5.NBINS));
 
-            int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(s
-                    .getDataBuff().getDataBuffer(), bins, Integer
-                    .parseInt(nray_org[i]), verbose);
+            int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(
+                    s.getDataBuffContainer(), bins,
+                    Integer.parseInt(nray_org[i]), verbose);
 
             infDataBuff = proc.shiftAzimuths(infDataBuff, rays, bins,
                     Integer.parseInt(s.dsWhere.get(PVOL_H5.A1GATE)));
@@ -368,9 +360,9 @@ public class Rainbow2HDFPVOL {
         // ======================= how group ===============================
         child_group_id = proc.H5Gcreate_wrap(file_id, "/how", 0, verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.STARTEPOCHS,
-                rb.H5_LONG, howG.get(PVOL_H5.STARTEPOCHS), verbose);
-        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.ENDEPOCHS, rb.H5_LONG,
-                howG.get(PVOL_H5.ENDEPOCHS), verbose);
+                rb.H5_DOUBLE, howG.get(PVOL_H5.STARTEPOCHS), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.ENDEPOCHS,
+                rb.H5_DOUBLE, howG.get(PVOL_H5.ENDEPOCHS), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SYSTEM, rb.H5_STRING,
                 rb.RAINBOW_SYSTEM, verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SOFTWARE, rb.H5_STRING,
@@ -381,6 +373,11 @@ public class Rainbow2HDFPVOL {
                 rb.H5_DOUBLE, howG.get(PVOL_H5.BEAMWIDTH), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.WAVELENGTH,
                 rb.H5_DOUBLE, howG.get(PVOL_H5.WAVELENGTH), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.RADOMELOSS,
+                rb.H5_DOUBLE, howG.get(PVOL_H5.RADOMELOSS), verbose);
+        proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.ANTGAIN,
+                rb.H5_DOUBLE, howG.get(PVOL_H5.ANTGAIN), verbose);
+        
         // =============== quality index ================
         if (qiG != null)
             makeQIfields(proc, child_group_id);
@@ -429,9 +426,79 @@ public class Rainbow2HDFPVOL {
                     rb.H5_LONG, s.dsWhere.get(PVOL_H5.A1GATE), verbose);
             proc.H5Gclose_wrap(grandchild_group_id, verbose);
 
+            // ===================== ds how group ===========================
+            // --------------- new attributes ODIM H5 2.1
+            grandchild_group_id = proc.H5Gcreate_wrap(child_group_id, "how",
+                    0, verbose);
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.TASK, rb.H5_STRING,
+                    howG.get(PVOL_H5.TASK), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.SIMULATED, rb.H5_STRING,
+                    s.dsHow.get(PVOL_H5.SIMULATED), verbose);
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.RPM,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.RPM), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.PULSEWIDTH,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.PULSEWIDTH), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.RXBANDWIDTH,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.RXBANDWIDTH), verbose);
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.LOWPRF,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.LOWPRF), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.HIGHPRF,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.HIGHPRF), verbose);
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.TXLOSS,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.TXLOSS), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.RXLOSS,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.RXLOSS), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.RADCONSTH,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.RADCONSTH), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.RADCONSTV,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.RADCONSTH), verbose);
+
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.GASATTN,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.GASATTN), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.NOMTXPOWER,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.NOMTXPOWER), verbose);
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.NI,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.NI), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.VSAMPLES,
+                    rb.H5_LONG, s.dsHow.get(PVOL_H5.VSAMPLES), verbose);
+            
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.VSAMPLES,
+                    rb.H5_LONG, s.dsHow.get(PVOL_H5.VSAMPLES), verbose);
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.AZMETHOD,
+                    rb.H5_STRING, s.dsHow.get(PVOL_H5.AZMETHOD), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.BINMETHOD,
+                    rb.H5_STRING, s.dsHow.get(PVOL_H5.BINMETHOD), verbose);
+            
+            proc.H5Acreate_double_array(grandchild_group_id, PVOL_H5.STARTAZA,
+                    s.getAngles(), verbose);
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.MALFUNC, rb.H5_STRING,
+                    s.dsHow.get(PVOL_H5.MALFUNC), verbose);
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.SQI,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.SQI), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.CSR,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.CSR), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.LOG,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.LOG), verbose);
+            
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.RAC,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.RAC), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.PAC,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.PAC), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.S2N,
+                    rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.S2N), verbose);
+            proc.H5Gclose_wrap(grandchild_group_id, verbose);
+            
             grandchild_group_id = proc.H5Gcreate_wrap(child_group_id, "data1",
                     0, verbose);
-
             int grandgrandchild_group_id = -1;
             // ====================== dsd what group ==========================
             grandgrandchild_group_id = proc.H5Gcreate_wrap(grandchild_group_id,
@@ -481,9 +548,9 @@ public class Rainbow2HDFPVOL {
             proc.H5Acreate_any_wrap(grandgrandchild_group_id, PVOL_H5.IM_VER,
                     rb.H5_STRING, rb.IMAGE_VER, verbose);
 
-            int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(s
-                    .getDataBuff().getDataBuffer(), bins, Integer
-                    .parseInt(nray_org[i]), verbose);
+            int[][] infDataBuff = rb.inflate2DRAINBOWDataSection(
+                    s.getDataBuffContainer(), bins,
+                    Integer.parseInt(nray_org[i]), verbose);
 
             // przesunac azymuty
             // System.out.println(i + ": rays=" + rays + " bins=" + bins);
@@ -507,7 +574,7 @@ public class Rainbow2HDFPVOL {
 
                 int qi_group_id = -1;
                 int qi_children_group_id = -1;
-                qi_group_id = proc.H5Gcreate_wrap(grandchild_group_id,
+                qi_group_id = proc.H5Gcreate_wrap(child_group_id,
                         "quality1", 0, verbose);
 
                 // quantity/what
@@ -543,8 +610,8 @@ public class Rainbow2HDFPVOL {
                 proc.H5Acreate_any_wrap(qi_children_group_id, PVOL_H5.IM_VER,
                         rb.H5_STRING, rb.IMAGE_VER, verbose);
 
-                infQiBuff = rb.inflate2DRAINBOWDataSection(s.getQiBuff()
-                        .getDataBuffer(), qiBins, qiRays, verbose);
+                infQiBuff = rb.inflate2DRAINBOWDataSection(s.getQiBuff(),
+                        qiBins, qiRays, verbose);
 
                 infQiBuff = proc.transposeArray(infQiBuff, qiRays, qiBins);
 
@@ -574,7 +641,10 @@ public class Rainbow2HDFPVOL {
      * @param proc
      * @param child_group_id
      */
-    private void makeQIfields(HDF5Model proc, int child_group_id) {
+    private void makeQIfields(HDF5Model proc, int parent) {
+        
+        int child_group_id = proc.H5Gcreate_wrap(parent, "radvol-qc", 0, verbose);
+        
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.GEN_a, rb.H5_DOUBLE,
                 qiG.get(PVOL_H5.GEN_a), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.GEN_b, rb.H5_DOUBLE,
@@ -736,6 +806,8 @@ public class Rainbow2HDFPVOL {
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SUM_QI1, rb.H5_DOUBLE,
                 qiG.get(PVOL_H5.SUM_QI1), verbose);
 
+        proc.H5Gclose_wrap(child_group_id, verbose);
+        
     }
 
     private HashMap<String, String> makeWhatGroup(Document inputDoc) {
@@ -745,15 +817,15 @@ public class Rainbow2HDFPVOL {
 
         String source = "";
 
-        if (version.substring(0, 3).matches(VER51X)
-                || version.substring(0, 3).matches(VER52X)) {
+        if (version.substring(0, 3).matches(rb.VER51X)
+                || version.substring(0, 3).matches(rb.VER52X)) {
 
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
             source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
             radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
                     verbose);
 
-        } else if (version.substring(0, 3).matches(VER53X)) {
+        } else if (version.substring(0, 3).matches(rb.VER53X)) {
 
             nodeList = rb
                     .getRAINBOWNodesByName(inputDoc, "sensorinfo", verbose);
@@ -773,6 +845,7 @@ public class Rainbow2HDFPVOL {
             if (source.matches(options[i].getRadarName())) {
                 radarName = options[i].getRadarWMOName();
                 filePrefix = options[i].getFileName();
+                rIndex = i;
                 if (options[i].getNrays() != null)
                     nray_new = options[i].getNrays();
                 if (options[i].getLocation() != null)
@@ -817,6 +890,9 @@ public class Rainbow2HDFPVOL {
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "wavelen", verbose);
         String wavelength = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
+        
+        nodeList = rb.getRAINBOWNodesByName(inputDoc, "scan", verbose);
+        String task = rb.getRAINBOWMetadataElement(nodeList, "name", verbose);
 
         how.put(PVOL_H5.STARTEPOCHS,
                 rb.convertRAINBOWDate2Epoch(date, time, verbose));
@@ -824,10 +900,14 @@ public class Rainbow2HDFPVOL {
                 rb.convertRAINBOWDate2Epoch(date, time, verbose));
         how.put(PVOL_H5.SYSTEM, rb.RAINBOW_SYSTEM);
         how.put(PVOL_H5.SOFTWARE, rb.RAINBOW_SOFTWARE);
+        how.put(PVOL_H5.TASK, task);
+        
         how.put(PVOL_H5.SW_VERSION, version);
         how.put(PVOL_H5.BEAMWIDTH, beamwidth);
         how.put(PVOL_H5.WAVELENGTH, wavelength);
-
+        how.put(PVOL_H5.RADOMELOSS, options[rIndex].getRadomeloss());
+        how.put(PVOL_H5.ANTGAIN, options[rIndex].getAntgain());
+        
         return how;
 
     }
@@ -1249,8 +1329,8 @@ public class Rainbow2HDFPVOL {
         String lat = "";
         String height = "";
 
-        if (version.substring(0, 3).matches(VER51X)
-                || version.substring(0, 3).matches(VER52X)) {
+        if (version.substring(0, 3).matches(rb.VER51X)
+                || version.substring(0, 3).matches(rb.VER52X)) {
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
             lon = (rb.getRAINBOWMetadataElement(nodeList, "lon", verbose));
 
@@ -1259,7 +1339,7 @@ public class Rainbow2HDFPVOL {
 
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
             height = (rb.getRAINBOWMetadataElement(nodeList, "alt", verbose));
-        } else if (version.substring(0, 3).matches(VER53X)) {
+        } else if (version.substring(0, 3).matches(rb.VER53X)) {
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "lon", verbose);
             lon = (rb.getRAINBOWMetadataElement(nodeList, "", verbose));
 
@@ -1304,6 +1384,19 @@ public class Rainbow2HDFPVOL {
                 qiBlobNumber = Integer.parseInt(qi);
 
             // =============== what group =================================
+            
+            
+            try {
+                antSpeed = Double.parseDouble(rb.getValueByName(sliceList.item(i), "antspeed",
+                        null));
+            } catch (NumberFormatException e) {
+                System.out.println("<antspeed> is missing or is not a number");
+                // return;
+            } catch (NullPointerException e) {
+                
+            }
+            
+            shift = (int) (360.0 / antSpeed);
             String date = (rb.parseRAINBOWDate(
                     rb.getValueByName(sliceList.item(i), "slicedata", "date"),
                     verbose));
@@ -1325,6 +1418,101 @@ public class Rainbow2HDFPVOL {
                     "bins");
             String srange = rb.getValueByName(sliceList.item(i), "start_range",
                     null);
+
+            // =============== how group ================================
+            double rpm = antSpeed * 60 / 360;
+            slices[i].dsHow.put(PVOL_H5.RPM, String.valueOf(rpm));
+            
+            // ======= ATTRIBUTES FOR ODIM H5 2.1 
+            // ------- Radar Options
+            slices[i].dsHow.put(PVOL_H5.SIMULATED, options[rIndex].getSimulated());
+            slices[i].dsHow.put(PVOL_H5.PULSEWIDTH, options[rIndex].getPulsewidth());
+            slices[i].dsHow.put(PVOL_H5.RXBANDWIDTH, options[rIndex].getRXbandwidth());
+            slices[i].dsHow.put(PVOL_H5.TXLOSS, options[rIndex].getTXloss());
+            slices[i].dsHow.put(PVOL_H5.RXLOSS, options[rIndex].getRXloss());
+            slices[i].dsHow.put(PVOL_H5.GASATTN, options[rIndex].getGasattn());
+            slices[i].dsHow.put(PVOL_H5.RADCONSTH, options[rIndex].getRadconstH());
+            slices[i].dsHow.put(PVOL_H5.RADCONSTV, options[rIndex].getRadconstV());
+            slices[i].dsHow.put(PVOL_H5.NOMTXPOWER, options[rIndex].getNomTXpower());
+            slices[i].dsHow.put(PVOL_H5.TXPOWER, options[rIndex].getTXpower());
+            slices[i].dsHow.put(PVOL_H5.VSAMPLES, options[rIndex].getVsamples());
+            slices[i].dsHow.put(PVOL_H5.AZMETHOD, options[rIndex].getAzmethod());
+            slices[i].dsHow.put(PVOL_H5.BINMETHOD, options[rIndex].getBinmethod());
+            slices[i].dsHow.put(PVOL_H5.MALFUNC, options[rIndex].getMalfunc());
+            slices[i].dsHow.put(PVOL_H5.NEZ, options[rIndex].getNEZ());
+            slices[i].dsHow.put(PVOL_H5.RAC, options[rIndex].getRAC());
+            slices[i].dsHow.put(PVOL_H5.PAC, options[rIndex].getPAC());
+            slices[i].dsHow.put(PVOL_H5.S2N, options[rIndex].getS2N());
+            double radconstH = 0, radconstV = 0;
+            try {
+                radconstH = Double.parseDouble(options[rIndex].getRadconstH());
+            } catch (Exception e) {
+                radconstH = 0;
+            }
+            try {
+                radconstV = Double.parseDouble(options[rIndex].getRadconstH());
+            } catch (Exception e) {
+                radconstV = 0;
+            }
+            //-------- RAINBOW XML
+            String value = rb.getValueByName(sliceList.item(i), "highprf", null);
+            if (value != null)
+                highprf = value;
+            slices[i].dsHow.put(PVOL_H5.HIGHPRF, highprf);
+            value = rb.getValueByName(sliceList.item(i), "lowprf", null);
+            if (value != null)
+                lowprf = value;
+            if (lowprf.matches("0"))
+                lowprf = highprf;
+            slices[i].dsHow.put(PVOL_H5.LOWPRF, lowprf);
+            String ni = rb.getValueByName(sliceList.item(i), "dynv", "max");
+            slices[i].dsHow.put(PVOL_H5.NI, ni);
+            
+            String vsampl = rb.getValueByName(sliceList.item(i), "timesamp", null);
+            slices[i].dsHow.put(PVOL_H5.VSAMPLES, vsampl);
+            
+            value = rb.getValueByName(sliceList.item(i), "csr", null);
+            if (value != null)
+                csr = value;
+            slices[i].dsHow.put(PVOL_H5.CSR, csr);
+            
+            value = rb.getValueByName(sliceList.item(i), "sqi", null);
+            if (value != null)
+                sqi = value;
+            slices[i].dsHow.put(PVOL_H5.SQI, sqi);
+            
+            value = rb.getValueByName(sliceList.item(i), "log", null);
+            if (value != null)
+                log = value;
+            slices[i].dsHow.put(PVOL_H5.LOG, log);
+            
+            if (radconstH == 0) {
+                try {
+                    double wavelength = Double.parseDouble(howG
+                            .get(PVOL_H5.WAVELENGTH));
+                    double nompower = Double.parseDouble(options[rIndex]
+                            .getNomTXpower());
+                    double beamwidth = Double.parseDouble(howG
+                            .get(PVOL_H5.BEAMWIDTH));
+                    double pulselength = Double.parseDouble(options[rIndex]
+                            .getPulsewidth());
+                    double antgain = Double.parseDouble(options[rIndex]
+                            .getAntgain());
+                    double radomeloss = Double.parseDouble(options[rIndex]
+                            .getRadomeloss());
+                    double txloss = Double.parseDouble(options[rIndex]
+                            .getTXloss());
+                    double rxloss = Double.parseDouble(options[rIndex]
+                            .getRXloss());
+                    radconstH = radarConst(wavelength, nompower, beamwidth,
+                            pulselength, antgain, radomeloss, txloss, rxloss);
+                } catch (Exception e) {
+                    
+                }
+            }
+            if (radconstH != 0)
+                slices[i].dsHow.put(PVOL_H5.RADCONSTH,
+                        String.valueOf(radconstH));
 
             // =============== quality index prefs =========================
             String qiBins = rb.getValueByName(sliceList.item(i), "QIdata",
@@ -1355,18 +1543,27 @@ public class Rainbow2HDFPVOL {
             nray_org[i] = rb.getValueByName(sliceList.item(i), "rawdata",
                     "rays");
 
-            DataBufferContainer raysBuff = blobs.get(raysBlobNumber);
-            byte[] infRaysBuff = rb.inflate1DRAINBOWDataSection(
-                    raysBuff.getDataBuffer(), raysBuff.getDataBufferLength(),
-                    verbose);
-            String a1gate = String.valueOf(startingAzimuthNumber(infRaysBuff,
-                    Integer.parseInt(nray_org[i])));
-
+            DataBufferContainer dbcRays = blobs.get(raysBlobNumber);
+            byte[] infRaysBuff = null;
+            if (dbcRays.getCompression() == 1) {
+                infRaysBuff = rb.inflate1DRAINBOWDataSection(dbcRays, verbose);
+            } else {
+                infRaysBuff = dbcRays.getDataBuffer();
+            }
+            
             String rays = "";
             if (!nray_new.isEmpty())
                 rays = nray_new;
             else
                 rays = nray_org[i];
+            
+            int[] angles = new int[Integer.parseInt(nray_org[i])];
+            angles = getAngles(infRaysBuff, Integer.parseInt(rays));
+            int firstAngle = startingAzimuthNumber(angles);
+            String a1gate = String.valueOf(firstAngle);
+            double[] anglesD = sortAngles(angles, firstAngle);
+            slices[i].setAngles(anglesD);
+            
 
             slices[i].dsWhere.put(PVOL_H5.ELANGLE, posangle);
             slices[i].dsWhere.put(PVOL_H5.NBINS, bins);
@@ -1404,14 +1601,14 @@ public class Rainbow2HDFPVOL {
                     rb.getRAINBOWOffset(min, gain));
 
             // =============== data dataset ================================
-            DataBufferContainer dataBuff = blobs.get(dataBlobNumber);
-            DataBufferContainer qiBuff = null;
+            DataBufferContainer dbcData = blobs.get(dataBlobNumber);
+            DataBufferContainer dbcQi = null;
             if (qiBlobNumber > -1)
-                qiBuff = blobs.get(qiBlobNumber);
+                dbcQi = blobs.get(qiBlobNumber);
             slices[i].dsdData.put(PVOL_H5.DATA_SIZE, dataDepth);
-            slices[i].setDataBuff(dataBuff);
-            if (qiBuff != null)
-                slices[i].setQiBuff(qiBuff);
+            slices[i].setDataBuffContainer(dbcData);
+            if (dbcQi != null)
+                slices[i].setQiBuff(dbcQi);
 
         }
         return slices;
@@ -1427,13 +1624,14 @@ public class Rainbow2HDFPVOL {
      * @return index of the smallest azimuth from the intArray
      */
 
-    public int startingAzimuthNumber(byte[] data, int length) {
+    public int startingAzimuthNumber(int[] data) {
 
         int value = 0, minValue = 99999, counter = 0;
+        int length = data.length;
 
         for (int i = 0; i < length; i++) {
 
-            value = byte2int(data[i * 2], data[i * 2 + 1]);
+            value = data[i];
 
             if (value < minValue) {
                 minValue = value;
@@ -1443,6 +1641,28 @@ public class Rainbow2HDFPVOL {
 
         return counter;
     }
+    
+    public int[] getAngles(byte[] data, int length) {
+        
+        int angles[] = new int[length];
+        for (int i = 0; i < length; i++) {
+            angles[i] = byte2int(data[i * 2], data[i * 2 + 1]);
+        }
+        return angles;
+    }
+    
+    public double[] sortAngles(int[] data, int first) {
+        
+        double gain = 0.00549; 
+
+        double angles[] = new double[data.length];
+        for (int i = 0; i < data.length; i++) {
+            angles[i] = data[(first + i)%data.length] * gain;
+        }
+        return angles;
+    }
+    
+    
 
     /**
      * 
@@ -1468,6 +1688,29 @@ public class Rainbow2HDFPVOL {
 
     public String getRadarFullName() {
         return radarFullName;
+    }
+    
+    private double radarConst(double wavelength, double nompower,
+            double beamwidth, double pulselength, double antgain,
+            double radomeloss, double txloss, double rxloss) {
+        
+        if (wavelength * nompower * beamwidth * pulselength * antgain
+                * radomeloss * txloss * rxloss == 0)
+            return 0;
+        
+        double c = 3.0E8;
+        double K = 0.93;
+        
+        double numerator = 2.025 * Math.pow(2, 14) * Math.log(2) * 100
+                * wavelength * 100 * wavelength;
+        double nominative = Math.pow(Math.PI, 5) * 10.0E-23 * c * nompower
+                * beamwidth * beamwidth * pulselength * K;
+
+        double fraction = numerator/nominative;
+        
+        double log10 = 10*(Math.log(fraction)/Math.log(10));
+        
+        return log10 - 2 * antgain + radomeloss + txloss + rxloss;
     }
 
 }
