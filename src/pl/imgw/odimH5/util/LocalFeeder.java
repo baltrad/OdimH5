@@ -22,6 +22,7 @@ import name.pachler.nio.file.WatchService;
 
 import org.w3c.dom.Document;
 
+import pl.imgw.odimH5.Main;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
@@ -282,8 +283,9 @@ public class LocalFeeder extends Thread {
             // System.out.println("sender: " + baltradOptions.getSender());
             // System.out.println("server: " + baltradOptions.getServer());
 
-            BaltradFrameHandler bfh = new BaltradFrameHandler(
-                    baltradOptions.getServer());
+            BaltradFrameHandler bfh = new BaltradFrameHandler( Main.SCHEME,
+                    baltradOptions.getHostAddress(), baltradOptions.getPort(), Main.APP_CTX,
+                    Main.ENTRY_ADDRESS, Main.SO_TIMEOUT, Main.CONN_TIMEOUT );
 
             String a = bfh
                     .createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
@@ -293,7 +295,8 @@ public class LocalFeeder extends Thread {
             // System.out.print("BFDataHdr: ");
             // System.out.println(a);
 
-            BaltradFrame bf = new BaltradFrame(a, toBeSentFileName);
+            BaltradFrame bf = new BaltradFrame( Main.ADDR_SEPARATOR + Main.APP_CTX +
+                    Main.ADDR_SEPARATOR + Main.ENTRY_ADDRESS, a, toBeSentFile );
 
             if (bfh.handleBF(bf) == 0) {
 

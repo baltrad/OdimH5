@@ -34,7 +34,8 @@ public class OptionsHandler {
     public final static String DIRECTORY = "directory";
     public final static String NRAYS = "nrays";
     public final static String FORMAT = "format";
-    public final static String SERVER = "server";
+    public final static String HOST_ADDRESS = "host_address";
+    public static final String PORT_NUMBER = "port_number";
     public final static String SENDER = "sender";
 
     public final static String SIMULATED = "simulated";
@@ -179,9 +180,10 @@ public class OptionsHandler {
 
         options.setSender(RainbowModel.getValueByName(baltradList.item(0),
                 SENDER, null));
-        options.setServer(RainbowModel.getValueByName(baltradList.item(0),
-                SERVER, null));
-
+        options.setHostAddress( RainbowModel.getValueByName( baltradList.item( 0 ),
+                HOST_ADDRESS, null) );
+        options.setPort( Integer.parseInt( RainbowModel.getValueByName( baltradList.item( 0 ),
+                PORT_NUMBER, null) ) );
         return options;
     }
 
@@ -290,7 +292,9 @@ public class OptionsHandler {
         // System.out.println("    <start_time>mm</start_time>");
         // System.out.println("    <" + REPETITION + " >mm</" + REPETITION +
         // ">");
-        System.out.println("        <" + SERVER + ">HTTP_address</" + SERVER
+        System.out.println("        <" + HOST_ADDRESS + ">host_address</" + HOST_ADDRESS
+                + ">");
+        System.out.println("        <" + PORT_NUMBER + ">port_number</" + PORT_NUMBER
                 + ">");
         System.out.println("        <" + SENDER + ">Baltrad.IMGW.pl</" + SENDER
                 + ">");

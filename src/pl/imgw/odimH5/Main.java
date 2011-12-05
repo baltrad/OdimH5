@@ -37,6 +37,18 @@ public class Main {
     public static final String VERSION = "2.14b_linux64";
 
     /**
+     * This is a temporary solution to make OdimH5 work with baltrad-frame-0.1.2 library.
+     * The following options should be passed as parameters via command line arguments parser.
+     */
+    public static final String SCHEME = "https";
+    public static final String APP_CTX = "BaltradDex";
+    public static final String ENTRY_ADDRESS = "dispatch.htm";
+    public static final int SO_TIMEOUT = 60000;
+    public static final int CONN_TIMEOUT = 60000;
+    // address separator
+    public static final String ADDR_SEPARATOR = "/";
+
+    /**
      * Main method creating
      * 
      * @param args

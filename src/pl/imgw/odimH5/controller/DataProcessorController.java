@@ -204,14 +204,14 @@ public class DataProcessorController {
             }
 
         } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
-                && cmd.hasArgument(cmd.ADDRESS_OPTION)
+                && cmd.hasArgument(cmd.HOST_ADDRESS_OPTION)
                 && cmd.hasArgument(cmd.SENDER_OPTION)
                 && cmd.hasArgument(cmd.RADAR_OPTION)) {
 
             msgl.showMessage("Sending file to server", true);
 
             BaltradFrameHandler bfh = new BaltradFrameHandler(
-                    cmd.getArgumentValue(cmd.ADDRESS_OPTION));
+                    cmd.getArgumentValue(cmd.HOST_ADDRESS_OPTION));
 
             String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
                     cmd.getArgumentValue(cmd.SENDER_OPTION),

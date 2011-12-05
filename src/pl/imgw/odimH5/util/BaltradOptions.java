@@ -14,7 +14,8 @@ package pl.imgw.odimH5.util;
 public class BaltradOptions {
 
     private String sender = "";
-    private String server = "";
+    private String hostAddress = "";
+    private int port = 0;
 
     public String getSender() {
         return sender;
@@ -24,13 +25,13 @@ public class BaltradOptions {
         this.sender = sender;
     }
 
-    public String getServer() {
-        return server;
-    }
+    public String getHostAddress() { return hostAddress; }
 
-    public void setServer(String server) {
-        this.server = server;
-    }
+    public void setHostAddress( String hostAddress ) { this.hostAddress = hostAddress; }
+
+    public int getPort() { return port; }
+
+    public void setPort( int port ) { this.port = port; }
 
     /**
      * 
@@ -42,7 +43,9 @@ public class BaltradOptions {
         
         if(sender == null || sender.isEmpty())
             return true;
-        if(server == null || server.isEmpty())
+        if( hostAddress == null || hostAddress.isEmpty() )
+            return true;
+        if( port == 0 )
             return true;
         return false;
     }
