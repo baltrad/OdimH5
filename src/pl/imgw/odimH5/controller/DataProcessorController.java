@@ -13,6 +13,7 @@ import ncsa.hdf.hdf5lib.HDF5Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import pl.imgw.odimH5.Main;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
 import pl.imgw.odimH5.model.rainbow.ModelImage;
@@ -210,8 +211,17 @@ public class DataProcessorController {
 
             msgl.showMessage("Sending file to server", true);
 
-            BaltradFrameHandler bfh = new BaltradFrameHandler(
-                    cmd.getArgumentValue(cmd.HOST_ADDRESS_OPTION));
+            int port = 0;
+            
+            port = Integer.parseInt(cmd.getArgumentValue(cmd.PORT_NUMBER_OPTION));
+            
+            BaltradFrameHandler bfh = new BaltradFrameHandler( Main.SCHEME,
+                    cmd.getArgumentValue(cmd.HOST_ADDRESS_OPTION), port, Main.APP_CTX,
+                    Main.ENTRY_ADDRESS, Main.SO_TIMEOUT, Main.CONN_TIMEOUT );
+
+            // System.out.print("BFDataHdr: ");
+            // System.out.println(a);
+
 
             String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
                     cmd.getArgumentValue(cmd.SENDER_OPTION),
