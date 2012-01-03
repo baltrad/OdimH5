@@ -176,6 +176,7 @@ public class LocalFeeder extends Thread {
             radarName = hdf.getRadarName();
             toBeSentFileName = hdf.getOutputFileName();
             toBeSentFile = new File(toBeSentFileName);
+//komentarz
 
 
         } else {
