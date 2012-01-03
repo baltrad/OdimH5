@@ -171,12 +171,7 @@ public class LocalFeeder extends Thread {
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
-            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", filePath, verbose,
-                    rb, radarOptions);
-            radarName = hdf.getRadarName();
-            toBeSentFileName = hdf.getOutputFileName();
-            toBeSentFile = new File(toBeSentFileName);
-//komentarz
+            toBeSentFile = originalFile;
 
 
         } else {
