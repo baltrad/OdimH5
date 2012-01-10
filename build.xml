@@ -21,7 +21,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 		<!-- Sets variables which can later be used. -->
 		<!-- The value of a property is accessed via ${} -->
 		<property name="version" value="64" />
-		<property name="app.name" value="odimH5" />
+		<property name="app.name" value="odimh5" />
 		<property name="main.class" value="pl.imgw.odimH5.Main" />
 		<property name="src.dir" location="src" />
 		<property name="lib.dir" location="lib" />
@@ -82,7 +82,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 			</jar>
 		</target>
 
-		<target name="install" depends="jar">
+		<target name="install">
 			<mkdir dir="${prefix}/${app.name}" />
 			<copy todir="${prefix}/${app.name}" flatten="true">
 				<fileset dir="${dist.dir}">
@@ -105,7 +105,7 @@ java -Djava.library.path=${prefix}/${app.name}/lib/ -jar ${prefix}/${app.name}/$
 			<echo message="run program by typing ${app.name}" />
 		</target>
 
-		<target name="main" depends="compile, jar, doc">
+		<target name="main" depends="jar, doc">
 			<description>Main target</description>
 		</target>
 

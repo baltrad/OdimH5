@@ -17,6 +17,8 @@
 
 package pl.imgw.odimH5;
 
+import java.io.File;
+
 import pl.imgw.odimH5.controller.DataProcessorController;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
@@ -35,7 +37,7 @@ import pl.imgw.odimH5.util.MessageLogger;
 public class Main {
 
     public static final String VERSION = "2.14b_linux64";
-
+    public static final String ODIM_H5 = "OdimH5";
     /**
      * This is a temporary solution to make OdimH5 work with baltrad-frame-0.1.2 library.
      * The following options should be passed as parameters via command line arguments parser.
@@ -55,6 +57,11 @@ public class Main {
      *            the command line arguments
      */
     public static void main(String[] args) {
+        
+        File file = new File(getProgPath());
+        if (!file.exists()) {
+            file.mkdirs();
+        }
         
         LogsHandler.saveProgramLogs("System starts");
 
@@ -81,4 +88,11 @@ public class Main {
 
     }
 
+    public static final String HOME = System.getProperty("user.home");
+
+    
+    public static String getProgPath() {
+        return new File(HOME, ODIM_H5).getPath();
+    }
+    
 }

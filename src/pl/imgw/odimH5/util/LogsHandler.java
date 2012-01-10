@@ -14,6 +14,8 @@ import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import pl.imgw.odimH5.Main;
+
 /**
  * 
  * /Class description/
@@ -26,6 +28,10 @@ public class LogsHandler {
 
     public static final String PROGRAM_LOGS_FILE = "error.log";
 
+    private static String getLogPath() {
+        return new File(Main.getProgPath(), PROGRAM_LOGS_FILE).getPath();
+    }
+    
     /**
      * Make a note in log file.
      * 
@@ -38,7 +44,7 @@ public class LogsHandler {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm");
         Calendar cal = Calendar.getInstance();
         saveLine(sdf.format(cal.getTime()) + "; [" + className + "] " + text,
-                PROGRAM_LOGS_FILE, cal.getTimeZone().getID());
+                getLogPath(), cal.getTimeZone().getID());
     }
 
     /**
@@ -48,9 +54,10 @@ public class LogsHandler {
      *            Output text
      */
     public static void saveProgramLogs(String text) {
+        System.out.println(getLogPath());
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm");
         Calendar cal = Calendar.getInstance();
-        saveLine(sdf.format(cal.getTime()) + "; " + text, PROGRAM_LOGS_FILE,
+        saveLine(sdf.format(cal.getTime()) + "; " + text, getLogPath(),
                 cal.getTimeZone().getID());
     }
 

@@ -24,7 +24,6 @@ import org.w3c.dom.Document;
 
 import pl.imgw.odimH5.Main;
 import pl.imgw.odimH5.model.HDF5Model;
-import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 

@@ -3,13 +3,15 @@
  */
 package pl.imgw.odimH5.util;
 
-import org.apache.xerces.parsers.DOMParser;
+import java.io.File;
+
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import pl.imgw.odimH5.Main;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
+
+import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 
 /**
  * 
@@ -59,6 +61,9 @@ public class OptionsHandler {
     public final static String PAC = "PAC";
     public final static String S2N = "S2N";
 
+    private static String getOptionPath() {
+        return new File(Main.getProgPath(), OPTION_XML_FILE).getPath();
+    }
     /**
      * 
      * This method reads options from XML file and return XML document object
@@ -72,9 +77,9 @@ public class OptionsHandler {
         Document doc = null;
         try {
             DOMParser parser = new DOMParser();
-            parser.parse(OPTION_XML_FILE);
+            parser.parse(getOptionPath());
             doc = parser.getDocument();
-            msgl.showMessage("Parsing options file: " + OPTION_XML_FILE,
+            msgl.showMessage("Parsing options file: " + getOptionPath(),
                     verbose);
         } catch (Exception e) {
             msgl.showMessage("Failed to parse options file: " + e.getMessage(),
