@@ -593,11 +593,11 @@ public class HDF5Model {
         } catch (HDF5Exception hdf5e) {
             msgl.showMessage(
                     "[HDF5 Error] Failed to create HDF5 numeric attribute: "
-                            + hdf5e.getMessage(), verbose);
+                            + attr_name, verbose);
         } catch (Exception e) {
             msgl.showMessage(
                     "[Error] Failed to create HDF5 numeric attribute: "
-                            + e.getMessage(), verbose);
+                            + attr_name, verbose);
         }
         return attribute_id;
     }

@@ -154,6 +154,11 @@ public class DataProcessorController {
                             vol.makeH5();
                         else
                             vol.makeXML();
+                        if(vol.correct)
+                            msgl.showMessage("Conversion completed", true);
+                        else
+                            msgl.showMessage("Conversion failed", true);
+                            
                     } else if (fileNameIn.endsWith("h5")
                             || fileNameIn.endsWith("hdf")) {
 
@@ -161,6 +166,7 @@ public class DataProcessorController {
                         HDF2RainbowPVOL hdf = new HDF2RainbowPVOL(fileNameOut,
                                 fileNameIn, verbose, rainbow, options);
 
+                        
                     }
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.IMAGE)) {

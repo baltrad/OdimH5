@@ -315,7 +315,7 @@ public class Rainbow2HDFPVOL {
         rb.hdf.saveXMLFile(od, outputFileName, verbose);
     }
 
-    public void makeH5() throws Exception {
+    public void makeH5() {
 
         HDF5Model proc = rb.getHDFModel();
 
@@ -323,6 +323,7 @@ public class Rainbow2HDFPVOL {
         int file_id = -1;
         int child_group_id = -1;
         // HDF5 file operation status
+        
 
         file_id = proc.H5Fcreate_wrap(outputFileName,
                 HDF5Constants.H5F_ACC_TRUNC, HDF5Constants.H5P_DEFAULT,
@@ -345,7 +346,8 @@ public class Rainbow2HDFPVOL {
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.SOURCE, rb.H5_STRING,
                 whatG.get(PVOL_H5.SOURCE), verbose);
 
-        proc.H5Gclose_wrap(child_group_id, verbose);
+        if(proc.H5Gclose_wrap(child_group_id, verbose) < 0)
+            correct = false;
 
         // ======================= where group =============================
         child_group_id = proc.H5Gcreate_wrap(file_id, "/where", 0, verbose);
@@ -355,7 +357,8 @@ public class Rainbow2HDFPVOL {
                 whereG.get(PVOL_H5.LAT), verbose);
         proc.H5Acreate_any_wrap(child_group_id, PVOL_H5.HEIGHT, rb.H5_DOUBLE,
                 whereG.get(PVOL_H5.HEIGHT), verbose);
-        proc.H5Gclose_wrap(child_group_id, verbose);
+        if(proc.H5Gclose_wrap(child_group_id, verbose) < 0)
+            correct = false;
 
         // ======================= how group ===============================
         child_group_id = proc.H5Gcreate_wrap(file_id, "/how", 0, verbose);
@@ -382,7 +385,8 @@ public class Rainbow2HDFPVOL {
         if (qiG != null)
             makeQIfields(proc, child_group_id);
 
-        proc.H5Gclose_wrap(child_group_id, verbose);
+        if(proc.H5Gclose_wrap(child_group_id, verbose)< 0)
+            correct = false;
 
         for (int i = 0; i < size; i++) {
 
@@ -406,7 +410,8 @@ public class Rainbow2HDFPVOL {
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.ENDTIME,
                     rb.H5_STRING, s.dsWhat.get(PVOL_H5.ENDTIME), verbose);
 
-            proc.H5Gclose_wrap(grandchild_group_id, verbose);
+            if(proc.H5Gclose_wrap(grandchild_group_id, verbose)< 0)
+                correct = false;
 
             // ===================== ds where group ===========================
             grandchild_group_id = proc.H5Gcreate_wrap(child_group_id, "where",
@@ -424,7 +429,8 @@ public class Rainbow2HDFPVOL {
                     rb.H5_LONG, s.dsWhere.get(PVOL_H5.NRAYS), verbose);
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.A1GATE,
                     rb.H5_LONG, s.dsWhere.get(PVOL_H5.A1GATE), verbose);
-            proc.H5Gclose_wrap(grandchild_group_id, verbose);
+            if(proc.H5Gclose_wrap(grandchild_group_id, verbose)< 0)
+                correct = false;
 
             // ===================== ds how group ===========================
             // --------------- new attributes ODIM H5 2.1
@@ -464,8 +470,8 @@ public class Rainbow2HDFPVOL {
             
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.NI,
                     rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.NI), verbose);
-            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.VSAMPLES,
-                    rb.H5_LONG, s.dsHow.get(PVOL_H5.VSAMPLES), verbose);
+//            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.VSAMPLES,
+//                    rb.H5_LONG, s.dsHow.get(PVOL_H5.VSAMPLES), verbose);
             
             
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.VSAMPLES,
@@ -476,8 +482,8 @@ public class Rainbow2HDFPVOL {
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.BINMETHOD,
                     rb.H5_STRING, s.dsHow.get(PVOL_H5.BINMETHOD), verbose);
             
-            proc.H5Acreate_double_array(grandchild_group_id, PVOL_H5.STARTAZA,
-                    s.getAngles(), verbose);
+//            proc.H5Acreate_double_array(grandchild_group_id, PVOL_H5.STARTAZA,
+//                    s.getAngles(), verbose);
             
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.MALFUNC, rb.H5_STRING,
                     s.dsHow.get(PVOL_H5.MALFUNC), verbose);
@@ -495,7 +501,8 @@ public class Rainbow2HDFPVOL {
                     rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.PAC), verbose);
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.S2N,
                     rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.S2N), verbose);
-            proc.H5Gclose_wrap(grandchild_group_id, verbose);
+            if(proc.H5Gclose_wrap(grandchild_group_id, verbose)< 0)
+                correct = false;
             
             grandchild_group_id = proc.H5Gcreate_wrap(child_group_id, "data1",
                     0, verbose);
@@ -516,7 +523,8 @@ public class Rainbow2HDFPVOL {
             proc.H5Acreate_any_wrap(grandgrandchild_group_id, PVOL_H5.UNDETECT,
                     rb.H5_DOUBLE, String.valueOf(rb.RAINBOW_UNDETECT), verbose);
 
-            proc.H5Gclose_wrap(grandgrandchild_group_id, verbose);
+            if(proc.H5Gclose_wrap(grandgrandchild_group_id, verbose)< 0)
+                correct = false;
 
             int rays = Integer.parseInt(s.dsWhere.get(PVOL_H5.NRAYS));
             int bins = Integer.parseInt(s.dsWhere.get(PVOL_H5.NBINS));
@@ -559,10 +567,11 @@ public class Rainbow2HDFPVOL {
 
             infDataBuff = proc.transposeArray(infDataBuff, rays, bins);
 
-            proc.H5Dwrite_wrap(grandgrandchild_group_id,
+            if(proc.H5Dwrite_wrap(grandgrandchild_group_id,
                     HDF5Constants.H5T_NATIVE_INT, HDF5Constants.H5S_ALL,
                     HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
-                    infDataBuff, verbose);
+                    infDataBuff, verbose)< 0)
+                correct = false;
 
             // ====================== quality index group ===================
 
@@ -592,7 +601,8 @@ public class Rainbow2HDFPVOL {
                         rb.H5_DOUBLE, String.valueOf(rb.RAINBOW_UNDETECT),
                         verbose);
 
-                proc.H5Gclose_wrap(qi_children_group_id, verbose);
+                if(proc.H5Gclose_wrap(qi_children_group_id, verbose)< 0)
+                    correct = false;
 
                 int qi_dataspace_id = proc.H5Screate_simple_wrap(2, qiRays,
                         qiBins, null, verbose);
@@ -615,26 +625,34 @@ public class Rainbow2HDFPVOL {
 
                 infQiBuff = proc.transposeArray(infQiBuff, qiRays, qiBins);
 
-                proc.H5Dwrite_wrap(qi_children_group_id,
+                if(proc.H5Dwrite_wrap(qi_children_group_id,
                         HDF5Constants.H5T_NATIVE_INT, HDF5Constants.H5S_ALL,
                         HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
-                        infQiBuff, verbose);
-                proc.H5Dclose_wrap(qi_children_group_id, verbose);
-                proc.H5Gclose_wrap(qi_group_id, verbose);
+                        infQiBuff, verbose)< 0)
+                    correct = false;
+                if(proc.H5Dclose_wrap(qi_children_group_id, verbose)< 0)
+                    correct = false;
+                if(proc.H5Gclose_wrap(qi_group_id, verbose)< 0)
+                    correct = false;
 
             }
 
-            proc.H5Dclose_wrap(grandgrandchild_group_id, verbose);
-            proc.H5Gclose_wrap(grandchild_group_id, verbose);
-            proc.H5Gclose_wrap(child_group_id, verbose);
-            proc.H5Sclose_wrap(dataspace_id, verbose);
+            if( proc.H5Dclose_wrap(grandgrandchild_group_id, verbose)< 0)
+                correct = false;
+            if(proc.H5Gclose_wrap(grandchild_group_id, verbose)< 0)
+                correct = false;
+            if(proc.H5Gclose_wrap(child_group_id, verbose)< 0)
+                correct = false;
+            if(proc.H5Sclose_wrap(dataspace_id, verbose)< 0)
+                correct = false;
 
         }
 
         // proc.H5Gclose_wrap(child_group_id, verbose);
 
-        proc.H5Fclose_wrap(file_id, verbose);
-
+        if (proc.H5Fclose_wrap(file_id, verbose) < 0)
+            correct = false;
+        
     }
 
     /**
