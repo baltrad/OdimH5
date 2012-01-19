@@ -17,7 +17,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 -->
-<project name="OdimH5" default="jar" basedir=".">
+<project name="OdimH5" default="install" basedir=".">
     <property name="app.name" value="odimH5" />
     <property name="app.version" value="2.14b"/>
     <property name="main.class" value="pl.imgw.odimH5.Main" />
@@ -43,14 +43,9 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     <property name="host.address" value="http://localhost"/>
     <property name="conn.timeout" value="60000"/>
     <property name="so.timeout" value="60000"/>
-    
+    <!-- Hudson environment property -->
     <property environment="env"/>
     
-    <property name="prefix" value="${env.PREFIX}"/>
-    <property name="hostname" value="${env.HOSTNAME}"/>
-    <property name="system" value="${env.SYSTEM}"/>
-    <property name="arch" value="${env.ARCH}"/>
-
     <!-- Library path -->
     <path id="lib.path">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -162,6 +157,8 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
         <echo message="Installation completed"/>
         <echo message="Run program using scripts located in ${bin.dir} directory"/>
     </target>
+    
+    <target name="hudson" depends="init,jar"/>
     
     <!-- Generate source code documentation -->
     <target name="javadocs">
