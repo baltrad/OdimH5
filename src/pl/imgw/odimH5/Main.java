@@ -17,8 +17,6 @@
 
 package pl.imgw.odimH5;
 
-import java.io.File;
-
 import pl.imgw.odimH5.controller.DataProcessorController;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
@@ -36,17 +34,9 @@ import pl.imgw.odimH5.util.MessageLogger;
  */
 public class Main {
 
-    public static final String VERSION = "2.14b_linux64";
+    //public static final String VERSION = "2.14b_linux64";
     public static final String ODIM_H5 = "OdimH5";
-    /**
-     * This is a temporary solution to make OdimH5 work with baltrad-frame-0.1.2 library.
-     * The following options should be passed as parameters via command line arguments parser.
-     */
-    public static final String SCHEME = "https";
-    public static final String APP_CTX = "BaltradDex";
-    public static final String ENTRY_ADDRESS = "dispatch.htm";
-    public static final int SO_TIMEOUT = 60000;
-    public static final int CONN_TIMEOUT = 60000;
+    
     // address separator
     public static final String ADDR_SEPARATOR = "/";
 
@@ -58,10 +48,10 @@ public class Main {
      */
     public static void main(String[] args) {
         
-        File file = new File(getProgPath());
+        /*File file = new File(getProgPath());
         if (!file.exists()) {
             file.mkdirs();
-        }
+        }*/
         
         LogsHandler.saveProgramLogs("System starts");
 
@@ -82,17 +72,16 @@ public class Main {
             cont.startProcessor(args);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
             LogsHandler.saveProgramLogs("DataProcessorController.startProcessor", e.getLocalizedMessage());
         }
 
     }
 
-    public static final String HOME = System.getProperty("user.home");
+    /*public static final String HOME = System.getProperty("user.home");
 
     
     public static String getProgPath() {
         return new File(HOME, ODIM_H5).getPath();
-    }
+    }*/
     
 }

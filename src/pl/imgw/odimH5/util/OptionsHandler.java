@@ -8,7 +8,6 @@ import java.io.File;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import pl.imgw.odimH5.Main;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 
 import com.sun.org.apache.xerces.internal.parsers.DOMParser;
@@ -62,7 +61,8 @@ public class OptionsHandler {
     public final static String S2N = "S2N";
 
     private static String getOptionPath() {
-        return new File(Main.getProgPath(), OPTION_XML_FILE).getPath();
+        InitAppUtil init = InitAppUtil.getInstance();
+        return new File(init.getConfDir(), OPTION_XML_FILE).getPath();
     }
     /**
      * 
@@ -182,13 +182,8 @@ public class OptionsHandler {
         if (baltradList.getLength() == 0) {
             return options;
         }
-
-        options.setSender(RainbowModel.getValueByName(baltradList.item(0),
-                SENDER, null));
         options.setHostAddress( RainbowModel.getValueByName( baltradList.item( 0 ),
                 HOST_ADDRESS, null) );
-        options.setPort( Integer.parseInt( RainbowModel.getValueByName( baltradList.item( 0 ),
-                PORT_NUMBER, null) ) );
         return options;
     }
 
@@ -297,11 +292,7 @@ public class OptionsHandler {
         // System.out.println("    <start_time>mm</start_time>");
         // System.out.println("    <" + REPETITION + " >mm</" + REPETITION +
         // ">");
-        System.out.println("        <" + HOST_ADDRESS + ">host_address</" + HOST_ADDRESS
-                + ">");
-        System.out.println("        <" + PORT_NUMBER + ">port_number</" + PORT_NUMBER
-                + ">");
-        System.out.println("        <" + SENDER + ">Baltrad.IMGW.pl</" + SENDER
+        System.out.println("        <" + HOST_ADDRESS + ">node_address</" + HOST_ADDRESS
                 + ">");
         System.out.println("    </baltrad>");
         System.out.println("</options>\n\n");

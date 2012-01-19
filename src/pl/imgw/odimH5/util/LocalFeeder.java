@@ -1,5 +1,5 @@
 /**
- * (C) 2010 INSTITUT OF METEOROLOGY AND WATER MANAGEMENT
+ * (C) 2010 INSTITUTE OF METEOROLOGY AND WATER MANAGEMENT
  */
 package pl.imgw.odimH5.util;
 
@@ -21,8 +21,8 @@ import name.pachler.nio.file.WatchKey;
 import name.pachler.nio.file.WatchService;
 
 import org.w3c.dom.Document;
+import org.apache.http.HttpResponse;
 
-import pl.imgw.odimH5.Main;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
@@ -31,8 +31,7 @@ import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPTransferType;
 import com.enterprisedt.net.ftp.FileTransferClient;
 
-import eu.baltrad.frame.model.BaltradFrame;
-import eu.baltrad.frame.model.BaltradFrameHandler;
+import eu.baltrad.frame.model.*;
 
 /**
  * 
@@ -157,7 +156,6 @@ public class LocalFeeder extends Thread {
                 fis.close();
 
             } catch (IOException e) {
-                e.printStackTrace();
             }
 
             Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose,
@@ -179,8 +177,6 @@ public class LocalFeeder extends Thread {
                     + " not supported");
             return;
         }
-
-        // System.out.println("nowy plik: " + newFileName);
 
         if (toBeSentFile != null && ftpOptions != null) {
 
@@ -274,41 +270,32 @@ public class LocalFeeder extends Thread {
                 && (toBeSentFile.getName().endsWith("h5") || toBeSentFile
                         .getName().endsWith("hdf"))
                 && !baltradOptions.isEmpty()) {
-
-            // System.out.println("sender: " + baltradOptions.getSender());
-            // System.out.println("server: " + baltradOptions.getServer());
-
-            BaltradFrameHandler bfh = new BaltradFrameHandler( Main.SCHEME,
-                    baltradOptions.getHostAddress(), baltradOptions.getPort(), Main.APP_CTX,
-                    Main.ENTRY_ADDRESS, Main.SO_TIMEOUT, Main.CONN_TIMEOUT );
-
-            String a = bfh
-                    .createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
-                            baltradOptions.getSender(), radarFullName,
-                            toBeSentFileName);
-
-            // System.out.print("BFDataHdr: ");
-            // System.out.println(a);
-
-            BaltradFrame bf = new BaltradFrame( Main.ADDR_SEPARATOR + Main.APP_CTX +
-                    Main.ADDR_SEPARATOR + Main.ENTRY_ADDRESS, a, toBeSentFile );
-
-            if (bfh.handleBF(bf) == 0) {
-
-                msgl.showMessage(radarName + ": file " + toBeSentFileName
-                        + " sent to BALTRAD", true);
-
+            
+            msgl.showMessage("Sending file " + toBeSentFileName + " to " + 
+                    baltradOptions.getHostAddress(), verbose);
+            
+            InitAppUtil init = InitAppUtil.getInstance();
+            
+            long timestamp = System.currentTimeMillis();
+            String signature = Protocol.getSignatureString(init.getKeystoreDir(), 
+                    init.getHostName(), timestamp);
+            Frame frame = Frame.postDataDeliveryRequest(baltradOptions.getHostAddress(), 
+                    init.getHostAddress(), init.getHostName(), timestamp, signature, toBeSentFile);
+                    
+            Handler handler = new Handler(init.getConnTimeout(), init.getSoTimeout());
+            HttpResponse response = handler.post(frame);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                msgl.showMessage("File " + toBeSentFile.getName() + " sent to " +
+                        baltradOptions.getHostAddress(), verbose);
             } else {
-                msgl.showMessage(radarName + " failed to send file to BALTRAD",
-                        true);
+                msgl.showMessage("Failed to send file " + toBeSentFile.getName() + " to " + 
+                        baltradOptions.getHostAddress(), verbose);
             }
         }
 
         originalFile.delete();
         if (toBeSentFile != null) {
-            
             toBeSentFile.delete();
-                
         }
 
     }
@@ -483,7 +470,7 @@ public class LocalFeeder extends Thread {
 
                     } else if (e.kind() == StandardWatchEventKind.OVERFLOW) {
                         System.out
-                                .println("OVERFLOW: more changes happened than we could retreive");
+                                .println("OVERFLOW: more changes happened than we could retrieve");
                     }
                 }
             } catch (Exception e) {

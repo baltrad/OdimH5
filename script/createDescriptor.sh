@@ -1,0 +1,75 @@
+###################################################################################
+#                                                                                 #
+# Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW     #
+#                                                                                 #
+# This file is part of the BaltradDex software.                                   #
+#                                                                                 #
+# BaltradDex is free software: you can redistribute it and/or modify              #
+# it under the terms of the GNU Lesser General Public License as published by     #
+# the Free Software Foundation, either version 3 of the License, or               #
+# (at your option) any later version.                                             #
+#                                                                                 #
+# BaltradDex is distributed in the hope that it will be useful,                   #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of                  #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                   #
+# GNU Lesser General Public License for more details.                             #
+#                                                                                 #
+# You should have received a copy of the GNU Lesser General Public License        #
+# along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.   # 
+#                                                                                 #
+###################################################################################
+#
+# Creates descriptor based on a given data file.                 
+#                                                                                       
+# 
+
+#!/bin/bash 
+
+usage() {
+    echo "Usage: createDescriptor.sh file descriptor platform object mode"
+    echo -e "\tfile :: Input file name, either rawdata or product" 
+    echo -e "\tdescriptor :: Output descriptor file name"
+    echo -e "\tplatform :: Type of processing software:"
+	echo -e "\t\tCASTOR: Météo France’s system"
+   	echo -e "\t\tEDGE: EEC Edge"
+    	echo -e "\t\tFROG: Gamic FROG, MURAN..."
+    	echo -e "\t\tIRIS: Sigmet IRIS"
+    	echo -e "\t\tNORDRAD: NORDRAD"
+    	echo -e "\t\tRADARNET: UKMO’s system"
+        echo -e "\t\tRAINBOW: Gematronik Rainbow"
+    echo -e "\tobject :: ODIMH5 file object type:"
+	echo -e "\t\tPVOL: polar volume"
+        echo -e "\t\tCVOL: carthesian volume"
+        echo -e "\t\tSCAN polar scan"
+        echo -e "\t\tRAY: single polar ray"
+        echo -e "\t\tAZIM: azimuthal object"
+        echo -e "\t\tIMAGE: 2-D cartesian image"
+        echo -e "\t\tCOMP: cartesian composite image(s)"
+        echo -e "\t\tXSEC: 2-D vertical cross section(s)"
+        echo -e "\t\tVP: 1-D vertical profile"
+        echo -e "\t\tPIC: embedded graphical image"
+    echo -e "\tmode :: Use v option for verbose mode" 
+}
+create_descriptor() {
+    lib_dir=${PWD//bin/lib}
+    share_dir=${PWD//bin/share}
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$lib_dir
+    java -jar $share_dir/odimH5.jar -i $1 -o $2 -p $3 -f $4 $5
+}
+if [ "$#" -ge "4" ] 
+then
+    if [ "$5" == "v" ] 
+    then
+        mode="-v"
+    else
+        mode=""
+    fi
+    create_descriptor $1 $2 $3 $4 $mode
+else
+    usage
+fi
+
+###################################################################################
+
+
+

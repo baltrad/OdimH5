@@ -1,0 +1,93 @@
+################################################################################
+
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+
+This file is part of the OdimH5 software.
+
+OdimH5 is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+OdimH5 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
+
+################################################################################
+
+OdimH5 converter software provides a set of scripts for convenient data 
+processing. The scripts are located in bin directory. 
+--------------------------------------------------------------------------------
+NOTE: It is not recommended to run odimH5.jar executable directly, unless there
+is a good reason to do so. Otherwise use only wrapper scripts. 
+--------------------------------------------------------------------------------
+
+The following scripts are available: 
+
+createDescriptor.sh :: Creates descriptor and dataset files corresponding to
+                       a given data file  
+
+Usage: createDescriptor.sh file descriptor platform object mode
+	file :: Input file name, either rawdata or product
+	descriptor :: Output descriptor file name
+	platform :: Type of processing software:
+		CASTOR: Météo France’s system
+		EDGE: EEC Edge
+		FROG: Gamic FROG, MURAN...
+		IRIS: Sigmet IRIS
+		NORDRAD: NORDRAD
+		RADARNET: UKMO’s system
+		RAINBOW: Gematronik Rainbow
+	object :: ODIMH5 file object type:
+		PVOL: polar volume
+		CVOL: carthesian volume
+		SCAN polar scan
+		RAY: single polar ray
+		AZIM: azimuthal object
+		IMAGE: 2-D cartesian image
+		COMP: cartesian composite image(s)
+		XSEC: 2-D vertical cross section(s)
+		VP: 1-D vertical profile
+		PIC: embedded graphical image
+	mode :: Use v option for verbose mode
+--------------------------------------------------------------------------------
+convertFromDescriptor.sh :: Converts given native data file into hdf5 file
+                            using the descriptor
+
+Usage: convertDescriptor.sh descriptor file mode
+	descriptor :: Input descriptor file name
+	file :: Output data file name (hdf5 format)
+	mode :: Use v option for verbose mode
+--------------------------------------------------------------------------------
+convertNative.sh :: Converts given native data file directly into hdf5 file
+
+Usage: convertDescriptor.sh descriptor file mode
+	descriptor :: Input descriptor file name
+	file :: Output data file name (hdf5 format)
+	mode :: Use v option for verbose mode
+-------------------------------------------------------------------------------- 
+feedToBaltrad.sh :: Sends given file to BALTRAD node
+
+Usage: convertNative.sh input_file node_address mode
+	input_file :: Input file name (hdf5 format)
+	node_address :: BALTRAD node address, 
+                        e.g. http://127.0.0.1:8084/BaltradDex/dispatch.htm
+	mode :: Use v option for verbose mode
+--------------------------------------------------------------------------------
+startFeeder.sh :: Runs BALTRAD feeder. BALTRAD feeder watches a given directory
+                  specified in conf/options.xml file. Once a new file is stored
+                  in this directory, it is sent to a BALTRAD node with a given
+                  address specified on conf/options.xml file. Refer to OdimH5
+                  manual for more information.
+
+Usage: startFeeder.sh mode
+	mode :: Use v option for verbose mode    
+
+################################################################################
+
+
+ 

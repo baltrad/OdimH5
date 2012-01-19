@@ -14,8 +14,6 @@ import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import pl.imgw.odimH5.Main;
-
 /**
  * 
  * /Class description/
@@ -26,10 +24,12 @@ import pl.imgw.odimH5.Main;
  */
 public class LogsHandler {
 
-    public static final String PROGRAM_LOGS_FILE = "error.log";
+    public static final String LOG_FILE = "error.log";
 
     private static String getLogPath() {
-        return new File(Main.getProgPath(), PROGRAM_LOGS_FILE).getPath();
+        //return new File(Main.getProgPath(), PROGRAM_LOGS_FILE).getPath();
+        InitAppUtil init = InitAppUtil.getInstance();
+        return init.getLogDir() + File.separator + LOG_FILE;
     }
     
     /**

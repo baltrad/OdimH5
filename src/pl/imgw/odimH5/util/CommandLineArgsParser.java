@@ -17,8 +17,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.PosixParser;
 
-import pl.imgw.odimH5.Main;
-
 /**
  * Class implementing command line arguments parser functionality.
  * 
@@ -38,10 +36,7 @@ public class CommandLineArgsParser {
     public final static String VERBOSE_OPTION = "v";
     public final static String HELP_OPTION = "h";
     public final static String CONTINOUOS_OPTION = "c";
-    public final static String HOST_ADDRESS_OPTION = "a";
-    public final static String PORT_NUMBER_OPTION = "n";
-    public final static String SENDER_OPTION = "s";
-    public final static String RADAR_OPTION = "r";
+    public final static String NODE_ADDRESS_OPTION = "a";
 
     private final static String START_COMMAND = "java -jar odimH5.jar -i <descriptor_file : "
             + "data_file> -f <object> -p <platform> -o <output_file> -c <file_format> "
@@ -66,17 +61,8 @@ public class CommandLineArgsParser {
 
     private final static String CONTINOUOS_DESCRIPTION = "Baltrad feeder continuous work mode\n";
 
-    private final static String HOST_ADDRESS_DESCRIPTION = "send file to server\n"
-            + "<arg>\n server address, e.g. 127.0.0.1, baltrad.imgw.pl ...\n";
-
-    private final static String PORT_NUMBER_DESCRIPTION = "send file to server\n"
-            + "<arg>\n port number, e.g. 8443\n";
-
-    private final static String SENDER_DESCRIPTION = "sender\n"
-            + "<arg>\n sender name\n";
-
-    private final static String RADAR_DESCRIPTION = "radar name\n"
-            + "<arg>\n radar name\n";
+    private final static String NODE_ADDRESS_DESCRIPTION = "send file to server\n"
+            + "<arg>\n full server address, e.g. http://localhost:8084/BaltradDex/dispatch.htm\n";
 
     private final static String VERBOSE_DESCRIPTION = "verbose mode option";
 
@@ -111,24 +97,9 @@ public class CommandLineArgsParser {
                 .withDescription(CONTINOUOS_DESCRIPTION).create(
                         CONTINOUOS_OPTION);
 
-        Option address = OptionBuilder.withArgName(HOST_ADDRESS_OPTION).withArgName(
-                "arg").hasArg().withDescription(HOST_ADDRESS_DESCRIPTION).create(
-                HOST_ADDRESS_OPTION);
-
-        Option port = OptionBuilder.withArgName(PORT_NUMBER_OPTION).withArgName(
-                "arg").hasArg().withDescription(PORT_NUMBER_DESCRIPTION).create(
-                PORT_NUMBER_OPTION);
-
-        Option sender = OptionBuilder.withArgName(SENDER_OPTION).withArgName(
-                "arg").hasArg().withDescription(SENDER_DESCRIPTION).create(
-                SENDER_OPTION);
-
-        Option radar = OptionBuilder.withArgName(RADAR_OPTION).withArgName(
-                "arg").hasArg().withDescription(RADAR_DESCRIPTION).create(
-                RADAR_OPTION);
-
-        // Option descriptor = OptionBuilder.withArgName(DESCRIPTOR_OPTION)
-        // .withDescription(DESCRIPTOR_DESCRIPTION).create(DESCRIPTOR_OPTION);
+        Option address = OptionBuilder.withArgName(NODE_ADDRESS_OPTION).withArgName(
+                "arg").hasArg().withDescription(NODE_ADDRESS_DESCRIPTION).create(
+                NODE_ADDRESS_OPTION);
 
         Option verbose = OptionBuilder.withArgName(VERBOSE_OPTION)
                 .withDescription(VERBOSE_DESCRIPTION).create(VERBOSE_OPTION);
@@ -142,9 +113,6 @@ public class CommandLineArgsParser {
         options.addOption(output_file);
         options.addOption(continuous);
         options.addOption(address);
-        options.addOption( port );
-        options.addOption(sender);
-        options.addOption(radar);
         options.addOption(verbose);
         options.addOption(help);
     }
@@ -180,9 +148,7 @@ public class CommandLineArgsParser {
 
                 || cmd.hasOption(CONTINOUOS_OPTION)
 
-        || cmd.hasOption(HOST_ADDRESS_OPTION) && cmd.hasOption( PORT_NUMBER_OPTION ) &&
-                cmd.hasOption(SENDER_OPTION)
-                && cmd.hasOption(RADAR_OPTION))) {
+        || cmd.hasOption(NODE_ADDRESS_OPTION))) {
             printHelpAndExit(1, START_COMMAND, options);
         }
     }
@@ -225,7 +191,8 @@ public class CommandLineArgsParser {
     public void printHelpAndExit(int exitCode, String startCommand,
             Options options) {
         // Help formatter
-        System.out.println("OdimH5 version " + Main.VERSION
+        InitAppUtil init = InitAppUtil.getInstance();
+        System.out.println("OdimH5 version " + init.getAppVersion()
                 + ". Converter software for OPERA Data Information Model\n");
         HelpFormatter helpFormatter = new HelpFormatter();
         helpFormatter.printHelp(startCommand, options);

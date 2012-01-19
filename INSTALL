@@ -1,6 +1,6 @@
 ################################################################################
 
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the OdimH5 software.
 
@@ -20,40 +20,23 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 ################################################################################
 
 
-Installation of OdimH5 software is performed by calling specified target within
-ant script. Typicall installation procedure is realized by issuing the following
-command:
+Installation of OdimH5 software is driven by ant and requires several options
+passed to the build script. The following options are required:
 
-$ ant install
+prefix :: installation prefix / target directory
+hostname :: name of the host on which the installation is performed, preferably 
+a domain name  
+system :: operating system type, possible choices are 'linux' or 'win'
+arch :: system architecture, possible choices are '32' and '64' 
 
-In this case the software will be installed with 64-bit Unix libraries in 
-the default directory /opt.
-For other operating systems use one of the following parameter:
+Example of installation command:
 
-* 32-bit Unix
-$ ant -Dversion=32 install
+$ ant -Dprefix=/home/odim -Dhostname=myhost.org -Dsystem=linux -Darch=64 install
 
-* 32-bit Windows
-$ ant -Dversion=win32 install
+In this case the software will be installed in linux/unix-type system under 
+/home/odim directory using a set of 64-bit native libraries.  
 
-* 64-bit Windows
-$ ant -Dversion=win64 install 
- 
-In order to override installation in default directory, you can provide 
-a paramater for the ant installation script:
-
-$ ant -Dprefix=/my/install/dir install
-
-The prefix denotes target installation directory.
-
-Dependencies: OdimH5 requires some libraries from the HDF Java Object Package.
-The set of files includes the following shared libraries: 
-
-- libjhdf.so
-- libjhdf5.so
-
-These libraries must be placed in the folder listed on your java.library.path 
-system variable.
+################################################################################
 
 
  

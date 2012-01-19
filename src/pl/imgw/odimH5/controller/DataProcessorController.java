@@ -12,8 +12,9 @@ import ncsa.hdf.hdf5lib.HDF5Constants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.apache.http.HttpResponse;
+import java.io.File;
 
-import pl.imgw.odimH5.Main;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
 import pl.imgw.odimH5.model.rainbow.ModelImage;
@@ -27,8 +28,9 @@ import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
 import pl.imgw.odimH5.util.OptionsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
-import eu.baltrad.frame.model.BaltradFrame;
-import eu.baltrad.frame.model.BaltradFrameHandler;
+import eu.baltrad.frame.model.*;
+import pl.imgw.odimH5.util.InitAppUtil;
+
 
 /**
  * Controller class for data processing routines.
@@ -63,7 +65,6 @@ public class DataProcessorController {
      */
     @SuppressWarnings("static-access")
     public void startProcessor(String[] args) throws Exception {
-
         // Parse command line arguments
         cmd.parseCommandLineArgs(args);
 
@@ -207,41 +208,31 @@ public class DataProcessorController {
                 worker.start();
             } catch (Exception e) {
                 LogsHandler.saveProgramLogs(e.getMessage());
-                e.printStackTrace();
             }
 
-        } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
-                && cmd.hasArgument(cmd.HOST_ADDRESS_OPTION)
-                && cmd.hasArgument(cmd.SENDER_OPTION)
-                && cmd.hasArgument(cmd.RADAR_OPTION)) {
-
-            msgl.showMessage("Sending file to server", true);
-
-            int port = 0;
-            
-            port = Integer.parseInt(cmd.getArgumentValue(cmd.PORT_NUMBER_OPTION));
-            
-            BaltradFrameHandler bfh = new BaltradFrameHandler( Main.SCHEME,
-                    cmd.getArgumentValue(cmd.HOST_ADDRESS_OPTION), port, Main.APP_CTX,
-                    Main.ENTRY_ADDRESS, Main.SO_TIMEOUT, Main.CONN_TIMEOUT );
-
-            // System.out.print("BFDataHdr: ");
-            // System.out.println(a);
-
-
-            String a = bfh.createDataHdr(BaltradFrameHandler.MIME_MULTIPART,
-                    cmd.getArgumentValue(cmd.SENDER_OPTION),
-                    cmd.getArgumentValue(cmd.RADAR_OPTION),
-                    cmd.getArgumentValue(cmd.INPUT_FILE_OPTION));
-
-            // System.out.println("BFDataHdr:");
-            // System.out.println(a);
-
-            BaltradFrame bf = new BaltradFrame(a,
-                    cmd.getArgumentValue(cmd.INPUT_FILE_OPTION));
-
-            bfh.handleBF(bf);
-
+        } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION) && 
+                cmd.hasArgument(cmd.NODE_ADDRESS_OPTION)) {
+            msgl.showMessage("Sending file to " + 
+                    cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), verbose);
+            InitAppUtil init = InitAppUtil.getInstance();
+            long timestamp = System.currentTimeMillis();
+            String signature = Protocol.getSignatureString(init.getKeystoreDir(), 
+                    init.getHostName(), timestamp);
+            Frame frame = Frame.postDataDeliveryRequest(
+                    cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), init.getHostAddress(),
+                    init.getHostName(), timestamp, signature, 
+                    new File(cmd.getArgumentValue(cmd.INPUT_FILE_OPTION)));
+                    
+            Handler handler = new Handler(init.getConnTimeout(), init.getSoTimeout());
+            HttpResponse response = handler.post(frame);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                msgl.showMessage("File " + cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + " sent to "
+                        + cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), verbose);
+            } else {
+                msgl.showMessage("Failed to send file " + cmd.getArgumentValue(
+                    cmd.INPUT_FILE_OPTION) + " to " + cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), 
+                        verbose);
+            }
         }
     }
 

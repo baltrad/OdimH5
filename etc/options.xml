@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<!-- FTP options -->
+<options>
+    <radar name="LEG">
+        <WMO_id>33333</WMO_id>
+        <file_name>FILE_NAME_PREFIX</file_name>
+        <directory>LOCAL_DIR</directory>
+        <nrays>360</nrays>
+        <format>file format</format>
+    </radar>
+    <ftp>
+        <radars>LIST OF RADARS</radars>
+        <address>FTP_SERVER</address>
+        <login>LOGIN</login>
+        <password>PASS</password>
+        <directory>DIR</directory>
+    </ftp>
+    <baltrad>
+        <host_address>host_address</host_address>
+    </baltrad>
+</options>
+

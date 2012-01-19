@@ -17,96 +17,157 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 -->
-<project name="OdimH5" default="main" basedir=".">
-		<!-- Sets variables which can later be used. -->
-		<!-- The value of a property is accessed via ${} -->
-		<property name="version" value="64" />
-		<property name="app.name" value="odimh5" />
-		<property name="main.class" value="pl.imgw.odimH5.Main" />
-		<property name="src.dir" location="src" />
-		<property name="lib.dir" location="lib" />
-		<property name="lib.version.dir" location="lib${version}" />
-		<property name="lib.native.dir" location="lib${version}/native" />
-		<property name="build.dir" location="build" />
-		<property name="dist.dir" location="dist" />
-		<property name="doc.dir" location="doc" />
+<project name="OdimH5" default="jar" basedir=".">
+    <property name="app.name" value="odimH5" />
+    <property name="app.version" value="2.14b"/>
+    <property name="main.class" value="pl.imgw.odimH5.Main" />
+    <property name="src.dir" value="src" />
+    <property name="lib.dir" value="lib" />
+    <property name="lib.hdf5.dir" value="${lib.dir}/hdf5"/>
+    <property name="build.dir" value="build" />
+    <property name="dist.dir" value="dist" />
+    <property name="share.dir" value="share"/>
+    <property name="bin.dir" value="bin"/>
+    <property name="doc.dir" value="doc" />
+    <property name="javadocs.dir" value="javadocs"/>
+    <property name="javadocs.src.dir" value="${src.dir}/pl/imgw/odimH5"/>
+    <property name="script.dir" value="script"/>
+    <property name="conf.dir" value="conf"/>
+    <property name="util.pkg" value="pl/imgw/odimH5/util"/>
+    <property name="log.dir" value="log"/>
+    <property name="etc.dir" value="etc"/>
+    <property name="options.file" value="options.xml"/>
+    <property name="keystore.dir" value=".keystore"/>
+    <property name="properties.file" value="odim.properties"/>
+    <!-- Override this property with -Dhost.address -->
+    <property name="host.address" value="http://localhost"/>
+    <property name="conn.timeout" value="60000"/>
+    <property name="so.timeout" value="60000"/>
 
-		<property name="prefix" value="/opt" />
+    <!-- Library path -->
+    <path id="lib.path">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
 
-		<!-- Library path -->
-		<path id="lib.path">
-			<fileset dir="${lib.dir}" includes="**/*.jar"/>
-			<fileset dir="${lib.version.dir}" includes="**/*.jar" />
-		</path>
+    <!-- Deletes the existing build, doc and dist directory-->
+    <target name="clean">
+        <delete dir="${build.dir}" />
+        <delete dir="${doc.dir}" />
+        <delete dir="${dist.dir}" />
+        <delete dir="${javadocs.dir}"/>
+    </target>
 
-		<!-- Deletes the existing build, doc and dist directory-->
-		<target name="clean">
-			<delete dir="${build.dir}" />
-			<delete dir="${doc.dir}" />
-			<delete dir="${dist.dir}" />
-		</target>
+    <!-- Create directories -->
+    <target name="init">
+        <fail unless="prefix">Please specify installation prefix, e.g -Dprefix=/opt</fail>
+        <fail unless="hostname">Please specify hostname, e.g. -Dhostname=rainbow.imgw.pl</fail>
+        <fail unless="system">Please specify system type: -Dsystem=linux|win</fail>
+        <fail unless="arch">Please specify system architecture: -Darch=32|64</fail>
+        
+        <property name="lib.version.dir" value="${lib.hdf5.dir}/${system}/${arch}"/>
+        
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${doc.dir}"/>
+    </target>
+    
+    <!-- Generates properties file -->
+    <target name="gen-properties">
+        <chmod file="${script.dir}/init-properties.sh" perm="755"/>
+        <exec executable="${script.dir}/init-properties.sh">
+            <arg value="${src.dir}/${util.pkg}/${properties.file}"/>
+            <arg value="${app.version}"/>
+            <arg value="${hostname}"/>
+            <arg value="${host.address}"/>
+            <arg value="${prefix}/${app.name}/${keystore.dir}"/>
+            <arg value="${prefix}/${app.name}/${conf.dir}"/>
+            <arg value="${prefix}/${app.name}/${log.dir}"/>
+            <arg value="${conn.timeout}"/>
+            <arg value="${so.timeout}"/>
+        </exec> 
+    </target>
+    
+    <!-- Generate keystore -->
+    <target name="gen-keystore">
+        <chmod file="${script.dir}/init-keystore.sh" perm="755"/>
+        <exec executable="${script.dir}/init-keystore.sh">
+            <arg value="${keystore.dir}"/>
+            <arg value="${hostname}"/>    
+        </exec> 
+    </target>
 
-		<target name="init">
-			<mkdir dir="${build.dir}" />
-			<mkdir dir="${dist.dir}" />
-			<mkdir dir="${doc.dir}" />
-		</target>
+    <!-- Compiles the java code (including the usage of library for JUnit -->
+    <target name="compile" depends="init">
+        <javac encoding="UTF-8" deprecation="on" srcdir="${src.dir}" destdir="${build.dir}" 
+               includeantruntime="false">
+            <include name="**/*.java"/>
+            <classpath refid="lib.path"/>
+        </javac>
+    </target>
 
-		<!-- Compiles the java code (including the usage of library for JUnit -->
-		<target name="compile" depends="clean, init">
-			<javac encoding="UTF-8" deprecation="on" srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
-				<include name="**/*.java" />
-				<classpath refid="lib.path" />
-			</javac>
-		</target>
-
-		<!-- Creates Javadoc -->
-		<target name="doc" depends="compile">
-			<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${doc.dir}">
-				<!-- Define which files / directory should get included, we include all -->
-				<fileset dir="${src.dir}">
-					<include name="**" />
-				</fileset>
-				<classpath refid="lib.path" />
-			</javadoc>
-		</target>
-
-		<!--Creates the deployable jar file  -->
-		<target name="jar" depends="compile">
-			<jar destfile="${dist.dir}\${app.name}.jar" basedir="${build.dir}">
-				<zipgroupfileset dir="${lib.dir}" includes="**/*.jar" />
-				<zipgroupfileset dir="${lib.version.dir}" includes="**/*.jar" />
-				<manifest>
-					<attribute name="Main-Class" value="${main.class}" />
-				</manifest>
-			</jar>
-		</target>
-
-		<target name="install">
-			<mkdir dir="${prefix}/${app.name}" />
-			<copy todir="${prefix}/${app.name}" flatten="true">
-				<fileset dir="${dist.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-			</copy>
-			<copy todir="${prefix}/${app.name}/lib" flatten="true">
-				<fileset dir="${lib.native.dir}">
-					<include name="**/*.so" />
-				</fileset>
-			</copy>
-			<chmod file="${prefix}/${app.name}/${app.name}.jar" perm="755" />
-			<echo file="${prefix}/${app.name}/${app.name}">#!/bin/sh
-java -Djava.library.path=${prefix}/${app.name}/lib/ -jar ${prefix}/${app.name}/${app.name}.jar $@</echo>
-			<chmod file="${prefix}/${app.name}/${app.name}" perm="755" />
-			<copy file="${prefix}/${app.name}/${app.name}" todir="/usr/bin"/>
-			<chmod file="/usr/bin/${app.name}" perm="755" />
-			<echo message="==========================" />
-			<echo message="Installation completed" />
-			<echo message="run program by typing ${app.name}" />
-		</target>
-
-		<target name="main" depends="jar, doc">
-			<description>Main target</description>
-		</target>
-
-	</project>
+    <!--Creates the deployable jar file  -->
+    <target name="jar" depends="compile, gen-properties">
+        <jar destfile="${dist.dir}/${app.name}.jar" basedir="${build.dir}">
+            <zipgroupfileset dir="${lib.dir}" includes="**/*.jar"/>
+            <zipgroupfileset dir="${lib.version.dir}" includes="**/*.jar"/>
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+            <!-- Include properties file to be used via classloader -->
+            <fileset dir="${src.dir}">
+                <include name="**/*.properties"/>
+            </fileset>
+        </jar>
+    </target>
+        
+    <!-- Installs OdimH5 -->
+    <target name="install" depends="jar, gen-keystore"> 
+        <mkdir dir="${prefix}/${app.name}"/>
+        <mkdir dir="${prefix}/${app.name}/${lib.dir}"/>
+        <mkdir dir="${prefix}/${app.name}/${bin.dir}"/>
+        <mkdir dir="${prefix}/${app.name}/${share.dir}"/>
+        <mkdir dir="${prefix}/${app.name}/${conf.dir}"/>
+        <mkdir dir="${prefix}/${app.name}/${log.dir}"/>
+        <copy todir="${prefix}/${app.name}/${share.dir}" flatten="true">
+            <fileset dir="${dist.dir}">
+                <include name="**/*.jar" />
+            </fileset>
+        </copy>
+        <move todir="${prefix}/${app.name}" file="${keystore.dir}"/>
+        <copy todir="${prefix}/${app.name}/lib" flatten="true">
+            <fileset dir="${lib.version.dir}/native">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <copy todir="${prefix}/${app.name}/${conf.dir}" file="${etc.dir}/${options.file}"/>
+        <!-- Copy wrapper scripts -->
+        <copy todir="${prefix}/${app.name}/${bin.dir}" file="${script.dir}/createDescriptor.sh"/>
+        <chmod file="${prefix}/${app.name}/${bin.dir}/createDescriptor.sh" perm="755"/>
+        <copy todir="${prefix}/${app.name}/${bin.dir}" file="${script.dir}/convertDescriptor.sh"/>
+        <chmod file="${prefix}/${app.name}/${bin.dir}/convertDescriptor.sh" perm="755"/>
+        <copy todir="${prefix}/${app.name}/${bin.dir}" file="${script.dir}/convertNative.sh"/>
+        <chmod file="${prefix}/${app.name}/${bin.dir}/convertNative.sh" perm="755"/>
+        <copy todir="${prefix}/${app.name}/${bin.dir}" file="${script.dir}/feedToBaltrad.sh"/>
+        <chmod file="${prefix}/${app.name}/${bin.dir}/feedToBaltrad.sh" perm="755"/>
+        <copy todir="${prefix}/${app.name}/${bin.dir}" file="${script.dir}/startFeeder.sh"/>
+        <chmod file="${prefix}/${app.name}/${bin.dir}/startFeeder.sh" perm="755"/>
+        
+        <chmod file="${prefix}/${app.name}/${share.dir}/${app.name}.jar" perm="755"/>
+        <echo message="=========================="/>
+        <echo message="Installation completed"/>
+        <echo message="Run program using scripts located in ${bin.dir} directory"/>
+    </target>
+    
+    <!-- Generate source code documentation -->
+    <target name="javadocs">
+        <mkdir dir="${javadocs.dir}"/>
+        <javadoc sourcepath="${src.dir}" destdir="${javadocs.dir}"
+            classpath="${src.dir}" author="true" version="true"
+            use="true" windowtitle="${app.name} API"
+            doctitle="&lt;h1&gt;${app.name}&lt;/h1&gt;">
+            <fileset dir="${javadocs.src.dir}">
+                <include name="**/*.java"/>
+            </fileset> 
+         </javadoc>
+    </target>
+</project>
