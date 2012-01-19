@@ -43,6 +43,12 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     <property name="host.address" value="http://localhost"/>
     <property name="conn.timeout" value="60000"/>
     <property name="so.timeout" value="60000"/>
+    
+    <property environment="env"/>
+    <property name="prefix" value="${env.PREFIX}"/>
+    <property name="hostname" value="${env.HOSTNAME}"/>
+    <property name="system" value="${env.SYSTEM}"/>
+    <property name="arch" value="${env.ARCH}"/>
 
     <!-- Library path -->
     <path id="lib.path">
@@ -63,9 +69,8 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
         <fail unless="hostname">Please specify hostname, e.g. -Dhostname=rainbow.imgw.pl</fail>
         <fail unless="system">Please specify system type: -Dsystem=linux|win</fail>
         <fail unless="arch">Please specify system architecture: -Darch=32|64</fail>
-        
+        <!-- System dependent library path -->
         <property name="lib.version.dir" value="${lib.hdf5.dir}/${system}/${arch}"/>
-        
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${dist.dir}"/>
         <mkdir dir="${doc.dir}"/>
