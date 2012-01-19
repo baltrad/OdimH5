@@ -45,10 +45,11 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     <property name="so.timeout" value="60000"/>
     
     <property environment="env"/>
-    <property name="prefix" value="${env.PREFIX}"/>
+    
+    <!--property name="prefix" value="${env.PREFIX}"/>
     <property name="hostname" value="${env.HOSTNAME}"/>
     <property name="system" value="${env.SYSTEM}"/>
-    <property name="arch" value="${env.ARCH}"/>
+    <property name="arch" value="${env.ARCH}"/-->
 
     <!-- Library path -->
     <path id="lib.path">
