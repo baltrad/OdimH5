@@ -46,10 +46,10 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     
     <property environment="env"/>
     
-    <!--property name="prefix" value="${env.PREFIX}"/>
+    <property name="prefix" value="${env.PREFIX}"/>
     <property name="hostname" value="${env.HOSTNAME}"/>
     <property name="system" value="${env.SYSTEM}"/>
-    <property name="arch" value="${env.ARCH}"/-->
+    <property name="arch" value="${env.ARCH}"/>
 
     <!-- Library path -->
     <path id="lib.path">
@@ -59,7 +59,6 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     <!-- Deletes the existing build, doc and dist directory-->
     <target name="clean">
         <delete dir="${build.dir}" />
-        <delete dir="${doc.dir}" />
         <delete dir="${dist.dir}" />
         <delete dir="${javadocs.dir}"/>
     </target>
