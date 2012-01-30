@@ -33,8 +33,9 @@ http://127.0.0.1:8084/BaltradDex/dispatch.htm"
     echo -e "\tmode :: Use v option for verbose mode" 
 }
 feed_to_baltrad() {
-    lib_dir=${PWD//bin/lib}
-    share_dir=${PWD//bin/share}
+    basedir=`dirname $0`
+    lib_dir=${basedir//bin/lib}
+    share_dir=${basedir//bin/share}
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$lib_dir
     java -jar $share_dir/odimH5.jar -i $1 -a $2 $3
 }

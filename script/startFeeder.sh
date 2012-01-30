@@ -27,8 +27,9 @@
 
 start_feeder() {
     echo "Use v option for verbose mode"
-    lib_dir=${PWD//bin/lib}
-    share_dir=${PWD//bin/share}
+    basedir=`dirname $0`
+    lib_dir=${basedir//bin/lib}
+    share_dir=${basedir//bin/share}
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$lib_dir
     java -jar $share_dir/odimH5.jar -c $1 &
 }
