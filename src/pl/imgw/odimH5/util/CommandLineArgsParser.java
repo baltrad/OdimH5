@@ -62,7 +62,7 @@ public class CommandLineArgsParser {
     private final static String CONTINOUOS_DESCRIPTION = "Baltrad feeder continuous work mode\n";
 
     private final static String NODE_ADDRESS_DESCRIPTION = "send file to server\n"
-            + "<arg>\n full server address, e.g. http://localhost:8084/BaltradDex/dispatch.htm\n";
+            + "<arg>\n server address, e.g. http://localhost:8084\n";
 
     private final static String VERBOSE_DESCRIPTION = "verbose mode option";
 

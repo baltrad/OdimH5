@@ -28,8 +28,7 @@ import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
 import pl.imgw.odimH5.util.OptionsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
-import eu.baltrad.frame.model.*;
-import pl.imgw.odimH5.util.InitAppUtil;
+import pl.imgw.odimH5.util.*;
 
 
 /**
@@ -215,24 +214,14 @@ public class DataProcessorController {
             msgl.showMessage("Sending file to " + 
                     cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), verbose);
             InitAppUtil init = InitAppUtil.getInstance();
-            long timestamp = System.currentTimeMillis();
-            String signature = Protocol.getSignatureString(init.getKeystoreDir(), 
-                    init.getHostName(), timestamp);
-            Frame frame = Frame.postDataDeliveryRequest(
-                    cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), init.getHostAddress(),
-                    init.getHostName(), timestamp, signature, 
+            
+            // Feed to BALTRAD
+            BaltradFeeder baltradFeeder = new BaltradFeeder(
+                    cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), init, 
                     new File(cmd.getArgumentValue(cmd.INPUT_FILE_OPTION)));
-                    
-            Handler handler = new Handler(init.getConnTimeout(), init.getSoTimeout());
-            HttpResponse response = handler.post(frame);
-            if (response.getStatusLine().getStatusCode() == 200) {
-                msgl.showMessage("File " + cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + " sent to "
-                        + cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), verbose);
-            } else {
-                msgl.showMessage("Failed to send file " + cmd.getArgumentValue(
-                    cmd.INPUT_FILE_OPTION) + " to " + cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), 
-                        verbose);
-            }
+            baltradFeeder.feedToBaltrad();
+            msgl.showMessage(baltradFeeder.getMessage(), verbose);
+            
         }
     }
 

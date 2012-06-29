@@ -4,6 +4,7 @@
 package pl.imgw.odimH5.util;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -21,7 +22,6 @@ import name.pachler.nio.file.WatchKey;
 import name.pachler.nio.file.WatchService;
 
 import org.w3c.dom.Document;
-import org.apache.http.HttpResponse;
 
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
@@ -30,8 +30,6 @@ import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPTransferType;
 import com.enterprisedt.net.ftp.FileTransferClient;
-
-import eu.baltrad.frame.model.*;
 
 /**
  * 
@@ -273,24 +271,14 @@ public class LocalFeeder extends Thread {
             
             msgl.showMessage("Sending file " + toBeSentFileName + " to " + 
                     baltradOptions.getHostAddress(), verbose);
-            
             InitAppUtil init = InitAppUtil.getInstance();
             
-            long timestamp = System.currentTimeMillis();
-            String signature = Protocol.getSignatureString(init.getKeystoreDir(), 
-                    init.getHostName(), timestamp);
-            Frame frame = Frame.postDataDeliveryRequest(baltradOptions.getHostAddress(), 
-                    init.getHostAddress(), init.getHostName(), timestamp, signature, toBeSentFile);
-                    
-            Handler handler = new Handler(init.getConnTimeout(), init.getSoTimeout());
-            HttpResponse response = handler.post(frame);
-            if (response.getStatusLine().getStatusCode() == 200) {
-                msgl.showMessage("File " + toBeSentFile.getName() + " sent to " +
-                        baltradOptions.getHostAddress(), verbose);
-            } else {
-                msgl.showMessage("Failed to send file " + toBeSentFile.getName() + " to " + 
-                        baltradOptions.getHostAddress(), verbose);
-            }
+            // Feed to BALTRAD
+            BaltradFeeder baltradFeeder = new BaltradFeeder(
+                    baltradOptions.getHostAddress(), init, toBeSentFile);
+            baltradFeeder.feedToBaltrad();
+            msgl.showMessage(baltradFeeder.getMessage(), verbose);
+            
         }
 
         originalFile.delete();

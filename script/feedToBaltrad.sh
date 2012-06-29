@@ -28,8 +28,7 @@
 usage() {
     echo "Usage: convertNative.sh input_file node_address mode"
     echo -e "\tinput_file :: Input file name (hdf5 format)" 
-    echo -e "\tnode_address :: BALTRAD node address, e.g. \
-http://127.0.0.1:8084/BaltradDex/dispatch.htm"
+    echo -e "\tnode_address :: BALTRAD node address, e.g. http://127.0.0.1:8084"
     echo -e "\tmode :: Use v option for verbose mode" 
 }
 feed_to_baltrad() {
