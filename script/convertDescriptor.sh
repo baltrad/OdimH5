@@ -36,7 +36,7 @@ convert_descriptor() {
     lib_dir=${base_dir//bin/lib}
     share_dir=${base_dir//bin/share}
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$lib_dir
-    java -jar $share_dir/odimH5.jar -i $1 -o $2 $3
+    java -Xms64m -Xmx256m -jar $share_dir/odimH5.jar -i $1 -o $2 $3
 }
 
 if [ "$#" -ge "2" ] 
