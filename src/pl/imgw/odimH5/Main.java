@@ -73,6 +73,7 @@ public class Main {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             LogsHandler.saveProgramLogs("DataProcessorController.startProcessor", e.getLocalizedMessage());
+            e.printStackTrace();
         }
 
     }

@@ -60,9 +60,13 @@ public class OptionsHandler {
     public final static String PAC = "PAC";
     public final static String S2N = "S2N";
 
+//    private static String getOptionPath() {
+//        InitAppUtil init = InitAppUtil.getInstance();
+//        return new File(init.getConfDir(), OPTION_XML_FILE).getPath();
+//    }
+    
     private static String getOptionPath() {
-        InitAppUtil init = InitAppUtil.getInstance();
-        return new File(init.getConfDir(), OPTION_XML_FILE).getPath();
+        return new File(OPTION_XML_FILE).getPath();
     }
     /**
      * 
