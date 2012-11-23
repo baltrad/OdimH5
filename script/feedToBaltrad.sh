@@ -28,15 +28,15 @@
 usage() {
     echo "Usage: convertNative.sh input_file node_address mode"
     echo -e "\tinput_file :: Input file name (hdf5 format)" 
-    echo -e "\tnode_address :: BALTRAD node address, e.g. \
-http://127.0.0.1:8084/BaltradDex/dispatch.htm"
+    echo -e "\tnode_address :: BALTRAD node address, e.g. http://127.0.0.1:8084"
     echo -e "\tmode :: Use v option for verbose mode" 
 }
 feed_to_baltrad() {
-    lib_dir=${PWD//bin/lib}
-    share_dir=${PWD//bin/share}
+    base_dir=$(cd `dirname $0` && pwd)
+    lib_dir=${base_dir//bin/lib}
+    share_dir=${base_dir//bin/share}
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$lib_dir
-    java -jar $share_dir/odimH5.jar -i $1 -a $2 $3
+    java -Xms64m -Xmx256m -jar $share_dir/odimH5.jar -i $1 -a $2 $3
 }
 
 if [ "$#" -ge "2" ] 

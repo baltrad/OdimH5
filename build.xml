@@ -158,6 +158,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
         <echo message="Run program using scripts located in ${bin.dir} directory"/>
     </target>
     
+    <!-- To be executed on Hudson -->
     <target name="hudson" depends="init,jar"/>
     
     <!-- Generate source code documentation -->

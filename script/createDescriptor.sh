@@ -51,10 +51,11 @@ usage() {
     echo -e "\tmode :: Use v option for verbose mode" 
 }
 create_descriptor() {
-    lib_dir=${PWD//bin/lib}
-    share_dir=${PWD//bin/share}
+    base_dir=$(cd `dirname $0` && pwd)
+    lib_dir=${base_dir//bin/lib}
+    share_dir=${base_dir//bin/share}
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$lib_dir
-    java -jar $share_dir/odimH5.jar -i $1 -o $2 -p $3 -f $4 $5
+    java -Xms64m -Xmx256m -jar $share_dir/odimH5.jar -i $1 -o $2 -p $3 -f $4 $5
 }
 if [ "$#" -ge "4" ] 
 then
