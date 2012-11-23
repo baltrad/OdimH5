@@ -264,6 +264,7 @@ public class LocalFeeder extends Thread {
             }
 
         }
+        
         if (toBeSentFile != null
                 && (toBeSentFile.getName().endsWith("h5") || toBeSentFile
                         .getName().endsWith("hdf"))
