@@ -166,7 +166,7 @@ public class LocalFeeder extends Thread {
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
-            toBeSentFile = originalFile;
+//            toBeSentFile = originalFile;
 
 
         } else {
@@ -281,6 +281,23 @@ public class LocalFeeder extends Thread {
             
         }
 
+        if (originalFile != null
+                && (originalFile.getName().endsWith("h5") || originalFile
+                        .getName().endsWith("hdf"))
+                && !baltradOptions.isEmpty()) {
+            
+            msgl.showMessage("Sending file " + originalFile + " to " + 
+                    baltradOptions.getHostAddress(), verbose);
+            InitAppUtil init = InitAppUtil.getInstance();
+            
+            // Feed to BALTRAD
+            BaltradFeeder baltradFeeder = new BaltradFeeder(
+                    baltradOptions.getHostAddress(), init, originalFile);
+            baltradFeeder.feedToBaltrad();
+            msgl.showMessage(baltradFeeder.getMessage(), verbose);
+            
+        }
+        
         originalFile.delete();
         if (toBeSentFile != null) {
             toBeSentFile.delete();
