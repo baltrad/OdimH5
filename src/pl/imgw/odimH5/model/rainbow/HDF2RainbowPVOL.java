@@ -162,7 +162,7 @@ public class HDF2RainbowPVOL {
         }
 
         for (int i = 0; i < options.length; i++) {
-            if (source.contains(options[i].getRadarWMOName())) {
+            if (source.contains(options[i].getRadarSourceName())) {
                 radarName = options[i].getRadarName();
 
                 break;
@@ -172,7 +172,7 @@ public class HDF2RainbowPVOL {
         if (radarName.isEmpty()) {
             System.out.println("Add name of radar number " + source
                     + " to options.xml");
-            return null;
+            radarName = "bornholm";
         }
 
         radar.put(PVOL_Rainbow.ALT, String.valueOf(alt));
@@ -208,7 +208,7 @@ public class HDF2RainbowPVOL {
                     rb.H5_WHERE, PVOL_H5.NBINS, verbose);
             int nrays = hdf.getHDF5IntLeafValue(rootHDF, dataset.get(i),
                     rb.H5_WHERE, PVOL_H5.NRAYS, verbose);
-
+            
             this.nbins[i] = nbins;
             this.nrays[i] = nrays;
 
@@ -455,15 +455,15 @@ public class HDF2RainbowPVOL {
     }
 
     private byte[] makeRayinfoData(int size) {
-        byte[] array = new byte[size * 2];
-
         if (size == 0)
             size = 360;
+        
+        byte[] array = new byte[size * 2];
 
         int step = 182;
         if (size < 360)
             step = 65535 / size;
-
+        
         for (int i = 0; i < size; i++) {
 
             int a = (i % 360) * step + 1;
@@ -480,6 +480,19 @@ public class HDF2RainbowPVOL {
 
     public String getRadarName() {
         return radarName;
+    }
+    
+    public static void main(String[] args) {
+        String input = "/home/lwojtas/poligon/vol/baltrad/dk.h5";
+        RadarOptions[] options = new RadarOptions[]{ };
+        RainbowModel rb = new RainbowModel();
+        rb.setHDFModel(new HDF5Model());
+        try {
+            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("dk.vol", input, true, rb, options);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 }

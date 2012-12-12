@@ -861,7 +861,7 @@ public class Rainbow2HDFPVOL {
 
         for (int i = 0; i < options.length; i++) {
             if (source.matches(options[i].getRadarName())) {
-                radarName = options[i].getRadarWMOName();
+                radarName = options[i].getRadarSourceName();
                 filePrefix = options[i].getFileName();
                 rIndex = i;
                 if (options[i].getNrays() != null)
@@ -876,7 +876,7 @@ public class Rainbow2HDFPVOL {
             System.out.println("Add " + source + " to options.xml");
             return null;
         } else {
-            source = "WMO:" + radarName;
+            source = radarName;
         }
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "scan", verbose);

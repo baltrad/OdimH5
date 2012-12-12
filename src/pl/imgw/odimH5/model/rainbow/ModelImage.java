@@ -84,7 +84,7 @@ public class ModelImage {
         String radarName = "";
         for (int i = 0; i < options.length; i++) {
             if (source.matches(options[i].getRadarName())) {
-                radarName = options[i].getRadarWMOName();
+                radarName = options[i].getRadarSourceName();
                 break;
             }
         }
