@@ -29,7 +29,8 @@ public class LogsHandler {
     private static String getLogPath() {
         //return new File(Main.getProgPath(), PROGRAM_LOGS_FILE).getPath();
         InitAppUtil init = InitAppUtil.getInstance();
-        return init.getLogDir() + File.separator + LOG_FILE;
+//        return init.getLogDir() + File.separator + LOG_FILE;
+        return LOG_FILE;
     }
     
     /**

@@ -1165,6 +1165,7 @@ public class HDF5Model {
             inputFile = (H5File) fileFormat.open(fileName, FileFormat.READ);
             inputFile.open();
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return inputFile;
     }
@@ -1511,7 +1512,8 @@ public class HDF5Model {
             String leafGrpName, String leafAttrName, boolean verbose) {
         List grpsList = grp.getMemberList();
         HObject obj = null;
-        int[] ret = null;
+        long[] ret = null;
+        int[] retint = null;
         try {
             for (int i = 0; i < grpsList.size(); i++) {
                 obj = (HObject) grpsList.get(i);
@@ -1533,7 +1535,12 @@ public class HDF5Model {
                                 // attribute name,
                                 // retrieve its value
                                 if (leafAttr.getName().matches(leafAttrName)) {
-                                    ret = (int[]) leafAttr.getValue();
+                                    if (leafAttr.getValue() instanceof long[]) {
+                                        ret = (long[]) leafAttr.getValue();
+                                    } else if (leafAttr.getValue() instanceof int[]) {
+                                        ret = new long[] { ((int[]) leafAttr
+                                                .getValue())[0] };
+                                    }
                                 }
                             }
                         }
@@ -1548,7 +1555,7 @@ public class HDF5Model {
         }
         if (ret == null)
             return 0;
-        return (ret[0]);
+        return (int) (ret[0]);
     }
 
     /**

@@ -24,6 +24,7 @@ import name.pachler.nio.file.WatchService;
 import org.w3c.dom.Document;
 
 import pl.imgw.odimH5.model.HDF5Model;
+import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 
@@ -166,8 +167,12 @@ public class LocalFeeder extends Thread {
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
-            toBeSentFile = originalFile;
-
+          //no single convertion from hdf to vol handle so far
+            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("",
+                    filePath, verbose, rb, radarOptions);
+            toBeSentFileName = hdf.getOutputFileName();
+            toBeSentFile = new File(hdf.getOutputFileName());
+            radarName = hdf.getRadarName();
 
         } else {
 
@@ -280,6 +285,22 @@ public class LocalFeeder extends Thread {
             msgl.showMessage(baltradFeeder.getMessage(), verbose);
             
         }
+        
+        if (!baltradOptions.isEmpty()
+                && (originalFile.getName().endsWith("h5") || originalFile
+                        .getName().endsWith("hdf"))) {
+
+            msgl.showMessage("Sending file " + originalFile + " to " + 
+                    baltradOptions.getHostAddress(), verbose);
+            InitAppUtil init = InitAppUtil.getInstance();
+            
+            // Feed to BALTRAD
+            BaltradFeeder baltradFeeder = new BaltradFeeder(
+                    baltradOptions.getHostAddress(), init, originalFile);
+            baltradFeeder.feedToBaltrad();
+            msgl.showMessage(baltradFeeder.getMessage(), verbose);
+            
+        }
 
         originalFile.delete();
         if (toBeSentFile != null) {
@@ -321,10 +342,11 @@ public class LocalFeeder extends Thread {
         if(ftpOptions.getDir() != null)
             ftp.changeDirectory(ftpOptions.getDir());
     
-        System.out.print("Directory changed. ");
 
         if (!remoteFolder.isEmpty())
             ftp.changeDirectory(remoteFolder);
+        
+        System.out.print("Directory changed. ");
 
         ftp.setContentType(FTPTransferType.BINARY);
 
