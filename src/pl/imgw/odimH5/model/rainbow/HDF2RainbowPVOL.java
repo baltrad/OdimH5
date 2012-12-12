@@ -162,7 +162,7 @@ public class HDF2RainbowPVOL {
         }
 
         for (int i = 0; i < options.length; i++) {
-            if (source.contains(options[i].getRadarWMOName())) {
+            if (source.contains(options[i].getRadarSourceName())) {
                 radarName = options[i].getRadarName();
 
                 break;

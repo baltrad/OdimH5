@@ -110,7 +110,7 @@ public class OptionsHandler {
             
             options[i].setLocation(RainbowModel.getValueByName(radarList
                     .item(i), LOCATION, null));
-            options[i].setRadarWMOName(RainbowModel.getValueByName(radarList
+            options[i].setRadarSourceName(RainbowModel.getValueByName(radarList
                     .item(i), WMO_ID, null));
             options[i].setFileName(RainbowModel.getValueByName(radarList
                     .item(i), FILE_NAME, null));
@@ -268,7 +268,7 @@ public class OptionsHandler {
         System.out.println("<!-- FTP options -->");
         System.out.println("<options>");
         System.out.println("    <radar name=\"NAME\">");
-        System.out.println("        <" + WMO_ID + ">WMO_ID</" + WMO_ID + ">");
+        System.out.println("        <" + WMO_ID + ">WMO_ID,location</" + WMO_ID + ">");
         System.out.println("        <" + FILE_NAME + ">FILE_NAME_PREFIX</"
                 + FILE_NAME + ">");
         System.out.println("        <" + DIRECTORY + ">LOCAL_DIR</" + DIRECTORY
