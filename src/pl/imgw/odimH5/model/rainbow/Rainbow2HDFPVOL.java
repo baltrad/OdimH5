@@ -909,6 +909,12 @@ public class Rainbow2HDFPVOL {
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "wavelen", verbose);
         String wavelength = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
         
+        try {
+            wavelength = Double.toString((Double.parseDouble(wavelength) * 100));
+        } catch (NumberFormatException e) {
+            
+        }
+        
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "scan", verbose);
         String task = rb.getRAINBOWMetadataElement(nodeList, "name", verbose);
 
@@ -1720,7 +1726,7 @@ public class Rainbow2HDFPVOL {
         double K = 0.93;
         
         double numerator = 2.025 * Math.pow(2, 14) * Math.log(2) * 100
-                * wavelength * 100 * wavelength;
+                * wavelength * wavelength;
         double nominative = Math.pow(Math.PI, 5) * 10.0E-23 * c * nompower
                 * beamwidth * beamwidth * pulselength * K;
 
@@ -1730,5 +1736,5 @@ public class Rainbow2HDFPVOL {
         
         return log10 - 2 * antgain + radomeloss + txloss + rxloss;
     }
-
+    
 }
