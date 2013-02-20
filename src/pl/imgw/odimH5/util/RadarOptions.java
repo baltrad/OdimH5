@@ -101,8 +101,6 @@ public class RadarOptions {
         this.location = location;
     }
 
-       
-    
     /**
      * @return the simulated
      */

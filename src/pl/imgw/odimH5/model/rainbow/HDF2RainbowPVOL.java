@@ -56,6 +56,7 @@ public class HDF2RainbowPVOL {
     private String date;
     private String time;
     private String radarName = "";
+    private String radarId = "";
     private int[] nbins;
     private int[] nrays;
 
@@ -75,7 +76,7 @@ public class HDF2RainbowPVOL {
      * @param options
      */
     public HDF2RainbowPVOL(String outputFileName, String inputFileName,
-            boolean verbose, RainbowModel rb, RadarOptions[] options) throws Exception {
+            boolean verbose, RainbowModel rb, RadarOptions[] options) {
 
         this.rb = rb;
         this.options = options;
@@ -161,26 +162,56 @@ public class HDF2RainbowPVOL {
             wvlength = WVLENGTH_SBAND;
         }
 
-        for (int i = 0; i < options.length; i++) {
-            if (source.contains(options[i].getRadarSourceName())) {
-                radarName = options[i].getRadarName();
-
-                break;
+        if(source.toUpperCase().contains("PLC:")) {
+            String[] names = source.split(",");
+            for(String n : names) {
+                if(n.contains("PLC:")) {
+                    radarName = n.substring(4);
+                }
             }
+        } else {
+            radarName = source;
         }
-
-        if (radarName.isEmpty()) {
-            System.out.println("Add name of radar number " + source
-                    + " to options.xml");
-            radarName = "bornholm";
+        
+        if(source.toUpperCase().contains("NOD:")) {
+            String[] names = source.split(",");
+            for(String n : names) {
+                if(n.contains("NOD:")) {
+                    radarId = n.substring(4);
+                }
+            }
+        } else if(source.toUpperCase().contains("CMT:")) {
+            String[] names = source.split(",");
+            for(String n : names) {
+                if(n.contains("CMT:")) {
+                    radarId = n.substring(4);
+                }
+            }
+        } else {
+            radarId = source;
         }
+        
+        
+//        for (int i = 0; i < options.length; i++) {
+//            if (source.contains(options[i].getRadarSourceName())) {
+//                radarName = options[i].getRadarName();
+//
+//                break;
+//            }
+//        }
+//
+//        if (radarName.isEmpty()) {
+//            System.out.println("Add name of radar number " + source
+//                    + " to options.xml");
+//            radarName = "bornholm";
+//        }
 
         radar.put(PVOL_Rainbow.ALT, String.valueOf(alt));
         radar.put(PVOL_Rainbow.LAT, String.valueOf(lat));
         radar.put(PVOL_Rainbow.LON, String.valueOf(lon));
         radar.put(PVOL_Rainbow.BEAMWIDTH, String.valueOf(bmwidth));
         radar.put(PVOL_Rainbow.WAVELEN, String.valueOf(wvlength));
-        radar.put(PVOL_Rainbow.ID, radarName);
+        radar.put(PVOL_Rainbow.ID, radarId);
 
         return radar;
     }

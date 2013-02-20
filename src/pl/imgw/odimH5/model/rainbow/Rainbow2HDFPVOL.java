@@ -80,7 +80,7 @@ public class Rainbow2HDFPVOL {
 
     public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff,
             boolean verbose, RainbowModel rb, RadarOptions[] options)
-            throws Exception {
+            {
 
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.VOLUME, verbose);
 
@@ -148,7 +148,7 @@ public class Rainbow2HDFPVOL {
 
     }
 
-    public void makeXML() throws Exception {
+    public void makeXML() {
 
         HDF5Model proc = rb.getHDFModel();
 
@@ -470,8 +470,8 @@ public class Rainbow2HDFPVOL {
             
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.NI,
                     rb.H5_DOUBLE, s.dsHow.get(PVOL_H5.NI), verbose);
-//            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.VSAMPLES,
-//                    rb.H5_LONG, s.dsHow.get(PVOL_H5.VSAMPLES), verbose);
+            proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.VSAMPLES,
+                    rb.H5_LONG, s.dsHow.get(PVOL_H5.VSAMPLES), verbose);
             
             
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.VSAMPLES,
@@ -482,8 +482,8 @@ public class Rainbow2HDFPVOL {
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.BINMETHOD,
                     rb.H5_STRING, s.dsHow.get(PVOL_H5.BINMETHOD), verbose);
             
-//            proc.H5Acreate_double_array(grandchild_group_id, PVOL_H5.STARTAZA,
-//                    s.getAngles(), verbose);
+            proc.H5Acreate_double_array(grandchild_group_id, PVOL_H5.STARTAZA,
+                    s.getAngles(), verbose);
             
             proc.H5Acreate_any_wrap(grandchild_group_id, PVOL_H5.MALFUNC, rb.H5_STRING,
                     s.dsHow.get(PVOL_H5.MALFUNC), verbose);
@@ -908,6 +908,12 @@ public class Rainbow2HDFPVOL {
 
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "wavelen", verbose);
         String wavelength = rb.getRAINBOWMetadataElement(nodeList, "", verbose);
+        
+        try {
+            wavelength = Double.toString((Double.parseDouble(wavelength) * 100));
+        } catch (NumberFormatException e) {
+            
+        }
         
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "scan", verbose);
         String task = rb.getRAINBOWMetadataElement(nodeList, "name", verbose);
@@ -1720,7 +1726,7 @@ public class Rainbow2HDFPVOL {
         double K = 0.93;
         
         double numerator = 2.025 * Math.pow(2, 14) * Math.log(2) * 100
-                * wavelength * 100 * wavelength;
+                * wavelength * wavelength;
         double nominative = Math.pow(Math.PI, 5) * 10.0E-23 * c * nompower
                 * beamwidth * beamwidth * pulselength * K;
 
@@ -1730,5 +1736,5 @@ public class Rainbow2HDFPVOL {
         
         return log10 - 2 * antgain + radomeloss + txloss + rxloss;
     }
-
+    
 }

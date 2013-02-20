@@ -63,7 +63,7 @@ public class DataProcessorController {
      * @throws Exception
      */
     @SuppressWarnings("static-access")
-    public void startProcessor(String[] args) throws Exception {
+    public void startProcessor(String[] args) {
         // Parse command line arguments
         cmd.parseCommandLineArgs(args);
 

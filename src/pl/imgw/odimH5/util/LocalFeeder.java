@@ -147,7 +147,6 @@ public class LocalFeeder extends Thread {
 
             int file_len = (int) originalFile.length();
             byte[] file_buf = new byte[file_len];
-            
 
             try {
                 FileInputStream fis = new FileInputStream(originalFile);
@@ -167,20 +166,14 @@ public class LocalFeeder extends Thread {
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-          //no single convertion from hdf to vol handle so far
-            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("",
-                    filePath, verbose, rb, radarOptions);
+            // no single convertion from hdf to vol handle so far
+            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", filePath, verbose,
+                    rb, radarOptions);
             toBeSentFileName = hdf.getOutputFileName();
-            toBeSentFile = new File(hdf.getOutputFileName());
+//            toBeSentFile = new File(hdf.getOutputFileName());
             radarName = hdf.getRadarName();
-=======
->>>>>>> lukasz
-//            toBeSentFile = originalFile;
 
->>>>>>> origin/master
+            toBeSentFile = originalFile;
 
         } else {
 
@@ -277,65 +270,57 @@ public class LocalFeeder extends Thread {
             }
 
         }
-        
+
         if (toBeSentFile != null
                 && (toBeSentFile.getName().endsWith("h5") || toBeSentFile
                         .getName().endsWith("hdf"))
                 && !baltradOptions.isEmpty()) {
-            
-            msgl.showMessage("Sending file " + toBeSentFileName + " to " + 
-                    baltradOptions.getHostAddress(), verbose);
+
+            msgl.showMessage("Sending file " + toBeSentFileName + " to "
+                    + baltradOptions.getHostAddress(), verbose);
             InitAppUtil init = InitAppUtil.getInstance();
-            
+
             // Feed to BALTRAD
             BaltradFeeder baltradFeeder = new BaltradFeeder(
                     baltradOptions.getHostAddress(), init, toBeSentFile);
             baltradFeeder.feedToBaltrad();
             msgl.showMessage(baltradFeeder.getMessage(), verbose);
-            
+
         }
-        
-<<<<<<< HEAD
-        if (originalFile != null
-                && (originalFile.getName().endsWith("h5") || originalFile
-                        .getName().endsWith("hdf"))
-                && !baltradOptions.isEmpty()) {
-            
-=======
+
         if (!baltradOptions.isEmpty()
                 && (originalFile.getName().endsWith("h5") || originalFile
                         .getName().endsWith("hdf"))) {
 
->>>>>>> lukasz
-            msgl.showMessage("Sending file " + originalFile + " to " + 
-                    baltradOptions.getHostAddress(), verbose);
+            msgl.showMessage("Sending file " + originalFile + " to "
+                    + baltradOptions.getHostAddress(), verbose);
             InitAppUtil init = InitAppUtil.getInstance();
-            
+
             // Feed to BALTRAD
             BaltradFeeder baltradFeeder = new BaltradFeeder(
                     baltradOptions.getHostAddress(), init, originalFile);
             baltradFeeder.feedToBaltrad();
             msgl.showMessage(baltradFeeder.getMessage(), verbose);
-            
+
         }
 
         if (originalFile != null
                 && (originalFile.getName().endsWith("h5") || originalFile
                         .getName().endsWith("hdf"))
                 && !baltradOptions.isEmpty()) {
-            
-            msgl.showMessage("Sending file " + originalFile + " to " + 
-                    baltradOptions.getHostAddress(), verbose);
+
+            msgl.showMessage("Sending file " + originalFile + " to "
+                    + baltradOptions.getHostAddress(), verbose);
             InitAppUtil init = InitAppUtil.getInstance();
-            
+
             // Feed to BALTRAD
             BaltradFeeder baltradFeeder = new BaltradFeeder(
                     baltradOptions.getHostAddress(), init, originalFile);
             baltradFeeder.feedToBaltrad();
             msgl.showMessage(baltradFeeder.getMessage(), verbose);
-            
+
         }
-        
+
         originalFile.delete();
         if (toBeSentFile != null) {
             toBeSentFile.delete();
@@ -348,18 +333,17 @@ public class LocalFeeder extends Thread {
             String remoteFolder, String extension) throws IOException,
             UnknownHostException, FTPException {
 
-        UtSocketFactory utSocketFactory = new
-        UtSocketFactory();
+        UtSocketFactory utSocketFactory = new UtSocketFactory();
         utSocketFactory.setConnectTimeout(5000);
-        
+
         FileTransferClient ftp = new FileTransferClient();
-        
+
         System.out.print("Connecting... ");
-        
+
         ftp.setRemoteHost(ftpOptions.getAddress());
 
         System.out.print("Connected! ");
-        
+
         // System.out.println(newFileName + " jako " + sendFileName);
 
         // After connection attempt, you should check the
@@ -370,16 +354,15 @@ public class LocalFeeder extends Thread {
         ftp.setUserName(ftpOptions.getLogin());
         ftp.setPassword(ftpOptions.getPassword());
         ftp.connect();
-        
+
         System.out.print("Logged in. ");
 
-        if(ftpOptions.getDir() != null)
+        if (ftpOptions.getDir() != null)
             ftp.changeDirectory(ftpOptions.getDir());
-    
 
         if (!remoteFolder.isEmpty())
             ftp.changeDirectory(remoteFolder);
-        
+
         System.out.print("Directory changed. ");
 
         ftp.setContentType(FTPTransferType.BINARY);
@@ -395,7 +378,7 @@ public class LocalFeeder extends Thread {
         // System.out.println("zmieniona nazwa na: " + newName);
         if (toBeSentFileName.endsWith("h5"))
             toBeSentFileName = toBeSentFileName.replace("h5", "hdf");
-        
+
         ftp.rename(sendFileTempName, toBeSentFileName);
 
         ftp.disconnect();
