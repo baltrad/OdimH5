@@ -392,11 +392,11 @@ public class HDF5Model {
 
         if (attr_class.equals("long")) {
             attribute_id = H5Acreate_numeric_wrap(group_id, attr_name,
-                    HDF5Constants.H5T_NATIVE_INT, dataspace_id,
+                    HDF5Constants.H5T_NATIVE_LONG, dataspace_id,
                     HDF5Constants.H5P_DEFAULT, verbose);
             long[] value = new long[1];
             value[0] = (long) Long.parseLong(attr_value);
-            H5Awrite_wrap(attribute_id, HDF5Constants.H5T_NATIVE_INT, value,
+            H5Awrite_wrap(attribute_id, HDF5Constants.H5T_NATIVE_LONG, value,
                     verbose);
         }
         if (attr_class.equals("double")) {
@@ -444,13 +444,14 @@ public class HDF5Model {
     public void H5Acreate_double_array(int group_id, String attr_name,
             double[] attr_value, boolean verbose) {
 
-        int rank = 1;
-        long dims[] = { attr_value.length, 1 };
-        long maxdims[] = { attr_value.length, 1 };
-
         if (attr_value == null) {
             return;
         }
+        int rank = 1;
+        
+        long dims[] = { attr_value.length };
+        long maxdims[] = { attr_value.length };
+
         int attribute_id = -1;
 
         int dataspace_id = H5Screate_wrap(HDF5Constants.H5S_SIMPLE, verbose);
@@ -458,7 +459,7 @@ public class HDF5Model {
             H5.H5Sset_extent_simple(dataspace_id, rank, dims, maxdims);
             attribute_id = H5.H5Acreate(group_id, attr_name,
                     HDF5Constants.H5T_NATIVE_DOUBLE, dataspace_id,
-                    HDF5Constants.H5P_DEFAULT);
+                    HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT);
             H5.H5Awrite(attribute_id, HDF5Constants.H5T_NATIVE_DOUBLE,
                     attr_value);
         } catch (NullPointerException e) {
@@ -1157,7 +1158,7 @@ public class HDF5Model {
      *            Input file name
      * @return Reference to open HDF5 file
      */
-    public H5File openHDF5File(String fileName) {
+    public static H5File openHDF5File(String fileName) {
         FileFormat fileFormat = FileFormat
                 .getFileFormat(FileFormat.FILE_TYPE_HDF5);
         H5File inputFile = null;
@@ -1643,6 +1644,9 @@ public class HDF5Model {
                 for (int y = 0; y < height; y++) {
                     count = y * width + x;
                     dataArray2D[x][y] = (int) dataArray[count] & 0xFF;
+                    if(dataArray2D[x][y] == 255) {
+                        dataArray2D[x][y] = 0;
+                    }
                 }
             }
 
