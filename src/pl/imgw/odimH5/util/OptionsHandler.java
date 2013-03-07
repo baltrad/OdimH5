@@ -4,10 +4,15 @@
 package pl.imgw.odimH5.util;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import pl.imgw.odimH5.AplicationConstans;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 
 import com.sun.org.apache.xerces.internal.parsers.DOMParser;
@@ -66,7 +71,7 @@ public class OptionsHandler {
 //    }
     
     private static String getOptionPath() {
-        return new File(OPTION_XML_FILE).getPath();
+        return new File(AplicationConstans.CONF, OPTION_XML_FILE).getPath();
     }
     /**
      * 
@@ -198,7 +203,7 @@ public class OptionsHandler {
      * @param doc
      * @return
      */
-    public static FTP_Options[] getFTPOptions(Document doc) {
+    public static FTP_Options[] getOldFTPOptions(Document doc) {
 
         NodeList ftpList = doc.getElementsByTagName("ftp");
         int counter = ftpList.getLength();
@@ -226,6 +231,48 @@ public class OptionsHandler {
         return options;
     }
 
+    /**
+     * 
+     * This method reads FTP options from XML document
+     * 
+     * @param doc
+     * @return
+     */
+    public static Map<String, List<FTPContainer>> getFTPOptions(Document doc) {
+
+        Map<String, List<FTPContainer>> ftps = new HashMap<String, List<FTPContainer>>();
+        
+        NodeList ftpList = doc.getElementsByTagName("ftp");
+        int counter = ftpList.getLength();
+
+        for (int i = 0; i < counter; i++) {
+
+            String[] radars = RainbowModel.getValueByName(ftpList.item(i),
+                    RADARS, null).split(" ");
+
+            String address = (RainbowModel.getValueByName(ftpList.item(i),
+                    ADDRESS, null));
+            String login = (RainbowModel.getValueByName(ftpList.item(i),
+                    LOGIN, null));
+            StringBuilder pass = new StringBuilder(RainbowModel.getValueByName(ftpList.item(i),
+                    PASSWORD, null));
+            String remoteDir = (RainbowModel.getValueByName(ftpList.item(i),
+                    DIRECTORY, null));
+            
+            for(String radar : radars) {
+                if(!ftps.containsKey(radar)) {
+                    List<FTPContainer> ftpc = new LinkedList<FTPContainer>();
+                    ftps.put(radar, ftpc);
+                }
+                ftps.get(radar).add(new FTPContainer(address, login, pass, remoteDir));
+                
+            }
+            
+            
+        }
+        return ftps;
+    }
+    
     /**
      * 
      * Helper method

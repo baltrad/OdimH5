@@ -19,6 +19,10 @@ import pl.imgw.odimH5.model.PVOL_H5;
 import pl.imgw.odimH5.util.DataBufferContainer;
 import pl.imgw.odimH5.util.RadarOptions;
 
+import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER51X;
+import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER52X;
+import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER53X;
+
 /**
  * 
  * Converts Rainbow volume files to XML descriptor or HDF format.
@@ -833,17 +837,16 @@ public class Rainbow2HDFPVOL {
         NodeList nodeList = null;
         HashMap<String, String> what = new HashMap<String, String>();
 
-        String source = "";
 
-        if (version.substring(0, 3).matches(rb.VER51X)
-                || version.substring(0, 3).matches(rb.VER52X)) {
+        if (version.substring(0, 3).matches(VER51X)
+                || version.substring(0, 3).matches(VER52X)) {
 
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
             source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
             radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
                     verbose);
 
-        } else if (version.substring(0, 3).matches(rb.VER53X)) {
+        } else if (version.substring(0, 3).matches(VER53X)) {
 
             nodeList = rb
                     .getRAINBOWNodesByName(inputDoc, "sensorinfo", verbose);
@@ -856,7 +859,6 @@ public class Rainbow2HDFPVOL {
             return null;
         }
 
-        this.source = source;
         String radarName = "";
 
         for (int i = 0; i < options.length; i++) {
@@ -1706,11 +1708,19 @@ public class Rainbow2HDFPVOL {
         return outputFileName;
     }
 
-    public String getRadarName() {
+    /**
+     * Radar's ID
+     * @return
+     */
+    public String getRadarID() {
         return source;
     }
 
-    public String getRadarFullName() {
+    /**
+     * Radar's name
+     * @return
+     */
+    public String getRadarName() {
         return radarFullName;
     }
     
