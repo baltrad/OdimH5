@@ -17,6 +17,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.PosixParser;
 
+import pl.imgw.odimH5.AplicationConstans;
+
 /**
  * Class implementing command line arguments parser functionality.
  * 
@@ -191,9 +193,10 @@ public class CommandLineArgsParser {
     public void printHelpAndExit(int exitCode, String startCommand,
             Options options) {
         // Help formatter
-        InitAppUtil init = InitAppUtil.getInstance();
-        System.out.println("OdimH5 version " + init.getAppVersion()
-                + ". Converter software for OPERA Data Information Model\n");
+//        InitAppUtil init = InitAppUtil.getInstance();
+        System.out.println("OdimH5 version " + AplicationConstans.VERSION
+                + ". Converter software for OPERA Data Information Model\n" +
+                "Released: " + AplicationConstans.REL_DATE + " compiled: " + AplicationConstans.DATE);
         HelpFormatter helpFormatter = new HelpFormatter();
         helpFormatter.printHelp(startCommand, options);
         System.exit(exitCode);

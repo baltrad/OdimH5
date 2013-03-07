@@ -204,7 +204,7 @@ public class DataProcessorController {
             LocalFeeder worker = new LocalFeeder(doc, rainbow, hdf, msgl,
                     verbose);
             try {
-                worker.start();
+                new Thread(worker).run();
             } catch (Exception e) {
                 LogsHandler.saveProgramLogs(e.getMessage());
             }

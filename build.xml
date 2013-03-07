@@ -39,6 +39,8 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     <property name="options.file" value="options.xml"/>
     <property name="keystore.dir" value=".keystore"/>
     <property name="properties.file" value="odim.properties"/>
+	<property name="version.src" value="src/pl/imgw/odimH5/AplicationConstans.java" />
+	<property name="version" value="src/pl/imgw/odimH5/AplicationConstans" />
     <!-- Override this property with -Dhost.address -->
     <property name="host.address" value="http://localhost"/>
     <property name="conn.timeout" value="60000"/>
@@ -98,6 +100,16 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 
     <!-- Compiles the java code (including the usage of library for JUnit -->
     <target name="compile" depends="init">
+		<tstamp>
+			<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+		</tstamp>
+		<copy file="${version}" toFile="${version.src}" overwrite="true">
+			<filterset>
+				<filter token="DATE" value="${TODAY}" />
+				<filter token="LOG" value="${prefix}/${app.name}/${log.dir}" />
+				<filter token="CONF" value="${prefix}/${app.name}/${conf.dir}" />
+			</filterset>
+		</copy>
         <javac encoding="UTF-8" deprecation="on" srcdir="${src.dir}" destdir="${build.dir}" 
                includeantruntime="false">
             <include name="**/*.java"/>

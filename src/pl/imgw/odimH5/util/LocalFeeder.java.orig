@@ -11,7 +11,6 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import name.pachler.nio.file.ClosedWatchServiceException;
 import name.pachler.nio.file.FileSystems;
@@ -41,13 +40,12 @@ import com.enterprisedt.net.ftp.FileTransferClient;
  * @author <a href="mailto:lukasz.wojtas@imgw.pl">Lukasz Wojtas</a>
  * 
  */
-public class LocalFeeder implements Runnable {
+public class LocalFeeder extends Thread {
 
     WatchService watchService = FileSystems.getDefault().newWatchService();
     private RadarOptions[] radarOptions;
     private FTP_Options[] ftpOptions;
     private BaltradOptions baltradOptions;
-    private ConvertingTool converter;
     Path[] watchedPath;
 
     HashMap<WatchKey, RadarOptions> pathMap = new HashMap<WatchKey, RadarOptions>();
@@ -83,11 +81,8 @@ public class LocalFeeder implements Runnable {
         this.msgl = msgl;
 
         radarOptions = OptionsHandler.getRadarOptions(optionsDoc);
-        ftpOptions = OptionsHandler.getOldFTPOptions(optionsDoc);
+        ftpOptions = OptionsHandler.getFTPOptions(optionsDoc);
         baltradOptions = OptionsHandler.getBaltrad(optionsDoc);
-        
-        Map<String, List<FTPContainer>> ftpCont = OptionsHandler.getFTPOptions(optionsDoc);
-        converter = new ConvertingTool(radarOptions, ftpCont, rb, verbose);
 
         watchedPath = new Path[radarOptions.length];
         WatchKey key[] = new WatchKey[radarOptions.length];
@@ -115,43 +110,11 @@ public class LocalFeeder implements Runnable {
         }
     }
 
-    
-    private void convertAndSend(String filePath) {
-        
-        File file = new File(filePath);
-
-        if (filePath.contains("KDP") || filePath.contains("PhiDP")
-                || filePath.contains("HV") || filePath.contains("ZDR")) {
-
-            // System.out.println("kasuje: " + filePath.path);
-
-            file.delete();
-            return;
-        }
-
-        if (!file.canRead())
-            return;
-
-        if (file.getName().startsWith(".")) {
-            return;
-        }
-
-        if (file.getName().endsWith("dBZ.vol")) {
-            converter.convertRb5ToHdf5(file);
-        } else if (file.getName().endsWith("h5")
-                || file.getName().endsWith("hdf")) {
-            converter.convertHdf5ToVol(file);
-        }
-        
-        file.delete();
-        
-    }
-    
     /**
      * 
      * @param filePath
      */
-    private void convertAndSendFileOld(String filePath) throws Exception {
+    private void convertAndSendFile(String filePath) throws Exception {
 
         if (filePath.contains("KDP") || filePath.contains("PhiDP")
                 || filePath.contains("HV") || filePath.contains("ZDR")) {
@@ -184,6 +147,7 @@ public class LocalFeeder implements Runnable {
 
             int file_len = (int) originalFile.length();
             byte[] file_buf = new byte[file_len];
+            
 
             try {
                 FileInputStream fis = new FileInputStream(originalFile);
@@ -196,21 +160,27 @@ public class LocalFeeder implements Runnable {
             Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose,
                     rb, radarOptions);
             vol.makeH5();
-            radarName = vol.getRadarID();
+            radarName = vol.getRadarName();
             toBeSentFileName = vol.getOutputFileName();
             toBeSentFile = new File(toBeSentFileName);
-            radarFullName = vol.getRadarName();
+            radarFullName = vol.getRadarFullName();
         } else if (originalFile.getName().endsWith(".h5")
                 || originalFile.getName().endsWith(".hdf")) {
 
-            // no single convertion from hdf to vol handle so far
-            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", filePath, verbose,
-                    rb, radarOptions);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+          //no single convertion from hdf to vol handle so far
+            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("",
+                    filePath, verbose, rb, radarOptions);
             toBeSentFileName = hdf.getOutputFileName();
-//            toBeSentFile = new File(hdf.getOutputFileName());
+            toBeSentFile = new File(hdf.getOutputFileName());
             radarName = hdf.getRadarName();
+=======
+>>>>>>> lukasz
+//            toBeSentFile = originalFile;
 
-            toBeSentFile = originalFile;
+>>>>>>> origin/master
 
         } else {
 
@@ -220,7 +190,7 @@ public class LocalFeeder implements Runnable {
         }
 
         if (toBeSentFile != null && ftpOptions != null) {
-            
+
             for (int i = 0; i < ftpOptions.length; i++) {
                 if (ftpOptions[i].isEmpty())
                     continue;
@@ -307,57 +277,65 @@ public class LocalFeeder implements Runnable {
             }
 
         }
-
+        
         if (toBeSentFile != null
                 && (toBeSentFile.getName().endsWith("h5") || toBeSentFile
                         .getName().endsWith("hdf"))
                 && !baltradOptions.isEmpty()) {
-
-            msgl.showMessage("Sending file " + toBeSentFileName + " to "
-                    + baltradOptions.getHostAddress(), verbose);
+            
+            msgl.showMessage("Sending file " + toBeSentFileName + " to " + 
+                    baltradOptions.getHostAddress(), verbose);
             InitAppUtil init = InitAppUtil.getInstance();
-
+            
             // Feed to BALTRAD
             BaltradFeeder baltradFeeder = new BaltradFeeder(
                     baltradOptions.getHostAddress(), init, toBeSentFile);
             baltradFeeder.feedToBaltrad();
             msgl.showMessage(baltradFeeder.getMessage(), verbose);
-
+            
         }
-
+        
+<<<<<<< HEAD
+        if (originalFile != null
+                && (originalFile.getName().endsWith("h5") || originalFile
+                        .getName().endsWith("hdf"))
+                && !baltradOptions.isEmpty()) {
+            
+=======
         if (!baltradOptions.isEmpty()
                 && (originalFile.getName().endsWith("h5") || originalFile
                         .getName().endsWith("hdf"))) {
 
-            msgl.showMessage("Sending file " + originalFile + " to "
-                    + baltradOptions.getHostAddress(), verbose);
+>>>>>>> lukasz
+            msgl.showMessage("Sending file " + originalFile + " to " + 
+                    baltradOptions.getHostAddress(), verbose);
             InitAppUtil init = InitAppUtil.getInstance();
-
+            
             // Feed to BALTRAD
             BaltradFeeder baltradFeeder = new BaltradFeeder(
                     baltradOptions.getHostAddress(), init, originalFile);
             baltradFeeder.feedToBaltrad();
             msgl.showMessage(baltradFeeder.getMessage(), verbose);
-
+            
         }
 
         if (originalFile != null
                 && (originalFile.getName().endsWith("h5") || originalFile
                         .getName().endsWith("hdf"))
                 && !baltradOptions.isEmpty()) {
-
-            msgl.showMessage("Sending file " + originalFile + " to "
-                    + baltradOptions.getHostAddress(), verbose);
+            
+            msgl.showMessage("Sending file " + originalFile + " to " + 
+                    baltradOptions.getHostAddress(), verbose);
             InitAppUtil init = InitAppUtil.getInstance();
-
+            
             // Feed to BALTRAD
             BaltradFeeder baltradFeeder = new BaltradFeeder(
                     baltradOptions.getHostAddress(), init, originalFile);
             baltradFeeder.feedToBaltrad();
             msgl.showMessage(baltradFeeder.getMessage(), verbose);
-
+            
         }
-
+        
         originalFile.delete();
         if (toBeSentFile != null) {
             toBeSentFile.delete();
@@ -370,17 +348,18 @@ public class LocalFeeder implements Runnable {
             String remoteFolder, String extension) throws IOException,
             UnknownHostException, FTPException {
 
-        UtSocketFactory utSocketFactory = new UtSocketFactory();
+        UtSocketFactory utSocketFactory = new
+        UtSocketFactory();
         utSocketFactory.setConnectTimeout(5000);
-
+        
         FileTransferClient ftp = new FileTransferClient();
-
+        
         System.out.print("Connecting... ");
-
+        
         ftp.setRemoteHost(ftpOptions.getAddress());
 
         System.out.print("Connected! ");
-
+        
         // System.out.println(newFileName + " jako " + sendFileName);
 
         // After connection attempt, you should check the
@@ -391,15 +370,16 @@ public class LocalFeeder implements Runnable {
         ftp.setUserName(ftpOptions.getLogin());
         ftp.setPassword(ftpOptions.getPassword());
         ftp.connect();
-
+        
         System.out.print("Logged in. ");
 
-        if (ftpOptions.getDir() != null)
+        if(ftpOptions.getDir() != null)
             ftp.changeDirectory(ftpOptions.getDir());
+    
 
         if (!remoteFolder.isEmpty())
             ftp.changeDirectory(remoteFolder);
-
+        
         System.out.print("Directory changed. ");
 
         ftp.setContentType(FTPTransferType.BINARY);
@@ -415,7 +395,7 @@ public class LocalFeeder implements Runnable {
         // System.out.println("zmieniona nazwa na: " + newName);
         if (toBeSentFileName.endsWith("h5"))
             toBeSentFileName = toBeSentFileName.replace("h5", "hdf");
-
+        
         ftp.rename(sendFileTempName, toBeSentFileName);
 
         ftp.disconnect();
@@ -460,7 +440,7 @@ public class LocalFeeder implements Runnable {
                         itr = fileTimeMap.keySet().iterator();
                         msgl.showMessage(key + " download finished", true);
                         try {
-                            convertAndSend(key);
+                            convertAndSendFile(key);
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();

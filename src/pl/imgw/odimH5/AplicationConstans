@@ -1,0 +1,22 @@
+/**
+ * (C) 2013 INSTITUT OF METEOROLOGY AND WATER MANAGEMENT
+ */
+package pl.imgw.odimH5;
+
+/**
+ *
+ *  /Class description/
+ *
+ * @author <a href="mailto:lukasz.wojtas@imgw.pl">Lukasz Wojtas</a>
+ *
+ * 
+ */
+public class AplicationConstans {
+
+    public static final String DATE = "@DATE@";
+    public static final String LOG = "@LOG@";
+    public static final String CONF = "@CONF@";
+    public final static String VERSION = "2.15"; 
+    public static final String REL_DATE = "2013-03-06";
+
+}
