@@ -1,0 +1,4 @@
+#!/bin/sh
+
+java -Djava.library.path=@LIBDIR@ -Xms64m -Xmx256m -jar @JARDIR@ $@
+
