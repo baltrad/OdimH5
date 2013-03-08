@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.enterprisedt.net.ftp.FTPConnectionClosedException;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPTransferType;
 import com.enterprisedt.net.ftp.FileTransferClient;
@@ -41,13 +42,12 @@ public class FTPHandler {
         // UtSocketFactory utSocketFactory = new UtSocketFactory();
         // utSocketFactory.setConnectTimeout(5000);
 
-        if (ftp.isConnected())
-            return;
-
         ftp.setRemoteHost(ftpCont.getAddress());
         ftp.setUserName(ftpCont.getLogin());
         ftp.setPassword(ftpCont.getPassword());
+        ftp.setTimeout(2000);
         ftp.connect();
+        
     }
 
     /**
@@ -59,8 +59,6 @@ public class FTPHandler {
      */
     public boolean sendFile(File file, String radarID) {
 
-        System.out.println("starting to send file: " + file);
-        
         if(!ftps.containsKey(radarID)) {
             System.out.println(radarID + ": No radar ID on the list");
             return false;
@@ -86,7 +84,9 @@ public class FTPHandler {
                 ftp.uploadFile(file.getPath(), "." + file.getName());
 
                 ftp.rename("." + file.getName(), file.getName());
-            } catch (FTPException e) {
+            }catch (FTPConnectionClosedException e) {
+                 
+            }catch (FTPException e) {
                 e.printStackTrace();
                 return false;
             } catch (IOException e) {

@@ -62,6 +62,8 @@ public class ConvertingTool {
         
         ftp.sendFile(toBeSentFile, radarID);
 
+        toBeSentFile.delete();
+        
         return true;
     }
 
@@ -76,6 +78,8 @@ public class ConvertingTool {
         String radarName = hdf.getRadarName();
         
         ftp.sendFile(toBeSentFile, radarName);
+        
+        toBeSentFile.delete();
         
         return true;
     }
