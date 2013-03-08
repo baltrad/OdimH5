@@ -62,7 +62,7 @@ public class ConvertingTool {
         
         ftp.sendFile(toBeSentFile, radarID);
 
-//        toBeSentFile.delete();
+        toBeSentFile.delete();
         
         return true;
     }
