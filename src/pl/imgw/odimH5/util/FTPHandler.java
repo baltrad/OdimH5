@@ -42,6 +42,9 @@ public class FTPHandler {
         // UtSocketFactory utSocketFactory = new UtSocketFactory();
         // utSocketFactory.setConnectTimeout(5000);
 
+        if(ftp.isConnected())
+            return;
+        
         ftp.setRemoteHost(ftpCont.getAddress());
         ftp.setUserName(ftpCont.getLogin());
         ftp.setPassword(ftpCont.getPassword());
@@ -84,6 +87,8 @@ public class FTPHandler {
                 ftp.uploadFile(file.getPath(), "." + file.getName());
 
                 ftp.rename("." + file.getName(), file.getName());
+                
+                ftp.disconnect();
             }catch (FTPConnectionClosedException e) {
                  
             }catch (FTPException e) {
@@ -92,7 +97,7 @@ public class FTPHandler {
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
-            }
+            } 
         }
 
         return true;
