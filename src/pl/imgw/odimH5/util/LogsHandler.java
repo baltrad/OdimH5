@@ -14,6 +14,8 @@ import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import pl.imgw.odimH5.AplicationConstans;
+
 /**
  * 
  * /Class description/
@@ -30,7 +32,7 @@ public class LogsHandler {
         //return new File(Main.getProgPath(), PROGRAM_LOGS_FILE).getPath();
         InitAppUtil init = InitAppUtil.getInstance();
 //        return init.getLogDir() + File.separator + LOG_FILE;
-        return LOG_FILE;
+        return new File(AplicationConstans.LOG, LOG_FILE).getPath();
     }
     
     /**

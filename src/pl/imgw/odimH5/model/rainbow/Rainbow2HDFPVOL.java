@@ -55,7 +55,7 @@ public class Rainbow2HDFPVOL {
     private String date = "";
     private String time = "";
     private String rangestep;
-    private String source = "";
+    private String radarId = "";
     private String radarFullName = "";
     private int shift = 0;
     private int size = 0;
@@ -839,12 +839,12 @@ public class Rainbow2HDFPVOL {
         NodeList nodeList = null;
         HashMap<String, String> what = new HashMap<String, String>();
 
-
+        
         if (version.substring(0, 3).matches(VER51X)
                 || version.substring(0, 3).matches(VER52X)) {
 
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
-            source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
+            radarId = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
             radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
                     verbose);
 
@@ -852,7 +852,7 @@ public class Rainbow2HDFPVOL {
 
             nodeList = rb
                     .getRAINBOWNodesByName(inputDoc, "sensorinfo", verbose);
-            source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
+            radarId = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
             radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
                     verbose);
 
@@ -861,6 +861,8 @@ public class Rainbow2HDFPVOL {
             return null;
         }
 
+        String source = radarId;
+        
         String radarName = "";
 
         for (int i = 0; i < options.length; i++) {
@@ -1715,7 +1717,7 @@ public class Rainbow2HDFPVOL {
      * @return
      */
     public String getRadarID() {
-        return source;
+        return radarId;
     }
 
     /**
