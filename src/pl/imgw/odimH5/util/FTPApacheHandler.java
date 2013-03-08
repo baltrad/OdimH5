@@ -72,11 +72,11 @@ public class FTPApacheHandler {
         String tmp = file.getName() + ".tmp";
         FileInputStream fis = new FileInputStream(file);
         if(!ftp.storeFile(tmp, fis)) {
+            fis.close();
             return false;
         }
-        
+        fis.close();
         return ftp.rename(tmp, file.getName());
-        
         
        
     }

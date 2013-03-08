@@ -77,7 +77,7 @@ public class HDF2RainbowPVOL {
      * @param rb
      * @param options
      */
-    public HDF2RainbowPVOL(String folderOutputPath, String outputFileName, String inputFileName,
+    public HDF2RainbowPVOL(String outputFileName, String inputFileName,
             boolean verbose, RainbowModel rb) {
 
         this.rb = rb;
@@ -521,7 +521,7 @@ public class HDF2RainbowPVOL {
         RainbowModel rb = new RainbowModel();
         rb.setHDFModel(new HDF5Model());
         try {
-            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", "dk.vol", input, true, rb);
+            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("dk.vol", input, true, rb);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
