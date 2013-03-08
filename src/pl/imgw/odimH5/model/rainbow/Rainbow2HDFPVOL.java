@@ -160,8 +160,9 @@ public class Rainbow2HDFPVOL {
             this.outputFileName = outputFileName;
         }
 
-        if(outputFolder != null)
-            outputFileName = new File(outputFolder, outputFileName).getPath();
+        if(outputFolder != null) {
+            this.outputFileName = new File(outputFolder, outputFileName).getPath();
+        }
         correct = true;
 
     }
