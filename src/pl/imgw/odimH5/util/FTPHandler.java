@@ -79,9 +79,15 @@ public class FTPHandler {
             try {
                 connect(ftp, ftpCont);
 
-                if (ftpCont.getRemoteDir() != null)
+                if (ftpCont.getRemoteDir() != null) {
+                    
+                    ftp.createDirectory(ftpCont.getRemoteDir());    
                     ftp.changeDirectory(ftpCont.getRemoteDir());
+                }
 
+                ftp.createDirectory(radarID);
+                ftp.changeDirectory(radarID);
+                
                 ftp.setContentType(FTPTransferType.BINARY);
 
                 ftp.uploadFile(file.getPath(), "." + file.getName());
