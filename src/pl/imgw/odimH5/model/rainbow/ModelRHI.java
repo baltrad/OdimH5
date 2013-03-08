@@ -10,6 +10,7 @@ import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.ParametersContainer;
 import pl.imgw.odimH5.util.DataBufferContainer;
+import pl.imgw.odimH5.util.OptionsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
 
 /**
@@ -37,8 +38,10 @@ public class ModelRHI {
      *            Rainbow class model
      */
     public static String createDescriptor(String fileName, byte[] fileBuff,
-            boolean verbose, RainbowModel rb, RadarOptions[] options) {
+            boolean verbose, RainbowModel rb) {
 
+        RadarOptions[] options = OptionsHandler.getOpt().getRadarOptions();
+        
         boolean isDirect = false;
         if (fileName.endsWith(".h5"))
             isDirect = true;

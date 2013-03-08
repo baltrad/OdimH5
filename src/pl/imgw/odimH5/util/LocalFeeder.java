@@ -45,8 +45,6 @@ public class LocalFeeder implements Runnable {
 
     WatchService watchService = FileSystems.getDefault().newWatchService();
     private RadarOptions[] radarOptions;
-    private FTP_Options[] ftpOptions;
-    private BaltradOptions baltradOptions;
     private ConvertingTool converter;
     Path[] watchedPath;
 
@@ -75,19 +73,16 @@ public class LocalFeeder implements Runnable {
      * @param verbose
      *            verbose mode
      */
-    public LocalFeeder(Document optionsDoc, RainbowModel rb, HDF5Model proc,
+    public LocalFeeder(RainbowModel rb, HDF5Model proc,
             MessageLogger msgl, boolean verbose) {
 
         this.rb = rb;
         this.verbose = verbose;
         this.msgl = msgl;
 
-        radarOptions = OptionsHandler.getRadarOptions(optionsDoc);
-        ftpOptions = OptionsHandler.getOldFTPOptions(optionsDoc);
-        baltradOptions = OptionsHandler.getBaltrad(optionsDoc);
+        radarOptions = OptionsHandler.getOpt().getRadarOptions();
         
-        Map<String, List<FTPContainer>> ftpCont = OptionsHandler.getFTPOptions(optionsDoc);
-        converter = new ConvertingTool(radarOptions, ftpCont, rb, verbose);
+        converter = new ConvertingTool(rb, verbose);
 
         watchedPath = new Path[radarOptions.length];
         WatchKey key[] = new WatchKey[radarOptions.length];
@@ -194,7 +189,7 @@ public class LocalFeeder implements Runnable {
             }
 
             Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose,
-                    rb, radarOptions);
+                    rb);
             vol.makeH5();
             radarName = vol.getRadarID();
             toBeSentFileName = vol.getOutputFileName();
@@ -205,7 +200,7 @@ public class LocalFeeder implements Runnable {
 
             // no single convertion from hdf to vol handle so far
             HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", filePath, verbose,
-                    rb, radarOptions);
+                    rb);
             toBeSentFileName = hdf.getOutputFileName();
 //            toBeSentFile = new File(hdf.getOutputFileName());
             radarName = hdf.getRadarName();
@@ -219,6 +214,8 @@ public class LocalFeeder implements Runnable {
             return;
         }
 
+        FTP_Options[] ftpOptions = OptionsHandler.getOpt().getOldFTPOptions();
+        
         if (toBeSentFile != null && ftpOptions != null) {
             
             for (int i = 0; i < ftpOptions.length; i++) {
@@ -308,6 +305,8 @@ public class LocalFeeder implements Runnable {
 
         }
 
+        BaltradOptions baltradOptions = OptionsHandler.getOpt().getBaltradOptions();
+        
         if (toBeSentFile != null
                 && (toBeSentFile.getName().endsWith("h5") || toBeSentFile
                         .getName().endsWith("hdf"))

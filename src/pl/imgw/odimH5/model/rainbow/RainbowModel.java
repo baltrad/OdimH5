@@ -567,7 +567,7 @@ public class RainbowModel {
      *            name of the parent Element
      * @param atrName
      *            name of the attribute
-     * @return attribute value
+     * @return attribute value null if not found
      */
     public static String getValueByName(Node node, String elemName,
             String atrName) {

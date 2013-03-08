@@ -70,6 +70,23 @@ public class OptionsHandler {
 //        return new File(init.getConfDir(), OPTION_XML_FILE).getPath();
 //    }
     
+    private MessageLogger msgl;
+    private boolean verbose;
+    
+    private static Document doc = loadOptions();
+    private RadarOptions[] radarOptions;
+    private BaltradOptions baltradOptions;
+    private Map<String, List<FTPContainer>> ftpOptions;
+    private FTP_Options[] oldFTPOptions;
+    
+    private static OptionsHandler options = new OptionsHandler();
+    
+    private OptionsHandler() {};
+    
+    public static OptionsHandler getOpt() {
+        return options;
+    }
+    
     private static String getOptionPath() {
         return new File(AplicationConstans.CONF, OPTION_XML_FILE).getPath();
     }
@@ -81,18 +98,17 @@ public class OptionsHandler {
      * @param verbose
      * @return XML document
      */
-    public static Document loadOptions(MessageLogger msgl, boolean verbose) {
-
+    private static Document loadOptions() {
         Document doc = null;
         try {
             DOMParser parser = new DOMParser();
             parser.parse(getOptionPath());
             doc = parser.getDocument();
-            msgl.showMessage("Parsing options file: " + getOptionPath(),
-                    verbose);
+
         } catch (Exception e) {
-            msgl.showMessage("Failed to parse options file: " + e.getMessage(),
-                    true);
+            System.out.println("Loading options failed!");
+            exampleOptionXML();
+            System.exit(0);
         }
         return doc;
     }
@@ -104,76 +120,76 @@ public class OptionsHandler {
      * @param doc
      * @return
      */
-    public static RadarOptions[] getRadarOptions(Document doc) {
+    private void loadRadarOptions() {
 
         NodeList radarList = doc.getElementsByTagName("radar");
         int counter = radarList.getLength();
-        RadarOptions[] options = new RadarOptions[counter];
+        radarOptions = new RadarOptions[counter];
 
         for (int i = 0; i < counter; i++) {
 
-            options[i] = new RadarOptions();
+            radarOptions[i] = new RadarOptions();
 
-            options[i].setRadarName(radarList.item(i).getAttributes()
+            radarOptions[i].setRadarName(radarList.item(i).getAttributes()
                     .getNamedItem(NAME).getNodeValue());
             
-            options[i].setLocation(RainbowModel.getValueByName(radarList
+            radarOptions[i].setLocation(RainbowModel.getValueByName(radarList
                     .item(i), LOCATION, null));
-            options[i].setRadarSourceName(RainbowModel.getValueByName(radarList
+            radarOptions[i].setRadarSourceName(RainbowModel.getValueByName(radarList
                     .item(i), WMO_ID, null));
-            options[i].setFileName(RainbowModel.getValueByName(radarList
+            radarOptions[i].setFileName(RainbowModel.getValueByName(radarList
                     .item(i), FILE_NAME, null));
-            options[i].setDir(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setDir(RainbowModel.getValueByName(radarList.item(i),
                     DIRECTORY, null));
-            options[i].setNrays(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setNrays(RainbowModel.getValueByName(radarList.item(i),
                     NRAYS, null));
-            options[i].setFormat(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setFormat(RainbowModel.getValueByName(radarList.item(i),
                     FORMAT, null));
             
             // attributes '/how' group in ODIM H5 2.1
-            options[i].setSimulated(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setSimulated(RainbowModel.getValueByName(radarList.item(i),
                     SIMULATED, null));
-            options[i].setPulsewidth(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setPulsewidth(RainbowModel.getValueByName(radarList.item(i),
                     PULSEWIDTH, null));
-            options[i].setRXbandwidth(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setRXbandwidth(RainbowModel.getValueByName(radarList.item(i),
                     RXBANDWIDTH, null));
-            options[i].setTXloss(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setTXloss(RainbowModel.getValueByName(radarList.item(i),
                     TXLOSS, null));
-            options[i].setRXloss(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setRXloss(RainbowModel.getValueByName(radarList.item(i),
                     RXLOSS, null));
-            options[i].setRadomeloss(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setRadomeloss(RainbowModel.getValueByName(radarList.item(i),
                     RADOMELOSS, null));
-            options[i].setAntgain(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setAntgain(RainbowModel.getValueByName(radarList.item(i),
                     ANTGAIN, null));
-            options[i].setGasattn(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setGasattn(RainbowModel.getValueByName(radarList.item(i),
                     GASATTN, null));
-            options[i].setRadconstH(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setRadconstH(RainbowModel.getValueByName(radarList.item(i),
                     RADCONSTH, null));
-            options[i].setRadconstV(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setRadconstV(RainbowModel.getValueByName(radarList.item(i),
                     RADCONSTV, null));
-            options[i].setNomTXpower(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setNomTXpower(RainbowModel.getValueByName(radarList.item(i),
                     NOMTXPOWER, null));
-            options[i].setTXpower(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setTXpower(RainbowModel.getValueByName(radarList.item(i),
                     TXPOWER, null));
-            options[i].setVsamples(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setVsamples(RainbowModel.getValueByName(radarList.item(i),
                     VSAMPLES, null));
-            options[i].setAzmethod(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setAzmethod(RainbowModel.getValueByName(radarList.item(i),
                     AZMETHOD, null));
-            options[i].setBinmethod(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setBinmethod(RainbowModel.getValueByName(radarList.item(i),
                     BINMETHOD, null));
-            options[i].setMalfunc(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setMalfunc(RainbowModel.getValueByName(radarList.item(i),
                     MALFUNC, null));
-            options[i].setNEZ(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setNEZ(RainbowModel.getValueByName(radarList.item(i),
                     NEZ, null));
-            options[i].setRAC(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setRAC(RainbowModel.getValueByName(radarList.item(i),
                     RAC, null));
-            options[i].setPAC(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setPAC(RainbowModel.getValueByName(radarList.item(i),
                     PAC, null));
-            options[i].setS2N(RainbowModel.getValueByName(radarList.item(i),
+            radarOptions[i].setS2N(RainbowModel.getValueByName(radarList.item(i),
                     S2N, null));
 
         }
-        return options;
+        
     }
 
     /**
@@ -183,17 +199,17 @@ public class OptionsHandler {
      * @param doc
      * @return
      */
-    public static BaltradOptions getBaltrad(Document doc) {
+    private void loadBaltrad() {
+
+        if (doc == null)
+            doc = loadOptions();
 
         NodeList baltradList = doc.getElementsByTagName("baltrad");
-        BaltradOptions options = new BaltradOptions();
+        baltradOptions = new BaltradOptions();
 
-        if (baltradList.getLength() == 0) {
-            return options;
-        }
-        options.setHostAddress( RainbowModel.getValueByName( baltradList.item( 0 ),
-                HOST_ADDRESS, null) );
-        return options;
+        if (baltradList.getLength() != 0)
+            baltradOptions.setHostAddress(RainbowModel.getValueByName(
+                    baltradList.item(0), HOST_ADDRESS, null));
     }
 
     /**
@@ -203,32 +219,34 @@ public class OptionsHandler {
      * @param doc
      * @return
      */
-    public static FTP_Options[] getOldFTPOptions(Document doc) {
+    private void loadOldFTPOptions() {
 
+        if(doc == null)
+            doc = loadOptions();
+        
         NodeList ftpList = doc.getElementsByTagName("ftp");
         int counter = ftpList.getLength();
-        FTP_Options[] options = new FTP_Options[counter];
+        oldFTPOptions = new FTP_Options[counter];
 
         for (int i = 0; i < counter; i++) {
 
-            options[i] = new FTP_Options();
+            oldFTPOptions[i] = new FTP_Options();
 
             String radars = RainbowModel.getValueByName(ftpList.item(i),
                     RADARS, null);
 
             if (radars != null && !radars.isEmpty())
-                options[i].setRadars(radars.split(" "));
+                oldFTPOptions[i].setRadars(radars.split(" "));
 
-            options[i].setAddress(RainbowModel.getValueByName(ftpList.item(i),
+            oldFTPOptions[i].setAddress(RainbowModel.getValueByName(ftpList.item(i),
                     ADDRESS, null));
-            options[i].setLogin(RainbowModel.getValueByName(ftpList.item(i),
+            oldFTPOptions[i].setLogin(RainbowModel.getValueByName(ftpList.item(i),
                     LOGIN, null));
-            options[i].setPassword(RainbowModel.getValueByName(ftpList.item(i),
+            oldFTPOptions[i].setPassword(RainbowModel.getValueByName(ftpList.item(i),
                     PASSWORD, null));
-            options[i].setDir(RainbowModel.getValueByName(ftpList.item(i),
+            oldFTPOptions[i].setDir(RainbowModel.getValueByName(ftpList.item(i),
                     DIRECTORY, null));
         }
-        return options;
     }
 
     /**
@@ -238,18 +256,25 @@ public class OptionsHandler {
      * @param doc
      * @return
      */
-    public static Map<String, List<FTPContainer>> getFTPOptions(Document doc) {
+    private void loadFTPOptions() {
+        
+        if(doc == null)
+            doc = loadOptions();
 
-        Map<String, List<FTPContainer>> ftps = new HashMap<String, List<FTPContainer>>();
+        ftpOptions = new HashMap<String, List<FTPContainer>>();
         
         NodeList ftpList = doc.getElementsByTagName("ftp");
         int counter = ftpList.getLength();
 
         for (int i = 0; i < counter; i++) {
 
-            String[] radars = RainbowModel.getValueByName(ftpList.item(i),
-                    RADARS, null).split(" ");
-
+            String r = RainbowModel.getValueByName(ftpList.item(i),
+                    RADARS, null);
+            if(r == null)
+                continue;
+            
+            String radars[] = r.split(" ");
+            
             String address = (RainbowModel.getValueByName(ftpList.item(i),
                     ADDRESS, null));
             String login = (RainbowModel.getValueByName(ftpList.item(i),
@@ -260,17 +285,16 @@ public class OptionsHandler {
                     DIRECTORY, null));
             
             for(String radar : radars) {
-                if(!ftps.containsKey(radar)) {
+                if(!ftpOptions.containsKey(radar)) {
                     List<FTPContainer> ftpc = new LinkedList<FTPContainer>();
-                    ftps.put(radar, ftpc);
+                    ftpOptions.put(radar, ftpc);
                 }
-                ftps.get(radar).add(new FTPContainer(address, login, pass, remoteDir));
+                ftpOptions.get(radar).add(new FTPContainer(address, login, pass, remoteDir));
                 
             }
             
             
         }
-        return ftps;
     }
     
     /**
@@ -352,4 +376,56 @@ public class OptionsHandler {
 
     }
 
+    /**
+     * @return the radarOptions
+     */
+    public RadarOptions[] getRadarOptions() {
+        if(radarOptions == null)
+            loadRadarOptions();
+        return radarOptions;
+    }
+
+    /**
+     * @return the baltradOptions
+     */
+    public BaltradOptions getBaltradOptions() {
+        if(baltradOptions == null)
+            loadBaltrad();
+        return baltradOptions;
+    }
+
+    /**
+     * @return the ftpOptions
+     */
+    public Map<String, List<FTPContainer>> getFtpOptions() {
+        if(ftpOptions == null)
+            loadFTPOptions();
+        return ftpOptions;
+    }
+
+    /**
+     * @return the oldFTPOptions
+     */
+    public FTP_Options[] getOldFTPOptions() {
+        if(oldFTPOptions == null)
+            loadOldFTPOptions();
+        return oldFTPOptions;
+    }
+
+    /**
+     * @param msgl the msgl to set
+     */
+    public void setMsgl(MessageLogger msgl) {
+        this.msgl = msgl;
+    }
+
+    /**
+     * @param verbose the verbose to set
+     */
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    
+    
 }

@@ -26,18 +26,14 @@ import com.enterprisedt.net.ftp.FileTransferClient;
 public class FTPHandler {
 
     private Map<String, FileTransferClient> connections = new HashMap<String, FileTransferClient>();
-    private Map<String, List<FTPContainer>> ftpContainers;
+    private Map<String, List<FTPContainer>> ftps;
+
 
     /**
      * 
-     * Map key is a radar ID, and value is a list of FTP properties, where this radar should be sent
-     * 
-     * @param ftps
      */
-    public FTPHandler(Map<String, List<FTPContainer>> ftps) throws IllegalArgumentException {
-        if(ftps.isEmpty())
-            throw new IllegalArgumentException("List cannot be empty");
-        this.ftpContainers = ftps;
+    public FTPHandler() {
+        ftps = OptionsHandler.getOpt().getFtpOptions();
     }
 
     private void connect(FileTransferClient ftp, FTPContainer ftpCont)
@@ -63,10 +59,11 @@ public class FTPHandler {
      */
     public boolean sendFile(File file, String radarID) {
 
-        if(!ftpContainers.containsKey(radarID))
+        if(!ftps.containsKey(radarID)) {
             return false;
+        }
         
-        List<FTPContainer> list = ftpContainers.get(radarID);
+        List<FTPContainer> list = ftps.get(radarID);
 
         
         for (FTPContainer ftpCont : list) {
@@ -78,7 +75,8 @@ public class FTPHandler {
             try {
                 connect(ftp, ftpCont);
 
-                ftp.changeDirectory(ftpCont.getRemoteDir());
+                if (ftpCont.getRemoteDir() != null)
+                    ftp.changeDirectory(ftpCont.getRemoteDir());
 
                 ftp.setContentType(FTPTransferType.BINARY);
 
@@ -86,11 +84,12 @@ public class FTPHandler {
 
                 ftp.rename("." + file.getName(), file.getName());
             } catch (FTPException e) {
+                e.printStackTrace();
                 return false;
             } catch (IOException e) {
+                e.printStackTrace();
                 return false;
             }
-
         }
 
         return true;

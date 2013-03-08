@@ -11,6 +11,7 @@ import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.ParametersContainer;
 import pl.imgw.odimH5.util.DataBufferContainer;
+import pl.imgw.odimH5.util.OptionsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
 
 /**
@@ -38,7 +39,7 @@ public class ModelImage {
      */
     @SuppressWarnings("static-access")
     public static String createDescriptor(String fileNameOut, byte[] fileBuff,
-            boolean verbose, RainbowModel rb, RadarOptions[] options) {
+            boolean verbose, RainbowModel rb) {
 
         boolean isDirect = false;
         if (fileNameOut.endsWith(".h5") || fileNameOut.isEmpty())
@@ -81,6 +82,8 @@ public class ModelImage {
             return null;
         }
 
+        RadarOptions[] options = OptionsHandler.getOpt().getRadarOptions();
+        
         String radarName = "";
         for (int i = 0; i < options.length; i++) {
             if (source.matches(options[i].getRadarName())) {

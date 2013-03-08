@@ -23,6 +23,7 @@ import pl.imgw.odimH5.model.rainbow.RainbowModel;
 import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
+import pl.imgw.odimH5.util.OptionsHandler;
 
 /**
  * Main class containing the main() function called by the operating system upon
@@ -69,6 +70,8 @@ public class Main {
         cont.setHDFModel(proc);
         cont.setRAINBOWModel(rainbow);
        
+        OptionsHandler.getOpt().setMsgl(msgl);
+        
         cont.startProcessor(args);
         
 

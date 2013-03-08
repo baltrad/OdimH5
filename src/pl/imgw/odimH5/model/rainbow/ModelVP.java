@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.model.ParametersContainer;
+import pl.imgw.odimH5.util.OptionsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
 
 
@@ -25,10 +26,12 @@ import pl.imgw.odimH5.util.RadarOptions;
 public class ModelVP {
 
     public static String createDescriptor(String fileName, byte[] fileBuff,
-            boolean verbose, RainbowModel rb, RadarOptions[] options) {
+            boolean verbose, RainbowModel rb) {
 
         
         //I'll finish that later ....
+        
+        RadarOptions[] options = OptionsHandler.getOpt().getRadarOptions();
         
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.PRODUCT, verbose);
         Document inputDoc = rb.parseRAINBOWMetadataBuffer(hdrBuff, verbose);
