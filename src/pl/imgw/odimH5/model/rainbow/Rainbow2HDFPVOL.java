@@ -17,6 +17,7 @@ import org.w3c.dom.Text;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
 import pl.imgw.odimH5.util.DataBufferContainer;
+import pl.imgw.odimH5.util.OptionsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
 
 import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER51X;
@@ -83,7 +84,7 @@ public class Rainbow2HDFPVOL {
      */
 
     public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff,
-            boolean verbose, RainbowModel rb, RadarOptions[] options)
+            boolean verbose, RainbowModel rb)
             {
 
         byte[] hdrBuff = rb.getRAINBOWMetadata(fileBuff, rb.VOLUME, verbose);
@@ -94,7 +95,8 @@ public class Rainbow2HDFPVOL {
 
         this.verbose = verbose;
         this.rb = rb;
-        this.options = options;
+        
+        options = OptionsHandler.getOpt().getRadarOptions();
 
         NodeList nodeList = null;
         nodeList = rb.getRAINBOWNodesByName(inputDoc, "volume", verbose);

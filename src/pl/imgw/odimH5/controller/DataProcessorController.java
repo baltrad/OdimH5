@@ -71,7 +71,7 @@ public class DataProcessorController {
         verbose = cmd.hasArgument(cmd.VERBOSE_OPTION) ? true : false;
 
         // Load options
-        Document doc = OptionsHandler.loadOptions(msgl, verbose);
+        OptionsHandler.getOpt().setVerbose(verbose);
 
         // Select operation mode depending on the command line arguments
         // provided
@@ -120,14 +120,6 @@ public class DataProcessorController {
 
             msgl.showMessage("Conversion mode selected", true);
 
-            if (doc == null) {
-                OptionsHandler.exampleOptionXML();
-                System.out.println("\nCreate and/or edit file "
-                        + OptionsHandler.OPTION_XML_FILE);
-                return;
-            }
-
-            RadarOptions[] options = OptionsHandler.getRadarOptions(doc);
             // Read input file
             byte[] fileBuff = hdf.readDataFile(
                     cmd.getArgumentValue(cmd.INPUT_FILE_OPTION), verbose);
@@ -143,7 +135,7 @@ public class DataProcessorController {
                     if (fileNameIn.endsWith("vol")) {
 
                         Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL(fileNameOut,
-                                fileBuff, verbose, rainbow, options);
+                                fileBuff, verbose, rainbow);
 
                         if (!vol.correct) {
                             return;
@@ -164,24 +156,24 @@ public class DataProcessorController {
 
                         //no single convertion from hdf to vol handle so far
                         HDF2RainbowPVOL hdf = new HDF2RainbowPVOL(fileNameOut,
-                                fileNameIn, verbose, rainbow, options);
+                                fileNameIn, verbose, rainbow);
 
                         
                     }
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.IMAGE)) {
                     fileNameOut = ModelImage.createDescriptor(fileNameOut,
-                            fileBuff, verbose, rainbow, options);
+                            fileBuff, verbose, rainbow);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.VP)) {
                     fileNameOut = ModelVP.createDescriptor(fileNameOut,
-                            fileBuff, verbose, rainbow, options);
+                            fileBuff, verbose, rainbow);
 
                 } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
                         rainbow.RHI)) {
                     fileNameOut = ModelRHI.createDescriptor(fileNameOut,
-                            fileBuff, verbose, rainbow, options);
+                            fileBuff, verbose, rainbow);
                 }
 
             }
@@ -194,14 +186,8 @@ public class DataProcessorController {
 
             msgl.showMessage("Operational feeder mode selected", true);
 
-            if (doc == null) {
-                OptionsHandler.exampleOptionXML();
-                System.out.println("\nCreate and/or edit file "
-                        + OptionsHandler.OPTION_XML_FILE);
-                return;
-            }
 
-            LocalFeeder worker = new LocalFeeder(doc, rainbow, hdf, msgl,
+            LocalFeeder worker = new LocalFeeder(rainbow, hdf, msgl,
                     verbose);
             try {
                 new Thread(worker).run();

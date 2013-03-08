@@ -1,22 +1,81 @@
 <?xml version="1.0" ?>
 <!-- FTP options -->
-<options>
-    <radar name="LEG">
-        <WMO_id>33333</WMO_id>
-        <file_name>FILE_NAME_PREFIX</file_name>
-        <directory>LOCAL_DIR</directory>
-        <nrays>360</nrays>
-        <format>file format</format>
-    </radar>
-    <ftp>
-        <radars>LIST OF RADARS</radars>
-        <address>FTP_SERVER</address>
-        <login>LOGIN</login>
-        <password>PASS</password>
-        <directory>DIR</directory>
-    </ftp>
-    <baltrad>
-        <host_address>host_address</host_address>
-    </baltrad>
-</options>
 
+<options>
+<!--
+     <radar name="DUB">
+        <WMO_id>123123</WMO_id>
+	<file_name>DUB_</file_name>
+        <directory></directory>
+    </radar>
+-->
+    <radar name="SWI">
+        <WMO_id>WMO:12220,NOD:plswi,PLC:Swidwin</WMO_id>
+	<file_name>T_PAGZ46_C_SOWR_</file_name>
+        <directory>rb5input/SWI/SWI_250_Z.vol</directory>
+         <nrays>360</nrays>
+   </radar>
+     <radar name="POZ">
+       <WMO_id>WMO:12331,NOD:plpoz,PLC:Poznan</WMO_id>
+	<file_name>T_PAGZ45_C_SOWR_</file_name>
+	<directory>rb5input/POZ/POZ_250_Z.vol</directory>
+        <nrays>360</nrays>
+    </radar>
+    <radar name="GDA">
+      <WMO_id>WMO:12151,NOD:plgda,PLC:Gdansk</WMO_id>
+	<file_name>T_PAGZ47_C_SOWR_</file_name>
+         <directory>rb5input/GDA/GDA_250_Z.vol</directory>
+         <nrays>360</nrays>
+    </radar>
+    <radar name="LEG">
+     <WMO_id>WMO:12374,NOD:plleg,PLC:Legionowo</WMO_id>
+	<file_name>T_PAGZ41_C_SOWR_</file_name>
+          <nrays>360</nrays>
+        <directory>rb5input/LEG/LEG_250_Z.vol</directory>
+    </radar>
+    <radar name="PAS">
+        <WMO_id>WMO:12544,NOD:plpas,PLC:Pastewnik</WMO_id>
+	<file_name>T_PAGZ43_C_SOWR_</file_name>
+           <nrays>360</nrays>
+       <directory>rb5input/PAS/PAS_250_Z.vol</directory>
+    </radar>
+    <radar name="RAM">
+        <WMO_id>WMO:12514,NOD:plram,PLC:Ramza</WMO_id>
+	<file_name>T_PAGZ42_C_SOWR_</file_name>
+         <directory>rb5input/RAM/RAM_250_Z.vol</directory>
+         <nrays>360</nrays>
+    </radar>
+    <radar name="BRZ">
+        <WMO_id>WMO:12568,NOD:plbrz,PLC:Brzuchania</WMO_id>
+	<file_name>T_PAGZ48_C_SOWR_</file_name>
+         <directory>rb5input/BRZ/BRZ_250_Z.vol</directory>
+         <nrays>360</nrays>
+    </radar>
+    <radar name="RZE">
+        <WMO_id>WMO:12579,NOD:plrze,PLC:Rzeszow</WMO_id>
+	<file_name>T_PAGZ44_C_SOWR_</file_name>
+         <directory>rb5input/RZE/RZE_250_Z.vol</directory>
+         <nrays>360</nrays>
+    </radar>
+	<radar name="BRD">
+        <WMO_id>11480</WMO_id>
+        <directory>rb5input/BRD</directory>
+		
+    </radar>
+	<radar name="SKA">
+        <WMO_id>11718</WMO_id>
+        <directory>rb5input/SKA</directory>
+    </radar>
+    <radar name="KOJ">
+	<WMO_id>11958</WMO_id>
+        <directory>rb5input/SLO</directory>
+    </radar>
+    <radar name="JAV">
+        <WMO_id>11812</WMO_id>
+        <directory>rb5input/SLO</directory>
+    </radar>
+	<radar name="BOR">
+        <WMO_id>06194</WMO_id>
+        <directory>rb5input/BOR</directory>
+    </radar>	
+</options>

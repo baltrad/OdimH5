@@ -18,12 +18,14 @@ import ncsa.hdf.object.Group;
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.h5.H5Group;
 
+import org.apache.log4j.spi.OptionHandler;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
+import pl.imgw.odimH5.util.OptionsHandler;
 import pl.imgw.odimH5.util.RadarOptions;
 
 /**
@@ -76,10 +78,10 @@ public class HDF2RainbowPVOL {
      * @param options
      */
     public HDF2RainbowPVOL(String outputFileName, String inputFileName,
-            boolean verbose, RainbowModel rb, RadarOptions[] options) {
+            boolean verbose, RainbowModel rb) {
 
         this.rb = rb;
-        this.options = options;
+        this.options = OptionsHandler.getOpt().getRadarOptions();
         this.verbose = verbose;
         this.outputFileName = outputFileName;
 
@@ -519,7 +521,7 @@ public class HDF2RainbowPVOL {
         RainbowModel rb = new RainbowModel();
         rb.setHDFModel(new HDF5Model());
         try {
-            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("dk.vol", input, true, rb, options);
+            HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("dk.vol", input, true, rb);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
