@@ -59,7 +59,10 @@ public class FTPHandler {
      */
     public boolean sendFile(File file, String radarID) {
 
+        System.out.println("starting to send file: " + file);
+        
         if(!ftps.containsKey(radarID)) {
+            System.out.println(radarID + ": No radar ID on the list");
             return false;
         }
         
