@@ -62,7 +62,7 @@ public class ConvertingTool {
         
         ftp.sendFile(toBeSentFile, radarID);
 
-        toBeSentFile.delete();
+//        toBeSentFile.delete();
         
         return true;
     }
@@ -70,7 +70,7 @@ public class ConvertingTool {
     public boolean convertHdf5ToVol(File file) {
 
         HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", file.getPath(), verbose,
-                rb);
+                rb, true);
         
         String toBeSentFileName = hdf.getOutputFileName();
         File toBeSentFile = new File(toBeSentFileName);

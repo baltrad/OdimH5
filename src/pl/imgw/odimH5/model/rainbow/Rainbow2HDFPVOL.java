@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import pl.imgw.odimH5.AplicationConstans;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
 import pl.imgw.odimH5.util.DataBufferContainer;
@@ -52,6 +53,7 @@ public class Rainbow2HDFPVOL {
     // private String radarName = "";
     private String filePrefix = "";
     private String outputFileName = "";
+    private String outputFolder;
     private String date = "";
     private String time = "";
     private String rangestep;
@@ -72,6 +74,14 @@ public class Rainbow2HDFPVOL {
 
     private HashMap<Integer, DataBufferContainer> blobs;
 
+    public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff,
+            boolean verbose, RainbowModel rb, boolean tmp) {
+        this(outputFileName, fileBuff, verbose, rb);
+        if(tmp) {
+            outputFolder = AplicationConstans.TMP;
+        }
+    }
+    
     /**
      * 
      * Collecting mandatory data from fileBuff for further processing.
@@ -150,6 +160,8 @@ public class Rainbow2HDFPVOL {
             this.outputFileName = outputFileName;
         }
 
+        if(outputFolder != null)
+            outputFileName = new File(outputFolder, outputFileName).getPath();
         correct = true;
 
     }

@@ -4,6 +4,7 @@
 package pl.imgw.odimH5.model.rainbow;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -23,6 +24,7 @@ import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import pl.imgw.odimH5.AplicationConstans;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
 import pl.imgw.odimH5.util.OptionsHandler;
@@ -68,14 +70,22 @@ public class HDF2RainbowPVOL {
     private boolean verbose;
     private H5File inputFile;
     private String outputFileName;
+    private String outputFolder;
 
+    public HDF2RainbowPVOL(String outputFileName, String inputFileName,
+            boolean verbose, RainbowModel rb, boolean tmp) {
+        this(outputFileName, inputFileName, verbose, rb);
+        if(tmp) {
+            outputFolder = AplicationConstans.TMP;
+        }
+    }
+    
     /**
      * 
      * @param outputFileName
      * @param inputFileName
      * @param verbose
      * @param rb
-     * @param options
      */
     public HDF2RainbowPVOL(String outputFileName, String inputFileName,
             boolean verbose, RainbowModel rb) {
@@ -394,6 +404,10 @@ public class HDF2RainbowPVOL {
         }
         Comment comment = od.createComment(" END XML ");
         od.appendChild(comment);
+        
+        if(outputFolder != null)
+            outputFileName = new File(outputFolder, outputFileName).getPath();
+        
         rb.hdf.saveXMLFile(od, outputFileName, verbose);
 
         for (int i = 0; i < size; i++) {
