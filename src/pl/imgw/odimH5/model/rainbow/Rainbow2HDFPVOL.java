@@ -53,7 +53,6 @@ public class Rainbow2HDFPVOL {
     // private String radarName = "";
     private String filePrefix = "";
     private String outputFileName = "";
-    private String outputFolder = null;
     private String date = "";
     private String time = "";
     private String rangestep;
@@ -77,8 +76,11 @@ public class Rainbow2HDFPVOL {
     public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff,
             boolean verbose, RainbowModel rb, boolean tmp) {
         this(outputFileName, fileBuff, verbose, rb);
-        if(tmp) {
-            outputFolder = AplicationConstans.TMP;
+        if (tmp) {
+
+            this.outputFileName = new File(AplicationConstans.TMP,
+                    this.outputFileName).getPath();
+
         }
     }
     
@@ -152,18 +154,14 @@ public class Rainbow2HDFPVOL {
         // ============ set output file name ==================
 
         if (outputFileName.isEmpty()) {
-            this.outputFileName = whatG.get(PVOL_H5.DATE)
+            outputFileName = whatG.get(PVOL_H5.DATE)
                     + whatG.get(PVOL_H5.TIME) + ".h5";
             if (filePrefix != null && !filePrefix.isEmpty())
-                this.outputFileName = filePrefix + this.outputFileName;
+                this.outputFileName = filePrefix + outputFileName;
         } else {
             this.outputFileName = outputFileName;
         }
 
-        if(outputFolder != null) {
-            this.outputFileName = new File(outputFolder, outputFileName).getPath();
-            System.out.println("tutaj: " + outputFileName);
-        }
         correct = true;
 
     }
