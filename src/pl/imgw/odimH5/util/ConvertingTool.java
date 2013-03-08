@@ -53,7 +53,7 @@ public class ConvertingTool {
             return false;
         }
 
-        Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose, rb);
+        Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose, rb, true);
         vol.makeH5();
         String radarID = vol.getRadarID();
         String toBeSentFileName = vol.getOutputFileName();
