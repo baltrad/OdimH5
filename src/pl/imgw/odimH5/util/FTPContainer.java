@@ -13,19 +13,23 @@ package pl.imgw.odimH5.util;
  */
 public class FTPContainer {
 
-    private String address;
-    private String login;
-    private StringBuilder password;
-    private String remoteDir;
+    private String address = "";
+    private String login = "";
+    private StringBuilder password = new StringBuilder("");
+    private String remoteDir = "";
     
     /**
      * 
      */
     public FTPContainer(String address, String login, StringBuilder password, String remoteDir) {
-        this.address = address;
-        this.login = login;
-        this.password = password;
-        this.remoteDir = remoteDir;
+        if (address != null)
+            this.address = address;
+        if (login != null)
+            this.login = login;
+        if (password != null)
+            this.password = password;
+        if (remoteDir != null)
+            this.remoteDir = remoteDir;
     }
     
     /**
@@ -41,7 +45,7 @@ public class FTPContainer {
         this.address = address;
     }
     /**
-     * @return the login
+     * @return the login, empty string if not set
      */
     public String getLogin() {
         return login;
@@ -53,7 +57,7 @@ public class FTPContainer {
         this.login = login;
     }
     /**
-     * @return the password
+     * @return the password, empty string if not set
      */
     public String getPassword() {
         return password.toString();
@@ -65,7 +69,7 @@ public class FTPContainer {
         this.password = new StringBuilder(password);
     }
     /**
-     * @return the remoteDir
+     * @return the remoteDir, empty string if not set
      */
     public String getRemoteDir() {
         return remoteDir;

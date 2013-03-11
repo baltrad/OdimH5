@@ -279,8 +279,11 @@ public class OptionsHandler {
                     ADDRESS, null));
             String login = (RainbowModel.getValueByName(ftpList.item(i),
                     LOGIN, null));
-            StringBuilder pass = new StringBuilder(RainbowModel.getValueByName(ftpList.item(i),
-                    PASSWORD, null));
+            String p = RainbowModel.getValueByName(ftpList.item(i), PASSWORD, null);
+            if(p == null)
+                p = "";
+                
+            StringBuilder pass = new StringBuilder(p);
             String remoteDir = (RainbowModel.getValueByName(ftpList.item(i),
                     DIRECTORY, null));
             

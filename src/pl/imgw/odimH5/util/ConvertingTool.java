@@ -25,7 +25,7 @@ import pl.imgw.odimH5.model.rainbow.RainbowModel;
 public class ConvertingTool {
 
 
-    private FTPHandler ftp;
+    private FTPApacheHandler ftp;
     private RainbowModel rb;
     private HashMap<String, FTPHandler> ftps = new HashMap<String, FTPHandler>();
     private boolean verbose;
@@ -35,7 +35,7 @@ public class ConvertingTool {
         
         this.rb = rb;
         this.verbose = verbose;
-        ftp = new FTPHandler();
+        ftp = new FTPApacheHandler();
 
     }
 

@@ -42,8 +42,9 @@ public class FTPHandler {
         // UtSocketFactory utSocketFactory = new UtSocketFactory();
         // utSocketFactory.setConnectTimeout(5000);
 
-        if(ftp.isConnected())
-            return;
+        if(ftp.isConnected()) {
+            ftp.disconnect();
+        }
         
         ftp.setRemoteHost(ftpCont.getAddress());
         ftp.setUserName(ftpCont.getLogin());
@@ -80,9 +81,12 @@ public class FTPHandler {
                 connect(ftp, ftpCont);
 
                 if (ftpCont.getRemoteDir() != null) {
-                    
-                    ftp.createDirectory(ftpCont.getRemoteDir());    
-                    ftp.changeDirectory(ftpCont.getRemoteDir());
+                    try {
+                        ftp.changeDirectory(ftpCont.getRemoteDir());
+                    } catch (FTPException e) {
+                        ftp.createDirectory(ftpCont.getRemoteDir());
+                        ftp.changeDirectory(ftpCont.getRemoteDir());
+                    }
                 }
 
                 ftp.createDirectory(radarID);
