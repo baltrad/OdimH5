@@ -181,8 +181,6 @@ public class HDF2RainbowPVOL {
                     radarName = n.substring(4);
                 }
             }
-        } else {
-            radarName = source;
         }
         
         if(source.toUpperCase().contains("NOD:")) {
@@ -203,6 +201,10 @@ public class HDF2RainbowPVOL {
             radarId = source;
         }
         
+        
+        if(radarName.isEmpty() && !radarId.isEmpty()) {
+            radarName = radarId;
+        }
         
 //        for (int i = 0; i < options.length; i++) {
 //            if (source.contains(options[i].getRadarSourceName())) {

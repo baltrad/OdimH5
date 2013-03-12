@@ -34,18 +34,6 @@ public class FTPApacheHandler {
         ftps = OptionsHandler.getOpt().getFtpOptions();
     }
     
-    private void connect(FTPClient ftp, FTPContainer ftpCont) throws IOException {
-        if(ftp.isConnected()) {
-            ftp.disconnect();
-        }
-        ftp.connect(ftpCont.getAddress());
-        ftp.setFileType(FTP.BINARY_FILE_TYPE, FTP.BINARY_FILE_TYPE);
-        ftp.setFileTransferMode(FTP.BINARY_FILE_TYPE);
-    }
-
-    
-
-
     public boolean sendFile(File file, String radarID) {
 
         if (!ftps.containsKey(radarID)) {
