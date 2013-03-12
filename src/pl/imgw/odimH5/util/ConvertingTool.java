@@ -60,10 +60,8 @@ public class ConvertingTool {
         File toBeSentFile = new File(toBeSentFileName);
 //        String radarName = vol.getRadarName();
         
-        for(int i = 0; i < 5; i++) {
-            if(ftp.sendFile(toBeSentFile, radarID))
-                break;
-        }
+
+        ftp.sendFile(toBeSentFile, radarID);
 
         toBeSentFile.delete();
         
@@ -80,10 +78,9 @@ public class ConvertingTool {
         
         String radarName = hdf.getRadarName();
         
-        for (int i = 0; i < 5; i++) {
-            if (ftp.sendFile(toBeSentFile, radarName))
-                break;
-        }
+        
+        ftp.sendFile(toBeSentFile, radarName);
+               
         
         toBeSentFile.delete();
         
