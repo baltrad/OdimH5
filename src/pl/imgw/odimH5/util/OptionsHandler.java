@@ -293,6 +293,7 @@ public class OptionsHandler {
                     ftpOptions.put(radar, ftpc);
                 }
                 ftpOptions.get(radar).add(new FTPContainer(address, login, pass, remoteDir));
+                System.out.println("Lista ftp: " + radar + " " + address);
                 
             }
             

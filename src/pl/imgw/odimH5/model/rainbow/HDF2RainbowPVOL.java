@@ -203,7 +203,6 @@ public class HDF2RainbowPVOL {
             for(RadarOptions opt :OptionsHandler.getOpt().getRadarOptions()) {
                 if(source.contains(opt.getRadarId())){
                     radarId = opt.getRadarName();
-                    System.out.println(radarId);
                 }
             }
         }
