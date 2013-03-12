@@ -135,7 +135,7 @@ public class OptionsHandler {
             
             radarOptions[i].setLocation(RainbowModel.getValueByName(radarList
                     .item(i), LOCATION, null));
-            radarOptions[i].setRadarSourceName(RainbowModel.getValueByName(radarList
+            radarOptions[i].setRadarId(RainbowModel.getValueByName(radarList
                     .item(i), WMO_ID, null));
             radarOptions[i].setFileName(RainbowModel.getValueByName(radarList
                     .item(i), FILE_NAME, null));

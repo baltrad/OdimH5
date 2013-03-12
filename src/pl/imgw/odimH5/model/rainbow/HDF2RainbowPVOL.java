@@ -197,14 +197,28 @@ public class HDF2RainbowPVOL {
                     radarId = n.substring(4);
                 }
             }
-        } else {
-            radarId = source;
+        } 
+        
+        if(radarId.isEmpty()) {
+            for(RadarOptions opt :OptionsHandler.getOpt().getRadarOptions()) {
+                if(source.contains(opt.getRadarId())){
+                    radarId = opt.getRadarName();
+                    System.out.println(radarId);
+                }
+            }
         }
         
+        if (radarId.isEmpty()) {
+            System.out.println("Add name of radar number " + source
+                    + " to options.xml");
+//            radarName = "bornholm";
+            
+        }
         
         if(radarName.isEmpty() && !radarId.isEmpty()) {
             radarName = radarId;
         }
+        
         
 //        for (int i = 0; i < options.length; i++) {
 //            if (source.contains(options[i].getRadarSourceName())) {
@@ -214,11 +228,6 @@ public class HDF2RainbowPVOL {
 //            }
 //        }
 //
-//        if (radarName.isEmpty()) {
-//            System.out.println("Add name of radar number " + source
-//                    + " to options.xml");
-//            radarName = "bornholm";
-//        }
 
         radar.put(PVOL_Rainbow.ALT, String.valueOf(alt));
         radar.put(PVOL_Rainbow.LAT, String.valueOf(lat));

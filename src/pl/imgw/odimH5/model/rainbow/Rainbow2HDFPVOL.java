@@ -879,7 +879,7 @@ public class Rainbow2HDFPVOL {
 
         for (int i = 0; i < options.length; i++) {
             if (source.matches(options[i].getRadarName())) {
-                radarName = options[i].getRadarSourceName();
+                radarName = options[i].getRadarId();
                 filePrefix = options[i].getFileName();
                 rIndex = i;
                 if (options[i].getNrays() != null)

@@ -15,7 +15,7 @@ public class RadarOptions {
 
     private String location = "";
     private String radarName = "";
-    private String radarSourceName = "";
+    private String radarId = "";
     private String fileName = "";
     private String dir = "";
     private String nrays = "";
@@ -52,12 +52,12 @@ public class RadarOptions {
         this.radarName = radarName;
     }
 
-    public String getRadarSourceName() {
-        return radarSourceName;
+    public String getRadarId() {
+        return radarId;
     }
 
-    public void setRadarSourceName(String radarSourceName) {
-        this.radarSourceName = radarSourceName;
+    public void setRadarId(String radarId) {
+        this.radarId = radarId;
     }
 
     public String getFileName() {
@@ -392,7 +392,7 @@ public class RadarOptions {
     public boolean isEmpty() {
         if (radarName == null || radarName.isEmpty())
             return true;
-        if (radarSourceName == null || radarSourceName.isEmpty())
+        if (radarId == null || radarId.isEmpty())
             return true;
         if (dir == null || dir.isEmpty())
             return true;

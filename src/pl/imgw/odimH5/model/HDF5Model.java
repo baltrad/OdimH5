@@ -1166,7 +1166,7 @@ public class HDF5Model {
             inputFile = (H5File) fileFormat.open(fileName, FileFormat.READ);
             inputFile.open();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("HDF5: Cannot open file: " + fileName);
         }
         return inputFile;
     }
