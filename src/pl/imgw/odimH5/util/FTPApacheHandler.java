@@ -43,6 +43,8 @@ public class FTPApacheHandler {
 
         List<FTPContainer> list = ftps.get(radarID);
 
+        System.out.println(radarID + " lista ftp: " + list.size());
+        
         for (FTPContainer ftpCont : list) {
             
             FTPClient ftp = connections.poll();
