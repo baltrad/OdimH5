@@ -129,7 +129,7 @@ public class FTPHandler {
 
         }
 
-        return false;
+        return true;
     }
 
     /**
