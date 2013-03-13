@@ -96,8 +96,12 @@ public class FTPHandler {
             ftp.setTimeout(2000);
             ftp.connect();
 
+            System.out.println("Polaczony");
+            
             if(!cd(ftp, ftpCont.getRemoteDir(), radarID))
                 return false;
+            
+            System.out.println("Katalog zmieniony");
             
             ftp.setContentType(FTPTransferType.BINARY);
 
@@ -105,7 +109,8 @@ public class FTPHandler {
 
             ftp.rename("." + file.getName(), file.getName());
             
-            ftp.disconnect();
+            System.out.println("Wyslane");
+            
         }catch (FTPConnectionClosedException e) {
              
         }catch (FTPException e) {
