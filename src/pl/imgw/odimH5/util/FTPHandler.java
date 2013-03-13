@@ -89,7 +89,7 @@ public class FTPHandler {
         if(ftpCont.getAddress().contains("localhost")) {
             File output = new File(new File(ftpCont.getRemoteDir(), radarID),
                     file.getName());
-            output.mkdirs();
+            output.getParentFile().mkdirs();
             try {
                 FileUtils.copyFile(file, output);
             } catch (IOException e) {
