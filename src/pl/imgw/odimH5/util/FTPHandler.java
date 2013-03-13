@@ -87,13 +87,17 @@ public class FTPHandler {
     private boolean send(File file, String radarID, FTPContainer ftpCont) {
         
         if(ftpCont.getAddress().contains("localhost")) {
-            File output = new File(ftpCont.getRemoteDir(), file.getName());
+            File output = new File(new File(ftpCont.getRemoteDir(), radarID),
+                    file.getName());
+            output.mkdirs();
             try {
                 FileUtils.copyFile(file, output);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            System.out.println(radarID + ": " + output.getPath() + " copied.");
+
             return true;
         }
         
