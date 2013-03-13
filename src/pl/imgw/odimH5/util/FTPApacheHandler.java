@@ -67,8 +67,9 @@ public class FTPApacheHandler {
 
         try {
             ftp.connect(ftpCont.getAddress());
-            ftp.setFileType(FTP.BINARY_FILE_TYPE, FTP.BINARY_FILE_TYPE);
-            ftp.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+//            ftp.setFileType(FTP.BINARY_FILE_TYPE, FTP.BINARY_FILE_TYPE);
+//            ftp.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);
             ftp.login(ftpCont.getLogin(), ftpCont.getPassword());
             
             if (!ftpCont.getRemoteDir().isEmpty()) {
@@ -93,6 +94,8 @@ public class FTPApacheHandler {
             } 
             
             FileInputStream fis = new FileInputStream(file);
+            
+            
             
             ftp.appendFile("." + file.getName(), fis);
             
