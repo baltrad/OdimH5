@@ -93,7 +93,7 @@ public class FTPHandler {
             ftp.setRemoteHost(ftpCont.getAddress());
             ftp.setUserName(ftpCont.getLogin());
             ftp.setPassword(ftpCont.getPassword());
-            ftp.setTimeout(2000);
+            ftp.setTimeout(10000);
             ftp.connect();
 
             System.out.println("Polaczony");
