@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ftp.FTPClient;
 
 import com.enterprisedt.net.ftp.FTPConnectionClosedException;
@@ -84,6 +85,18 @@ public class FTPHandler {
      * @return
      */
     private boolean send(File file, String radarID, FTPContainer ftpCont) {
+        
+        if(ftpCont.getAddress().contains("localhost")) {
+            File output = new File(ftpCont.getRemoteDir(), file.getName());
+            try {
+                FileUtils.copyFile(file, output);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return true;
+        }
+        
         FileTransferClient ftp = connections.poll();
         if(ftp == null)
             ftp = new FileTransferClient();
