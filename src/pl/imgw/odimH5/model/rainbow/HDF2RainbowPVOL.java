@@ -70,13 +70,13 @@ public class HDF2RainbowPVOL {
     private boolean verbose;
     private H5File inputFile;
     private String outputFileName;
-    private String outputFolder;
 
     public HDF2RainbowPVOL(String outputFileName, String inputFileName,
             boolean verbose, RainbowModel rb, boolean tmp) {
         this(outputFileName, inputFileName, verbose, rb);
-        if(tmp) {
-            outputFolder = AplicationConstans.TMP;
+        if (tmp) {
+            this.outputFileName = new File(AplicationConstans.TMP,
+                    this.outputFileName).getPath();
         }
     }
     
@@ -414,9 +414,6 @@ public class HDF2RainbowPVOL {
         }
         Comment comment = od.createComment(" END XML ");
         od.appendChild(comment);
-        
-        if(outputFolder != null)
-            outputFileName = new File(outputFolder, outputFileName).getPath();
         
         rb.hdf.saveXMLFile(od, outputFileName, verbose);
 

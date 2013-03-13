@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.apache.commons.net.ftp.FTPClient;
 
 import com.enterprisedt.net.ftp.FTPConnectionClosedException;
 import com.enterprisedt.net.ftp.FTPException;
@@ -26,7 +29,7 @@ import com.enterprisedt.net.ftp.FileTransferClient;
  */
 public class FTPHandler {
 
-    private Map<String, FileTransferClient> connections = new HashMap<String, FileTransferClient>();
+    private ConcurrentLinkedQueue<FileTransferClient> connections = new ConcurrentLinkedQueue<FileTransferClient>();
     private Map<String, List<FTPContainer>> ftps;
 
 
@@ -54,13 +57,123 @@ public class FTPHandler {
         
     }
 
+    public boolean sendFile(File file, String radarID) {
+
+        if (!ftps.containsKey(radarID)) {
+            System.out.println(radarID + ": No radar ID on the list");
+            return false;
+        }
+
+        List<FTPContainer> list = ftps.get(radarID);
+
+        for (FTPContainer ftpCont : list) {
+
+            for (int i = 0; i < 3; i++)
+                if (send(file, radarID, ftpCont))
+                    break;
+
+        }
+
+        return true;
+    }
+
+    /**
+     * @param file
+     * @param radarID
+     * @param ftpCont
+     * @return
+     */
+    private boolean send(File file, String radarID, FTPContainer ftpCont) {
+        FileTransferClient ftp = connections.poll();
+        if(ftp == null)
+            ftp = new FileTransferClient();
+        
+        try {
+            
+            ftp.setRemoteHost(ftpCont.getAddress());
+            ftp.setUserName(ftpCont.getLogin());
+            ftp.setPassword(ftpCont.getPassword());
+            ftp.setTimeout(2000);
+            ftp.connect();
+
+            if(!cd(ftp, ftpCont.getRemoteDir(), radarID))
+                return false;
+            
+            ftp.setContentType(FTPTransferType.BINARY);
+
+            ftp.uploadFile(file.getPath(), "." + file.getName());
+
+            ftp.rename("." + file.getName(), file.getName());
+            
+            ftp.disconnect();
+        }catch (FTPConnectionClosedException e) {
+             
+        }catch (FTPException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+
+            try {
+                ftp.disconnect();
+            } catch (Exception e) {
+            }
+            connections.offer(ftp);
+
+        }
+
+        return false;
+    }
+
+    /**
+     * @param ftp
+     * @param remoteDir
+     * @param radarID
+     */
+    private boolean cd(FileTransferClient ftp, String remoteDir, String radarID) {
+        
+        try {
+            ftp.changeDirectory(remoteDir);
+        } catch (FTPException e) {
+            try {
+                ftp.createDirectory(remoteDir);
+                ftp.changeDirectory(remoteDir);
+            } catch (FTPException e1) {
+                return false;
+            } catch (IOException e1) {
+                return false;
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        
+        try {
+            ftp.changeDirectory(radarID);
+        } catch (FTPException e) {
+            try {
+                ftp.createDirectory(radarID);
+                ftp.changeDirectory(radarID);
+            } catch (FTPException e1) {
+                return false;
+            } catch (IOException e1) {
+                return false;
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        
+        return true;
+    }
+    
     /**
      * 
      * @param file
      * @param radarID
      * @throws FTPException
      * @throws IOException
-     */
+     *
     public boolean sendFile(File file, String radarID) {
 
         if(!ftps.containsKey(radarID)) {
@@ -113,5 +226,5 @@ public class FTPHandler {
         return true;
         
     }
-
+*/
 }

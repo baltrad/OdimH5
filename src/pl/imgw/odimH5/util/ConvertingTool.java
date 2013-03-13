@@ -25,9 +25,8 @@ import pl.imgw.odimH5.model.rainbow.RainbowModel;
 public class ConvertingTool {
 
 
-    private FTPApacheHandler ftp;
+    private FTPHandler ftp;
     private RainbowModel rb;
-    private HashMap<String, FTPHandler> ftps = new HashMap<String, FTPHandler>();
     private boolean verbose;
 
     public ConvertingTool(RainbowModel rb, boolean verbose) {
@@ -35,7 +34,7 @@ public class ConvertingTool {
         
         this.rb = rb;
         this.verbose = verbose;
-        ftp = new FTPApacheHandler();
+        ftp = new FTPHandler();
 
     }
 
@@ -82,7 +81,7 @@ public class ConvertingTool {
         ftp.sendFile(toBeSentFile, radarName);
                
         
-//        toBeSentFile.delete();
+        toBeSentFile.delete();
         
         return true;
     }
