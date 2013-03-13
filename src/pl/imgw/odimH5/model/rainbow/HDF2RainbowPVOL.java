@@ -96,8 +96,15 @@ public class HDF2RainbowPVOL {
         this.outputFileName = outputFileName;
 
         hdf = rb.getHDFModel();
-
         inputFile = hdf.openHDF5File(inputFileName);
+    }
+
+    /**
+     * @param inputFileName
+     * @param verbose
+     */
+    private void convertToRainbow() {
+        
         Group rootHDF = hdf.getHDF5RootGroup(inputFile, verbose);
 
         dataset = new Vector<String>();
@@ -123,7 +130,6 @@ public class HDF2RainbowPVOL {
         makeXMLHead();
 
         hdf.closeHDF5File(inputFile);
-
     }
 
     private HashMap<String, String> makeVolAtributes(Group rootHDF) {
@@ -529,6 +535,7 @@ public class HDF2RainbowPVOL {
     }
 
     public String getOutputFileName() {
+        convertToRainbow();
         return outputFileName;
     }
 
