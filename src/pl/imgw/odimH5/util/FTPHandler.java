@@ -70,8 +70,11 @@ public class FTPHandler {
         for (FTPContainer ftpCont : list) {
 
             for (int i = 0; i < 3; i++)
-                if (send(file, radarID, ftpCont))
+                if (send(file, radarID, ftpCont)) {
+                    LogsHandler.saveRecentFile(file.getName(),
+                            ftpCont.getAddress());
                     break;
+                }
 
         }
 

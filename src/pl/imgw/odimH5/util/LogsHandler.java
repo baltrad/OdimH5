@@ -31,8 +31,8 @@ import pl.imgw.odimH5.AplicationConstans;
 public class LogsHandler {
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[MM/dd HH:mm:ss]");
-    private static final String RECENT_FILES = "recentFiles.log";
-    private static final String RECENT_TMP_FILES = "recentFiles.tmp";
+    private static final String RECENT_FILES = "recent.log";
+    private static final String RECENT_TMP_FILES = "recent.tmp";
     public static final String LOG_FILE = "error.log";
 
     private static String getLogPath() {
@@ -108,38 +108,41 @@ public class LogsHandler {
     }
 
     /**
-     * Save recent file name to log file.
+     * Save recent file name to log file. Keep only 10 newest lines in the log
+     * file.
      * 
      * @param recantFile
      *            name of the file
      */
     public static void saveRecentFile(String recantFile) {
-        saveRecentFile(recantFile, "");
+        saveRecentFile(recantFile, "localhost");
     }
-    
+
     /**
      * 
-     * Save recent file name to log file.
+     * Save recent file name to log file. Keep only 10 most recent lines in the log
+     * file.
      * 
      * @param recantFile
      *            name of the file
-     * @param msg
-     *            additional information (eg. FTP server address where the file
-     *            is sent)
+     * @param remoteHost
+     *            separate log file for this host will be created
      */
-    public static void saveRecentFile(String recantFile, String msg) {
+    public static void saveRecentFile(String recantFile, String remoteHost) {
 
         Calendar cal = Calendar.getInstance();
         
         String line = sdf.format(cal.getTime());
         line += ": " + recantFile;
         
-        if(!msg.isEmpty()) {
-            line += " " + msg;
+        if(!remoteHost.isEmpty()) {
+            line += " file stored in " + remoteHost;
         }
         
-        File tmp = new File(AplicationConstans.LOG, RECENT_TMP_FILES);
-        File old = new File(AplicationConstans.LOG, RECENT_FILES);
+        File tmp = new File(AplicationConstans.LOG, remoteHost + "_"
+                + RECENT_TMP_FILES);
+        File old = new File(AplicationConstans.LOG, remoteHost + "_"
+                + RECENT_FILES);
         
         try {
             old.createNewFile();
