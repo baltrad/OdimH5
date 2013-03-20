@@ -136,7 +136,7 @@ public class LogsHandler {
         line += ": " + recantFile;
         
         if(!remoteHost.isEmpty()) {
-            line += " file stored in " + remoteHost;
+            line += " sent to " + remoteHost;
         }
         
         File tmp = new File(AplicationConstans.LOG, remoteHost + "_"

@@ -71,7 +71,7 @@ public class FTPHandler {
 
             for (int i = 0; i < 3; i++)
                 if (send(file, radarID, ftpCont)) {
-                    LogsHandler.saveRecentFile(file.getName(),
+                    LogsHandler.saveRecentFile(radarID + " " + file.getName(),
                             ftpCont.getAddress());
                     break;
                 }
