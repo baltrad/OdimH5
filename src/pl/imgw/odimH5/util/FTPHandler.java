@@ -86,7 +86,7 @@ public class FTPHandler {
      */
     private boolean send(File file, String radarID, FTPContainer ftpCont) {
         
-        if(ftpCont.getAddress().contains("localhost")) {
+        if (ftpCont.getAddress().contains("localhost")) {
             File output = new File(new File(ftpCont.getRemoteDir(), radarID),
                     file.getName());
             output.getParentFile().mkdirs();
@@ -96,9 +96,14 @@ public class FTPHandler {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            System.out.println(radarID + ": " + output.getPath() + " copied.");
 
-            return true;
+            if (output.exists() && output.isFile()) {
+
+                System.out.println(radarID + ": " + output.getPath()
+                        + " copied.");
+                return true;
+            } else
+                return false;
         }
         
         FileTransferClient ftp = connections.poll();

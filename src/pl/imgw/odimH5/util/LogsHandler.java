@@ -3,9 +3,13 @@
  */
 package pl.imgw.odimH5.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
@@ -26,6 +30,9 @@ import pl.imgw.odimH5.AplicationConstans;
  */
 public class LogsHandler {
 
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("[MM/dd HH:mm:ss]");
+    private static final String RECENT_FILES = "recentFiles.log";
+    private static final String RECENT_TMP_FILES = "recentFiles.tmp";
     public static final String LOG_FILE = "error.log";
 
     private static String getLogPath() {
@@ -100,4 +107,66 @@ public class LogsHandler {
         }
     }
 
+    /**
+     * Save recent file name to log file.
+     * 
+     * @param recantFile
+     *            name of the file
+     */
+    public static void saveRecentFile(String recantFile) {
+        saveRecentFile(recantFile, "");
+    }
+    
+    /**
+     * 
+     * Save recent file name to log file.
+     * 
+     * @param recantFile
+     *            name of the file
+     * @param msg
+     *            additional information (eg. FTP server address where the file
+     *            is sent)
+     */
+    public static void saveRecentFile(String recantFile, String msg) {
+
+        Calendar cal = Calendar.getInstance();
+        
+        String line = sdf.format(cal.getTime());
+        line += ": " + recantFile;
+        
+        if(!msg.isEmpty()) {
+            line += " " + msg;
+        }
+        
+        File tmp = new File(AplicationConstans.LOG, RECENT_TMP_FILES);
+        File old = new File(AplicationConstans.LOG, RECENT_FILES);
+        
+        try {
+            old.createNewFile();
+
+            BufferedReader br = new BufferedReader(new FileReader(old));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(tmp));
+            
+            bw.write(String.format("%s%n", line));
+//            String l;
+            
+            for (int i = 0; i < 10; i++) {
+                line = br.readLine();
+                if (line == null)
+                    break;
+                bw.write(String.format("%s%n", line));
+            }
+
+            br.close();
+            bw.close();
+            
+            if (old.delete()) {
+                tmp.renameTo(old);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
 }

@@ -145,6 +145,7 @@ public class LocalFeeder implements Runnable {
     /**
      * 
      * @param filePath
+     * @deprecated
      */
     private void convertAndSendFileOld(String filePath) throws Exception {
 
