@@ -30,7 +30,7 @@ import com.enterprisedt.net.ftp.FileTransferClient;
  */
 public class FTPHandler {
 
-    private ConcurrentLinkedQueue<FileTransferClient> connections = new ConcurrentLinkedQueue<FileTransferClient>();
+    private Map<String, FileTransferClient> connections = new HashMap<String, FileTransferClient>();
     private Map<String, List<FTPContainer>> ftps;
 
 
@@ -108,9 +108,11 @@ public class FTPHandler {
                 return false;
         }
         
-        FileTransferClient ftp = connections.poll();
-        if(ftp == null)
+        FileTransferClient ftp = connections.get(ftpCont.getAddress());
+        if (ftp == null) {
             ftp = new FileTransferClient();
+            connections.put(ftpCont.getAddress(), ftp);
+        }
         
         try {
             
@@ -120,8 +122,12 @@ public class FTPHandler {
             ftp.setTimeout(10000);
             ftp.connect();
 
-            if(!cd(ftp, ftpCont.getRemoteDir(), radarID))
+            if (!cd(ftp, ftpCont.getRemoteDir(), radarID)) {
+                System.out.println(radarID + ": sending file " + file.getName()
+                        + " to " + ftpCont.getAddress()
+                        + " FAILED: cannot change remote directory");
                 return false;
+            }
             
             ftp.setContentType(FTPTransferType.BINARY);
 
@@ -151,8 +157,6 @@ public class FTPHandler {
                 ftp.disconnect();
             } catch (Exception e) {
             }
-            connections.offer(ftp);
-
         }
 
         return true;
