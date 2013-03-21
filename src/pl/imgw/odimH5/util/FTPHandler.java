@@ -75,7 +75,6 @@ public class FTPHandler {
                             ftpCont.getAddress());
                     break;
                 }
-
         }
 
         return true;
@@ -137,10 +136,14 @@ public class FTPHandler {
         }catch (FTPConnectionClosedException e) {
              
         }catch (FTPException e) {
-            e.printStackTrace();
+            System.out.println(radarID + ": sending file " + file.getName()
+                    + " to " + ftpCont.getAddress() + " FAILED: "
+                    + e.getMessage());
             return false;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(radarID + ": sending file " + file.getName()
+                    + " to " + ftpCont.getAddress() + " FAILED: "
+                    + e.getMessage());
             return false;
         } finally {
 

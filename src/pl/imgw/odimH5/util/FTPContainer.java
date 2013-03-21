@@ -16,7 +16,7 @@ public class FTPContainer {
     private String address = "";
     private String login = "";
     private StringBuilder password = new StringBuilder("");
-    private String remoteDir = "";
+    private String remoteDir = "/";
     
     /**
      * 
