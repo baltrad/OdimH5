@@ -122,7 +122,14 @@ public class FTPHandler {
             ftp.setTimeout(10000);
             ftp.connect();
 
-            if (!cd(ftp, ftpCont.getRemoteDir(), radarID)) {
+            String subfolder;
+            if(ftpCont.isSubfolders()) {
+                subfolder = radarID; 
+            } else {
+                subfolder = "";
+            }
+            
+            if (!cd(ftp, ftpCont.getRemoteDir(), subfolder)) {
                 System.out.println(radarID + ": sending file " + file.getName()
                         + " to " + ftpCont.getAddress()
                         + " FAILED: cannot change remote directory");
@@ -185,7 +192,8 @@ public class FTPHandler {
         }
         
         try {
-            ftp.changeDirectory(radarID);
+            if(!radarID.isEmpty())
+                ftp.changeDirectory(radarID);
         } catch (FTPException e) {
             try {
                 ftp.createDirectory(radarID);

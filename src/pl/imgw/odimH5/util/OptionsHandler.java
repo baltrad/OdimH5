@@ -38,6 +38,7 @@ public class OptionsHandler {
     public final static String LOGIN = "login";
     public final static String PASSWORD = "password";
     public final static String DIRECTORY = "directory";
+    public final static String SUBFOLDERS = "subfolders";
     public final static String NRAYS = "nrays";
     public final static String FORMAT = "format";
     public final static String HOST_ADDRESS = "host_address";
@@ -287,13 +288,29 @@ public class OptionsHandler {
             String remoteDir = (RainbowModel.getValueByName(ftpList.item(i),
                     DIRECTORY, null));
             
-            for(String radar : radars) {
-                if(!ftpOptions.containsKey(radar)) {
+            String s = (RainbowModel.getValueByName(ftpList.item(i),
+                    SUBFOLDERS, null));
+
+            boolean subfolders = true;
+
+            if(s == null) {
+                s = "true";
+            }
+            
+            if (s.toLowerCase().matches("true")) {
+                subfolders = true;
+            } else if (s.toLowerCase().matches("false"))
+                subfolders = false;
+
+            for (String radar : radars) {
+                if (!ftpOptions.containsKey(radar)) {
                     List<FTPContainer> ftpc = new LinkedList<FTPContainer>();
                     ftpOptions.put(radar, ftpc);
                 }
-                ftpOptions.get(radar).add(new FTPContainer(address, login, pass, remoteDir));
-                
+                ftpOptions.get(radar).add(
+                        new FTPContainer(address, login, pass, remoteDir,
+                                subfolders));
+
             }
             
             
@@ -365,6 +382,7 @@ public class OptionsHandler {
         System.out.println("        <" + PASSWORD + ">PASS</" + PASSWORD + ">");
         System.out
                 .println("        <" + DIRECTORY + ">DIR</" + DIRECTORY + ">");
+        System.out.println("        <" + SUBFOLDERS + ">true/false</" + SUBFOLDERS + ">");
         System.out.println("    </ftp>");
         System.out.println("    <baltrad>");
         // System.out.println("    <start_time>mm</start_time>");

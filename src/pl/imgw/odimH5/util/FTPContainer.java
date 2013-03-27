@@ -17,11 +17,12 @@ public class FTPContainer {
     private String login = "";
     private StringBuilder password = new StringBuilder("");
     private String remoteDir = "/";
+    private boolean subfolders = true;
     
     /**
      * 
      */
-    public FTPContainer(String address, String login, StringBuilder password, String remoteDir) {
+    public FTPContainer(String address, String login, StringBuilder password, String remoteDir, boolean subfolders) {
         if (address != null)
             this.address = address;
         if (login != null)
@@ -30,6 +31,7 @@ public class FTPContainer {
             this.password = password;
         if (remoteDir != null)
             this.remoteDir = remoteDir;
+        this.subfolders = subfolders;
     }
     
     /**
@@ -80,5 +82,21 @@ public class FTPContainer {
     public void setRemoteDir(String remoteDir) {
         this.remoteDir = remoteDir;
     }
+
+    /**
+     * @return the subfolders
+     */
+    public boolean isSubfolders() {
+        return subfolders;
+    }
+
+    /**
+     * @param subfolders the subfolders to set
+     */
+    public void setSubfolders(boolean subfolders) {
+        this.subfolders = subfolders;
+    }
+    
+    
     
 }
