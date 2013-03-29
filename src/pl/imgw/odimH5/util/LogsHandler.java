@@ -33,6 +33,8 @@ public class LogsHandler {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[MM/dd HH:mm:ss]");
     private static final String RECENT_FILES = "recent.log";
     private static final String RECENT_TMP_FILES = "recent.tmp";
+    private static final String INPUT_FILES = "input.log";
+    private static final String INPUT_TMP_FILES = "input.tmp";
     public static final String LOG_FILE = "error.log";
 
     private static String getLogPath() {
@@ -143,6 +145,61 @@ public class LogsHandler {
                 + RECENT_TMP_FILES);
         File old = new File(AplicationConstans.LOG, remoteHost + "_"
                 + RECENT_FILES);
+        
+        try {
+            old.createNewFile();
+
+            BufferedReader br = new BufferedReader(new FileReader(old));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(tmp));
+            
+            bw.write(String.format("%s%n", line));
+//            String l;
+            
+            for (int i = 0; i < 10; i++) {
+                line = br.readLine();
+                if (line == null)
+                    break;
+                bw.write(String.format("%s%n", line));
+            }
+
+            br.close();
+            bw.close();
+            
+            if (old.delete()) {
+                tmp.renameTo(old);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * 
+     * Save recent file name to log file. Keep only 10 most recent lines in the log
+     * file.
+     * 
+     * @param recantFile
+     *            name of the file
+     * @param remoteHost
+     *            separate log file for this host will be created
+     */
+    public static void saveRecentInputFile(String recantFile, String radarID) {
+
+        if(radarID.isEmpty()) {
+            return;
+        }
+        
+        Calendar cal = Calendar.getInstance();
+        
+        String line = sdf.format(cal.getTime());
+        line += ": " + recantFile;
+        line += " from: " + radarID;
+        
+        File tmp = new File(AplicationConstans.LOG, radarID + "_"
+                + INPUT_TMP_FILES);
+        File old = new File(AplicationConstans.LOG, radarID + "_"
+                + INPUT_FILES);
         
         try {
             old.createNewFile();

@@ -59,7 +59,8 @@ public class ConvertingTool {
         File toBeSentFile = new File(toBeSentFileName);
 //        String radarName = vol.getRadarName();
         
-
+        LogsHandler.saveRecentInputFile(file.getName(), radarID);
+        
         ftp.sendFile(toBeSentFile, radarID);
 
         toBeSentFile.delete();
@@ -77,6 +78,7 @@ public class ConvertingTool {
         
         String radarName = hdf.getRadarName();
         
+        LogsHandler.saveRecentInputFile(file.getName(), radarName);
         
         ftp.sendFile(toBeSentFile, radarName);
                
