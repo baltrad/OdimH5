@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import pl.imgw.odimH5.AplicationConstans;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
 import pl.imgw.odimH5.util.DataBufferContainer;
@@ -55,7 +56,7 @@ public class Rainbow2HDFPVOL {
     private String date = "";
     private String time = "";
     private String rangestep;
-    private String source = "";
+    private String radarId = "";
     private String radarFullName = "";
     private int shift = 0;
     private int size = 0;
@@ -72,6 +73,17 @@ public class Rainbow2HDFPVOL {
 
     private HashMap<Integer, DataBufferContainer> blobs;
 
+    public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff,
+            boolean verbose, RainbowModel rb, boolean tmp) {
+        this(outputFileName, fileBuff, verbose, rb);
+        if (tmp) {
+
+            this.outputFileName = new File(AplicationConstans.TMP,
+                    this.outputFileName).getPath();
+
+        }
+    }
+    
     /**
      * 
      * Collecting mandatory data from fileBuff for further processing.
@@ -142,10 +154,10 @@ public class Rainbow2HDFPVOL {
         // ============ set output file name ==================
 
         if (outputFileName.isEmpty()) {
-            this.outputFileName = whatG.get(PVOL_H5.DATE)
+            outputFileName = whatG.get(PVOL_H5.DATE)
                     + whatG.get(PVOL_H5.TIME) + ".h5";
             if (filePrefix != null && !filePrefix.isEmpty())
-                this.outputFileName = filePrefix + this.outputFileName;
+                this.outputFileName = filePrefix + outputFileName;
         } else {
             this.outputFileName = outputFileName;
         }
@@ -839,12 +851,12 @@ public class Rainbow2HDFPVOL {
         NodeList nodeList = null;
         HashMap<String, String> what = new HashMap<String, String>();
 
-
+        
         if (version.substring(0, 3).matches(VER51X)
                 || version.substring(0, 3).matches(VER52X)) {
 
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
-            source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
+            radarId = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
             radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
                     verbose);
 
@@ -852,7 +864,7 @@ public class Rainbow2HDFPVOL {
 
             nodeList = rb
                     .getRAINBOWNodesByName(inputDoc, "sensorinfo", verbose);
-            source = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
+            radarId = rb.getRAINBOWMetadataElement(nodeList, "id", verbose);
             radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
                     verbose);
 
@@ -861,11 +873,13 @@ public class Rainbow2HDFPVOL {
             return null;
         }
 
+        String source = radarId;
+        
         String radarName = "";
 
         for (int i = 0; i < options.length; i++) {
             if (source.matches(options[i].getRadarName())) {
-                radarName = options[i].getRadarSourceName();
+                radarName = options[i].getRadarId();
                 filePrefix = options[i].getFileName();
                 rIndex = i;
                 if (options[i].getNrays() != null)
@@ -1715,7 +1729,7 @@ public class Rainbow2HDFPVOL {
      * @return
      */
     public String getRadarID() {
-        return source;
+        return radarId;
     }
 
     /**

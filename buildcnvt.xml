@@ -37,6 +37,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 	<property name="util.pkg" value="pl/imgw/odimH5/util"/>
 	<property name="log.dir" value="log"/>
 	<property name="etc.dir" value="etc"/>
+	<property name="tmp.dir" value="tmp"/>
 	<property name="options.file" value="options.xml"/>
 	<property name="properties.file" value="odim.properties"/>
 
@@ -79,6 +80,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 				<filter token="DATE" value="${TODAY}" />
 				<filter token="LOG" value="${prefix}/${app.name}/${log.dir}" />
 				<filter token="CONF" value="${prefix}/${app.name}/${conf.dir}" />
+				<filter token="TMP" value="${prefix}/${app.name}/${tmp.dir}" />
 			</filterset>
 		</copy>
 		<javac encoding="UTF-8" deprecation="on" srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
@@ -110,6 +112,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 		<mkdir dir="${prefix}/${app.name}/${share.dir}"/>
 		<mkdir dir="${prefix}/${app.name}/${conf.dir}"/>
 		<mkdir dir="${prefix}/${app.name}/${log.dir}"/>
+		<mkdir dir="${prefix}/${app.name}/${tmp.dir}"/>
 		<copy todir="${prefix}/${app.name}/${share.dir}" flatten="true">
 			<fileset dir="${dist.dir}">
 				<include name="**/*.jar" />
@@ -124,7 +127,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
 		<!-- Copy wrapper scripts -->
 		<copy todir="${prefix}/${app.name}/${bin.dir}" file="${script.dir}/odimh5">
 			<filterset>
-				<filter token="LIBDIR" value="${prefix}/${app.name}/${lib.hdf5.dir}" />
+				<filter token="LIBDIR" value="${prefix}/${app.name}/${lib.dir}" />
 				<filter token="JARDIR" value="${prefix}/${app.name}/${share.dir}/${app.name}.jar" />
 			</filterset>
 		</copy>

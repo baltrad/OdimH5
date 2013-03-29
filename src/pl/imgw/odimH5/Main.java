@@ -17,6 +17,8 @@
 
 package pl.imgw.odimH5;
 
+import java.io.File;
+
 import pl.imgw.odimH5.controller.DataProcessorController;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
@@ -24,6 +26,7 @@ import pl.imgw.odimH5.util.CommandLineArgsParser;
 import pl.imgw.odimH5.util.LogsHandler;
 import pl.imgw.odimH5.util.MessageLogger;
 import pl.imgw.odimH5.util.OptionsHandler;
+import sun.misc.Cleaner;
 
 /**
  * Main class containing the main() function called by the operating system upon
@@ -55,6 +58,8 @@ public class Main {
         }*/
         
         LogsHandler.saveProgramLogs("System starts");
+        
+        cleanTmpFiles();
 
         HDF5Model proc = new HDF5Model();
         RainbowModel rainbow = new RainbowModel();
@@ -83,5 +88,12 @@ public class Main {
     public static String getProgPath() {
         return new File(HOME, ODIM_H5).getPath();
     }*/
+    
+    private static void cleanTmpFiles() {
+        File folder = new File(AplicationConstans.TMP);
+        for(File f : folder.listFiles()) {
+            f.delete();
+        }
+    }
     
 }

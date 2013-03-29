@@ -4,6 +4,7 @@
 package pl.imgw.odimH5.model.rainbow;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -23,6 +24,7 @@ import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import pl.imgw.odimH5.AplicationConstans;
 import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
 import pl.imgw.odimH5.util.OptionsHandler;
@@ -68,14 +70,22 @@ public class HDF2RainbowPVOL {
     private boolean verbose;
     private H5File inputFile;
     private String outputFileName;
+    private String outputFolder;
 
+    public HDF2RainbowPVOL(String outputFileName, String inputFileName,
+            boolean verbose, RainbowModel rb, boolean tmp) {
+        this(outputFileName, inputFileName, verbose, rb);
+        if (tmp) {
+            outputFolder = AplicationConstans.TMP;
+        }
+    }
+    
     /**
      * 
      * @param outputFileName
      * @param inputFileName
      * @param verbose
      * @param rb
-     * @param options
      */
     public HDF2RainbowPVOL(String outputFileName, String inputFileName,
             boolean verbose, RainbowModel rb) {
@@ -86,8 +96,15 @@ public class HDF2RainbowPVOL {
         this.outputFileName = outputFileName;
 
         hdf = rb.getHDFModel();
-
         inputFile = hdf.openHDF5File(inputFileName);
+    }
+
+    /**
+     * @param inputFileName
+     * @param verbose
+     */
+    private void convertToRainbow() {
+        
         Group rootHDF = hdf.getHDF5RootGroup(inputFile, verbose);
 
         dataset = new Vector<String>();
@@ -113,7 +130,6 @@ public class HDF2RainbowPVOL {
         makeXMLHead();
 
         hdf.closeHDF5File(inputFile);
-
     }
 
     private HashMap<String, String> makeVolAtributes(Group rootHDF) {
@@ -126,6 +142,8 @@ public class HDF2RainbowPVOL {
 
         if (outputFileName.isEmpty()) {
             outputFileName = d + t + "00dBZ.vol";
+            if(outputFolder != null)
+                outputFileName = new File(outputFolder, outputFileName).getPath();
         }
 
         date = d.substring(0, 4) + "-" + d.substring(4, 6) + "-"
@@ -171,8 +189,6 @@ public class HDF2RainbowPVOL {
                     radarName = n.substring(4);
                 }
             }
-        } else {
-            radarName = source;
         }
         
         if(source.toUpperCase().contains("NOD:")) {
@@ -189,8 +205,25 @@ public class HDF2RainbowPVOL {
                     radarId = n.substring(4);
                 }
             }
-        } else {
-            radarId = source;
+        } 
+        
+        if(radarId.isEmpty()) {
+            for(RadarOptions opt :OptionsHandler.getOpt().getRadarOptions()) {
+                if(source.contains(opt.getRadarId())){
+                    radarId = opt.getRadarName();
+                }
+            }
+        }
+        
+        if (radarId.isEmpty()) {
+            System.out.println("Add name of radar number " + source
+                    + " to options.xml");
+//            radarName = "bornholm";
+            
+        }
+        
+        if(radarName.isEmpty() && !radarId.isEmpty()) {
+            radarName = radarId;
         }
         
         
@@ -202,11 +235,6 @@ public class HDF2RainbowPVOL {
 //            }
 //        }
 //
-//        if (radarName.isEmpty()) {
-//            System.out.println("Add name of radar number " + source
-//                    + " to options.xml");
-//            radarName = "bornholm";
-//        }
 
         radar.put(PVOL_Rainbow.ALT, String.valueOf(alt));
         radar.put(PVOL_Rainbow.LAT, String.valueOf(lat));
@@ -394,6 +422,7 @@ public class HDF2RainbowPVOL {
         }
         Comment comment = od.createComment(" END XML ");
         od.appendChild(comment);
+        
         rb.hdf.saveXMLFile(od, outputFileName, verbose);
 
         for (int i = 0; i < size; i++) {
@@ -508,6 +537,7 @@ public class HDF2RainbowPVOL {
     }
 
     public String getOutputFileName() {
+        convertToRainbow();
         return outputFileName;
     }
 

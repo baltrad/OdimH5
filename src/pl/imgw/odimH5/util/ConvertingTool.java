@@ -27,7 +27,6 @@ public class ConvertingTool {
 
     private FTPHandler ftp;
     private RainbowModel rb;
-    private HashMap<String, FTPHandler> ftps = new HashMap<String, FTPHandler>();
     private boolean verbose;
 
     public ConvertingTool(RainbowModel rb, boolean verbose) {
@@ -53,29 +52,38 @@ public class ConvertingTool {
             return false;
         }
 
-        Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose, rb);
+        Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose, rb, true);
         vol.makeH5();
         String radarID = vol.getRadarID();
         String toBeSentFileName = vol.getOutputFileName();
         File toBeSentFile = new File(toBeSentFileName);
-        String radarName = vol.getRadarName();
+//        String radarName = vol.getRadarName();
+        
+        LogsHandler.saveRecentInputFile(file.getName(), radarID);
         
         ftp.sendFile(toBeSentFile, radarID);
 
+        toBeSentFile.delete();
+        
         return true;
     }
 
     public boolean convertHdf5ToVol(File file) {
 
         HDF2RainbowPVOL hdf = new HDF2RainbowPVOL("", file.getPath(), verbose,
-                rb);
+                rb, true);
         
         String toBeSentFileName = hdf.getOutputFileName();
         File toBeSentFile = new File(toBeSentFileName);
         
         String radarName = hdf.getRadarName();
         
+        LogsHandler.saveRecentInputFile(file.getName(), radarName);
+        
         ftp.sendFile(toBeSentFile, radarName);
+               
+        
+        toBeSentFile.delete();
         
         return true;
     }
