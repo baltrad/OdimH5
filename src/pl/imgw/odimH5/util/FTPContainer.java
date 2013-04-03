@@ -92,7 +92,7 @@ public class FTPContainer {
      * @return the remoteDir without slash (/) at the end, empty string if not set
      */
     public String getRemoteDir() {
-        if(remoteDir.endsWith("/"))
+        if(remoteDir.length() > 1 && remoteDir.endsWith("/"))
             return remoteDir.substring(0, remoteDir.length() - 1);
         return remoteDir;
     }
