@@ -35,13 +35,13 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     <property name="conf.dir" value="conf"/>
     <property name="util.pkg" value="pl/imgw/odimH5/util"/>
     <property name="log.dir" value="log"/>
-	<property name="tmp.dir" value="tmp"/>
     <property name="etc.dir" value="etc"/>
     <property name="options.file" value="options.xml"/>
     <property name="keystore.dir" value=".keystore"/>
     <property name="properties.file" value="odim.properties"/>
-	<property name="version.src" value="src/pl/imgw/odimH5/AplicationConstans.java" />
-	<property name="version" value="src/pl/imgw/odimH5/AplicationConstans" />
+    <property name="version.src" value="src/pl/imgw/odimH5/AplicationConstans.java" />
+    <property name="version" value="src/pl/imgw/odimH5/AplicationConstans" />
+    
     <!-- Override this property with -Dhost.address -->
     <property name="host.address" value="http://localhost"/>
     <property name="conn.timeout" value="60000"/>

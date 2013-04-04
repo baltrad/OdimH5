@@ -13,16 +13,22 @@ package pl.imgw.odimH5.util;
  */
 public class FTPContainer {
 
+    public static final int NO_SUBFOLDERS = 0;
+    public static final int RADAR_NAME_SUBFOLDERS = 1;
+    public static final int RADAR_NAME_DATE_SUBFOLDERS = 2;
+    
     private String address = "";
     private String login = "";
     private StringBuilder password = new StringBuilder("");
     private String remoteDir = "/";
-    private boolean subfolders = true;
+    private boolean subfolder = true;
+    private int subfolders = 0;
+    
     
     /**
      * 
-     */
-    public FTPContainer(String address, String login, StringBuilder password, String remoteDir, boolean subfolders) {
+     *
+    public FTPContainer(String address, String login, StringBuilder password, String remoteDir, boolean subfolder) {
         if (address != null)
             this.address = address;
         if (login != null)
@@ -30,6 +36,33 @@ public class FTPContainer {
         if (password != null)
             this.password = password;
         if (remoteDir != null)
+            this.remoteDir = remoteDir;
+        this.subfolder = subfolder;
+    }
+    */
+    
+    /**
+     * 
+     * @param address
+     *            remote ftp server address
+     * @param login
+     *            ftp server login
+     * @param password
+     *            ftp server password
+     * @param remoteDir
+     *            remote directory, use empty string if not needed
+     * @param subfolders
+     *            choose if you want ftp sender to create subfolders for
+     *            outcoming data
+     */
+    public FTPContainer(String address, String login, StringBuilder password, String remoteDir, int subfolders) {
+        if (address != null)
+            this.address = address;
+        if (login != null)
+            this.login = login;
+        if (password != null)
+            this.password = password;
+        if (remoteDir != null)            
             this.remoteDir = remoteDir;
         this.subfolders = subfolders;
     }
@@ -40,63 +73,40 @@ public class FTPContainer {
     public String getAddress() {
         return address;
     }
-    /**
-     * @param address the address to set
-     */
-    public void setAddress(String address) {
-        this.address = address;
-    }
+
     /**
      * @return the login, empty string if not set
      */
     public String getLogin() {
         return login;
     }
-    /**
-     * @param login the login to set
-     */
-    public void setLogin(String login) {
-        this.login = login;
-    }
+
     /**
      * @return the password, empty string if not set
      */
     public String getPassword() {
         return password.toString();
     }
+
     /**
-     * @param password the password to set
-     */
-    public void setPassword(String password) {
-        this.password = new StringBuilder(password);
-    }
-    /**
-     * @return the remoteDir, empty string if not set
+     * @return the remoteDir without slash (/) at the end, empty string if not set
      */
     public String getRemoteDir() {
+        if(remoteDir.length() > 1 && remoteDir.endsWith("/"))
+            return remoteDir.substring(0, remoteDir.length() - 1);
         return remoteDir;
     }
-    /**
-     * @param remoteDir the remoteDir to set
-     */
-    public void setRemoteDir(String remoteDir) {
-        this.remoteDir = remoteDir;
-    }
 
+
+    public int getSubfolders() {
+        return subfolders;
+    }
+    
     /**
      * @return the subfolders
      */
     public boolean isSubfolders() {
-        return subfolders;
+        return subfolder;
     }
 
-    /**
-     * @param subfolders the subfolders to set
-     */
-    public void setSubfolders(boolean subfolders) {
-        this.subfolders = subfolders;
-    }
-    
-    
-    
 }

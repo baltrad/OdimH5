@@ -291,16 +291,29 @@ public class OptionsHandler {
             String s = (RainbowModel.getValueByName(ftpList.item(i),
                     SUBFOLDERS, null));
 
-            boolean subfolders = true;
-
-            if(s == null) {
-                s = "true";
+            
+            int subfolders = FTPContainer.NO_SUBFOLDERS;
+            
+            try {
+                subfolders = Integer.parseInt(s);
+            } catch (NumberFormatException e) {
+                subfolders = FTPContainer.NO_SUBFOLDERS;
             }
             
-            if (s.toLowerCase().matches("true")) {
-                subfolders = true;
-            } else if (s.toLowerCase().matches("false"))
-                subfolders = false;
+            if(subfolders < 0 || subfolders > 2) {
+                subfolders = FTPContainer.NO_SUBFOLDERS;
+            }
+            
+//            boolean subfolder = true;
+//
+//            if(s == null) {
+//                s = "true";
+//            }
+//            
+//            if (s.toLowerCase().matches("true")) {
+//                subfolder = true;
+//            } else if (s.toLowerCase().matches("false"))
+//                subfolder = false;
 
             for (String radar : radars) {
                 if (!ftpOptions.containsKey(radar)) {

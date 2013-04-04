@@ -6,10 +6,14 @@ package pl.imgw.odimH5.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.io.FileUtils;
@@ -33,6 +37,9 @@ public class FTPHandler {
     private Map<String, FileTransferClient> connections = new HashMap<String, FileTransferClient>();
     private Map<String, List<FTPContainer>> ftps;
 
+    private SimpleDateFormat folderName = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat fileName = new SimpleDateFormat("yyyyMMdd");
+    
 
     /**
      * 
@@ -122,14 +129,19 @@ public class FTPHandler {
             ftp.setTimeout(10000);
             ftp.connect();
 
-            String subfolder;
-            if(ftpCont.isSubfolders()) {
-                subfolder = radarID; 
-            } else {
-                subfolder = "";
-            }
+//            String subfolder;
+//            if(ftpCont.isSubfolders()) {
+//                subfolder = radarID; 
+//            } else {
+//                subfolder = "";
+//            }
             
-            if (!cd(ftp, ftpCont.getRemoteDir(), subfolder)) {
+            String remote = getRemoteFolder(radarID, file.getName(),
+                    ftpCont.getRemoteDir(), ftpCont.getSubfolders());
+            
+//            System.out.println("remote: " + remote);
+            
+            if (!cd(ftp, remote)) {
                 System.out.println(radarID + ": sending file " + file.getName()
                         + " to " + ftpCont.getAddress()
                         + " FAILED: cannot change remote directory");
@@ -174,7 +186,7 @@ public class FTPHandler {
      * @param remoteDir
      * @param radarID
      */
-    private boolean cd(FileTransferClient ftp, String remoteDir, String radarID) {
+    private boolean cd(FileTransferClient ftp, String remoteDir) {
         
         try {
             ftp.changeDirectory(remoteDir);
@@ -191,23 +203,56 @@ public class FTPHandler {
             return false;
         }
         
-        try {
-            if(!radarID.isEmpty())
-                ftp.changeDirectory(radarID);
-        } catch (FTPException e) {
-            try {
-                ftp.createDirectory(radarID);
-                ftp.changeDirectory(radarID);
-            } catch (FTPException e1) {
-                return false;
-            } catch (IOException e1) {
-                return false;
-            }
-        } catch (IOException e) {
-            return false;
-        }
+//        try {
+//            if(!radarID.isEmpty())
+//                ftp.changeDirectory(radarID);
+//        } catch (FTPException e) {
+//            try {
+//                ftp.createDirectory(radarID);
+//                ftp.changeDirectory(radarID);
+//            } catch (FTPException e1) {
+//                return false;
+//            } catch (IOException e1) {
+//                return false;
+//            }
+//        } catch (IOException e) {
+//            return false;
+//        }
         
         return true;
+    }
+    
+    private String getRemoteFolder(String radarid, String file,
+            String remoteDir, int subfolders) {
+
+        switch (subfolders) {
+        case FTPContainer.NO_SUBFOLDERS:
+            return remoteDir;
+
+        case FTPContainer.RADAR_NAME_SUBFOLDERS:
+            return remoteDir + "/" + radarid;
+
+        case FTPContainer.RADAR_NAME_DATE_SUBFOLDERS:
+            Date date = null;
+            
+            if(file.contains("_")) {
+                file = file.split("_")[file.split("_").length - 1].substring(0,  8);
+            } else {
+                file = file.substring(0, 8);
+            }
+
+//            System.out.println("file: " + file);
+            
+            try {
+                date = fileName.parse(file);
+            } catch (ParseException e) {
+                date = new Date();
+            }
+            return remoteDir + "/" + radarid + "/" + folderName.format(date);
+
+        }
+
+        return "";
     }
     
     /**

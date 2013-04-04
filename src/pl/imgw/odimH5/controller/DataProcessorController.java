@@ -62,23 +62,23 @@ public class DataProcessorController {
      *            Command line arguments
      * @throws Exception
      */
-    @SuppressWarnings("static-access")
+//    @SuppressWarnings("static-access")
     public void startProcessor(String[] args) {
         // Parse command line arguments
         cmd.parseCommandLineArgs(args);
 
         // Check if verbose mode is chosen
-        verbose = cmd.hasArgument(cmd.VERBOSE_OPTION) ? true : false;
+        verbose = cmd.hasArgument(CommandLineArgsParser.VERBOSE_OPTION) ? true : false;
 
         // Load options
         OptionsHandler.getOpt().setVerbose(verbose);
 
         // Select operation mode depending on the command line arguments
         // provided
-        if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
-                && cmd.hasArgument(cmd.OUTPUT_FILE_OPTION)
-                && !cmd.hasArgument(cmd.FILE_OBJECT_OPTION)
-                && !cmd.hasArgument(cmd.PLATFORM_OPTION)) {
+        if (cmd.hasArgument(CommandLineArgsParser.INPUT_FILE_OPTION)
+                && cmd.hasArgument(CommandLineArgsParser.OUTPUT_FILE_OPTION)
+                && !cmd.hasArgument(CommandLineArgsParser.FILE_OBJECT_OPTION)
+                && !cmd.hasArgument(CommandLineArgsParser.PLATFORM_OPTION)) {
 
             msgl.showMessage("Conversion from xml descriptor mode selected",
                     true);
@@ -91,12 +91,12 @@ public class DataProcessorController {
 
             // Get a list of top-level nodes
             NodeList topLevelNodes = hdf.getTopLevelNodes(hdf.parseDescriptor(
-                    cmd.getArgumentValue(cmd.INPUT_FILE_OPTION), verbose));
+                    cmd.getArgumentValue(CommandLineArgsParser.INPUT_FILE_OPTION), verbose));
             // Append root path to top-level nodes
             hdf.appendRootPath(topLevelNodes);
             // Create new HDF5 file
             file_id = hdf.H5Fcreate_wrap(
-                    cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION),
+                    cmd.getArgumentValue(CommandLineArgsParser.OUTPUT_FILE_OPTION),
                     HDF5Constants.H5F_ACC_TRUNC, HDF5Constants.H5P_DEFAULT,
                     HDF5Constants.H5P_DEFAULT, verbose);
             // Create HDF5 file based on XML descriptor
@@ -106,29 +106,30 @@ public class DataProcessorController {
 
             msgl.showMessage("Conversion completed.", true);
 
-        } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION)
-                && cmd.hasArgument(cmd.FILE_OBJECT_OPTION)
-                && cmd.hasArgument(cmd.PLATFORM_OPTION)) {
+        } else if (cmd.hasArgument(CommandLineArgsParser.INPUT_FILE_OPTION)
+                && cmd.hasArgument(CommandLineArgsParser.FILE_OBJECT_OPTION)
+                && cmd.hasArgument(CommandLineArgsParser.PLATFORM_OPTION)) {
 
+            msgl.showMessage("Conversion mode selected", true);
+            
             String fileNameOut = "";
-            String fileNameIn = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION);
+            String fileNameIn = cmd.getArgumentValue(CommandLineArgsParser.INPUT_FILE_OPTION);
 
-            if (cmd.hasArgument(cmd.OUTPUT_FILE_OPTION))
-                fileNameOut = cmd.getArgumentValue(cmd.OUTPUT_FILE_OPTION);
+            if (cmd.hasArgument(CommandLineArgsParser.OUTPUT_FILE_OPTION))
+                fileNameOut = cmd.getArgumentValue(CommandLineArgsParser.OUTPUT_FILE_OPTION);
             // else
             // fileName = cmd.getArgumentValue(cmd.INPUT_FILE_OPTION) + ".h5";
 
-            msgl.showMessage("Conversion mode selected", true);
 
             // Read input file
             byte[] fileBuff = hdf.readDataFile(
-                    cmd.getArgumentValue(cmd.INPUT_FILE_OPTION), verbose);
+                    cmd.getArgumentValue(CommandLineArgsParser.INPUT_FILE_OPTION), verbose);
 
             // Data processing depending on platform type
-            if (cmd.getArgumentValue(cmd.PLATFORM_OPTION).equals(
+            if (cmd.getArgumentValue(CommandLineArgsParser.PLATFORM_OPTION).equals(
                     RAINBOW_PLATFORM)) {
 
-                if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
+                if (cmd.getArgumentValue(CommandLineArgsParser.FILE_OBJECT_OPTION).equals(
                         rainbow.PVOL)) {
 
                     // only input files with ".vol" extention will be accepted
@@ -157,20 +158,22 @@ public class DataProcessorController {
                         //no single convertion from hdf to vol handle so far
                         HDF2RainbowPVOL hdf = new HDF2RainbowPVOL(fileNameOut,
                                 fileNameIn, verbose, rainbow);
+                        fileNameOut = hdf.getOutputFileName();
+                        
 
                         
                     }
-                } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
+                } else if (cmd.getArgumentValue(CommandLineArgsParser.FILE_OBJECT_OPTION).equals(
                         rainbow.IMAGE)) {
                     fileNameOut = ModelImage.createDescriptor(fileNameOut,
                             fileBuff, verbose, rainbow);
 
-                } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
+                } else if (cmd.getArgumentValue(CommandLineArgsParser.FILE_OBJECT_OPTION).equals(
                         rainbow.VP)) {
                     fileNameOut = ModelVP.createDescriptor(fileNameOut,
                             fileBuff, verbose, rainbow);
 
-                } else if (cmd.getArgumentValue(cmd.FILE_OBJECT_OPTION).equals(
+                } else if (cmd.getArgumentValue(CommandLineArgsParser.FILE_OBJECT_OPTION).equals(
                         rainbow.RHI)) {
                     fileNameOut = ModelRHI.createDescriptor(fileNameOut,
                             fileBuff, verbose, rainbow);
@@ -179,10 +182,10 @@ public class DataProcessorController {
             }
 
             // Other platforms will come here at a later time...
-            if (!fileNameOut.isEmpty())
-                msgl.showMessage("Descriptor preparation completed.", true);
+            if (new File(fileNameOut).exists())
+                msgl.showMessage("New file created: " + fileNameOut, true);
 
-        } else if (cmd.hasArgument(cmd.CONTINOUOS_OPTION)) {
+        } else if (cmd.hasArgument(CommandLineArgsParser.CONTINOUOS_OPTION)) {
 
             msgl.showMessage("Operational feeder mode selected", true);
 
@@ -195,16 +198,16 @@ public class DataProcessorController {
                 LogsHandler.saveProgramLogs(e.getMessage());
             }
 
-        } else if (cmd.hasArgument(cmd.INPUT_FILE_OPTION) && 
-                cmd.hasArgument(cmd.NODE_ADDRESS_OPTION)) {
+        } else if (cmd.hasArgument(CommandLineArgsParser.INPUT_FILE_OPTION) && 
+                cmd.hasArgument(CommandLineArgsParser.NODE_ADDRESS_OPTION)) {
             msgl.showMessage("Sending file to " + 
-                    cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), verbose);
+                    cmd.getArgumentValue(CommandLineArgsParser.NODE_ADDRESS_OPTION), verbose);
             InitAppUtil init = InitAppUtil.getInstance();
             
             // Feed to BALTRAD
             BaltradFeeder baltradFeeder = new BaltradFeeder(
-                    cmd.getArgumentValue(cmd.NODE_ADDRESS_OPTION), init, 
-                    new File(cmd.getArgumentValue(cmd.INPUT_FILE_OPTION)));
+                    cmd.getArgumentValue(CommandLineArgsParser.NODE_ADDRESS_OPTION), init, 
+                    new File(cmd.getArgumentValue(CommandLineArgsParser.INPUT_FILE_OPTION)));
             baltradFeeder.feedToBaltrad();
             msgl.showMessage(baltradFeeder.getMessage(), verbose);
             
