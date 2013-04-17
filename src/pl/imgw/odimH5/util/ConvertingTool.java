@@ -80,8 +80,7 @@ public class ConvertingTool {
         
         LogsHandler.saveRecentInputFile(file.getName(), radarName);
         
-        ftp.sendFile(toBeSentFile, radarName);
-               
+        ftp.sendFile(toBeSentFile, hdf.getRadarID());
         
         toBeSentFile.delete();
         
