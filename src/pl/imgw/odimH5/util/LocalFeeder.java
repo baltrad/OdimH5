@@ -53,6 +53,7 @@ public class LocalFeeder implements Runnable {
 
     private RainbowModel rb;
     private MessageLogger msgl;
+    private static int counter = 0;
 
     private boolean verbose;
 
@@ -137,8 +138,12 @@ public class LocalFeeder implements Runnable {
                 || file.getName().endsWith("hdf")) {
             converter.convertHdf5ToVol(file);
         }
-        
+        counter++;
         file.delete();
+        if(counter > 50) {
+            System.gc();
+            counter = 0;
+        }
         
     }
     
