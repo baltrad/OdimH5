@@ -133,7 +133,9 @@ public class LocalFeeder implements Runnable {
         }
 
         if (file.getName().endsWith("dBZ.vol")) {
-            converter.convertRb5ToHdf5(file);
+            converter.convertDBZRb5ToHdf5(file);
+        } else if (file.getName().endsWith("V.vol")) {
+            converter.convertVRb5ToHdf5(file);
         } else if (file.getName().endsWith("h5")
                 || file.getName().endsWith("hdf")) {
             converter.convertHdf5ToVol(file);

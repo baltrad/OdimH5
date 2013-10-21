@@ -90,6 +90,8 @@ public class RainbowModel {
 
     protected final String UPHIDP = "uPhiDP";
     protected final String DBZ = "dBZ";
+    protected final String V = "V";
+    
 
     protected final String QNT_TH = "TH";
     protected final String QNT_RATE = "RATE";

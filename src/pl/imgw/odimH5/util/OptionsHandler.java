@@ -33,6 +33,8 @@ public class OptionsHandler {
     public static final String LOCATION = "location";
     public final static String WMO_ID = "WMO_id";
     public final static String FILE_NAME = "file_name";
+    public final static String ORIGINATOR = "originator";
+    public final static String PRODUCT_ID = "product_id";
     public final static String RADARS = "radars";
     public final static String ADDRESS = "address";
     public final static String LOGIN = "login";
@@ -140,6 +142,10 @@ public class OptionsHandler {
                     .item(i), WMO_ID, null));
             radarOptions[i].setFileName(RainbowModel.getValueByName(radarList
                     .item(i), FILE_NAME, null));
+            radarOptions[i].setOriginator(RainbowModel.getValueByName(radarList
+                    .item(i), ORIGINATOR, null));
+            radarOptions[i].setProductId(RainbowModel.getValueByName(radarList
+                    .item(i), PRODUCT_ID, null));
             radarOptions[i].setDir(RainbowModel.getValueByName(radarList.item(i),
                     DIRECTORY, null));
             radarOptions[i].setNrays(RainbowModel.getValueByName(radarList.item(i),
