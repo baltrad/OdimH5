@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<!-- FTP options -->
+<options>
+    <radar name="PAS">
+        <WMO_id>WMO:12544,NOD:plpas,PLC:Pastewnik</WMO_id>
+	<file_name>T_PAGZ43_C_SOWR_</file_name>
+        <nrays>360</nrays>
+        <directory>/home/lwojtas/Desktop/in</directory>
+    </radar>
+    <fpt>
+        <radars>SWI GDA POZ LEG PAS RAM BRZ RZE</radars>
+        <address>172.30.9.173</address>
+        <login>mf</login>
+        <password>falcon11</password>
+        <directory>/home/mf</directory>
+    </ftp>
+</options>

@@ -1,4 +1,4 @@
 #!/bin/sh
 
-java -Djava.library.path=@LIBDIR@ -Xms64m -Xmx256m -jar @JARDIR@ $@
+java -Djava.library.path=@LIBDIR@ -Xmx256m -XX:MaxPermSize=256m -jar @JARDIR@ $@
 

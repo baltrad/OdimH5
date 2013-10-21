@@ -1,29 +1,38 @@
 /**
- * (C) 2010 INSTITUT OF METEOROLOGY AND WATER MANAGEMENT
+ * (C) 2013 INSTITUT OF METEOROLOGY AND WATER MANAGEMENT
  */
 package pl.imgw.odimH5.model.rainbow;
 
+import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER51X;
+import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER52X;
+import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER53X;
+
 import java.io.File;
+import java.util.HashMap;
+
+import ncsa.hdf.hdf5lib.HDF5Constants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import pl.imgw.odimH5.AplicationConstans;
+import pl.imgw.odimH5.model.HDF5Model;
 import pl.imgw.odimH5.model.PVOL_H5;
+import pl.imgw.odimH5.util.DataBufferContainer;
 import pl.imgw.odimH5.util.OptionsHandler;
+import pl.imgw.odimH5.util.RadarOptions;
 
 /**
- * 
- * Converts Rainbow volume files to XML descriptor or HDF format.
- * 
- * 
+ *
+ *  /Class description/
+ *
+ *
  * @author <a href="mailto:lukasz.wojtas@imgw.pl">Lukasz Wojtas</a>
  * 
  */
-public class Rainbow2HDFPVOL extends Rainbow2HDF{
+public class Rainbow2HDFVVOL  extends Rainbow2HDF{
 
-    
-    private static final String PRODUCT_ID = "PAGZ";
+    private static final String PRODUCT_ID = "PAHZ";
     
     /**
      * 
@@ -36,7 +45,7 @@ public class Rainbow2HDFPVOL extends Rainbow2HDF{
      * @param options
      */
 
-    public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff,
+    public Rainbow2HDFVVOL(String outputFileName, byte[] fileBuff,
             boolean verbose, RainbowModel rb)
             {
 
@@ -50,7 +59,6 @@ public class Rainbow2HDFPVOL extends Rainbow2HDF{
         if (whatG == null)
             return;
 
-        
         // before making 'how', 'what' has to be done
         howG = makeHowGroup(inputDoc);
 
@@ -85,7 +93,6 @@ public class Rainbow2HDFPVOL extends Rainbow2HDF{
         slices = makeSlices(sliceList);
 
         // ============ set output file name ==================
-
         if (outputFileName.isEmpty()) {
             setOutputFileName();
         } else
@@ -93,10 +100,9 @@ public class Rainbow2HDFPVOL extends Rainbow2HDF{
 
         correct = true;
 
-    }
+    }    
     
-    
-    public Rainbow2HDFPVOL(String outputFileName, byte[] fileBuff,
+    public Rainbow2HDFVVOL(String outputFileName, byte[] fileBuff,
             boolean verbose, RainbowModel rb, boolean tmp) {
         this(outputFileName, fileBuff, verbose, rb);
         if (tmp) {
@@ -106,18 +112,19 @@ public class Rainbow2HDFPVOL extends Rainbow2HDF{
 
         }
     }
-
+    
     /**
      * @param outputFileName
      */
     protected void setOutputFileName() {
-        
-            String date = whatG.get(PVOL_H5.DATE) + whatG.get(PVOL_H5.TIME);
-            if (originator != null && !originator.isEmpty()) {
+
+        String date = whatG.get(PVOL_H5.DATE) + whatG.get(PVOL_H5.TIME);
+        if (originator != null && !originator.isEmpty()) {
             this.outputFileName = getFileName(PRODUCT_ID + product_id,
                     originator, date);
-            } else if (filePrefix != null && !filePrefix.isEmpty())
-                this.outputFileName = filePrefix + date + ".h5";
-        
+        } else if (filePrefix != null && !filePrefix.isEmpty())
+            this.outputFileName = filePrefix + date + ".h5";
+
     }
+    
 }

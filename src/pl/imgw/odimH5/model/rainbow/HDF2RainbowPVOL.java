@@ -182,6 +182,8 @@ public class HDF2RainbowPVOL {
             wvlength = WVLENGTH_SBAND;
         }
 
+        System.out.println("source: " + source);
+        
         if(source.toUpperCase().contains("PLC:")) {
             String[] names = source.split(",");
             for(String n : names) {
@@ -207,6 +209,8 @@ public class HDF2RainbowPVOL {
             }
         } 
         
+        System.out.println("radarID: " + radarId);
+        
         if(radarId.isEmpty()) {
             for(RadarOptions opt :OptionsHandler.getOpt().getRadarOptions()) {
                 if(source.contains(opt.getRadarId())){
@@ -216,7 +220,7 @@ public class HDF2RainbowPVOL {
         }
         
         if (radarId.isEmpty()) {
-            System.out.println("Add name of radar number " + source
+            System.out.println("Add name of radar source: " + source
                     + " to options.xml");
 //            radarName = "bornholm";
             
@@ -543,6 +547,10 @@ public class HDF2RainbowPVOL {
 
     public String getRadarName() {
         return radarName;
+    }
+    
+    public String getRadarID() {
+        return radarId;
     }
     
     public static void main(String[] args) {

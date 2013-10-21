@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<volume datetime="2013-01-09T10:00:00" owner="rainbow" type="vol" version="5.26.5">
+    <radarinfo alt="171.0" id="dkbor" lat="55.11275" lon="14.887517">
+        <name>Bornholm</name>
+        <beamwidth>0.94</beamwidth>
+        <wavelen>0.0533</wavelen>
+    </radarinfo>
+    <scan date="2013-01-09" name="dkbor.vol" time="10:00:00">
+        <unitid>SI</unitid>
+        <pargroup refid="sdfbase">
+            <numele>9</numele>
+        </pargroup>
+        <slice refid="0">
+            <posangle>0.4888920000000005</posangle>
+            <stoprange>236.0</stoprange>
+            <startangle>0.5</startangle>
+            <stopangle>360</stopangle>
+            <rangestep>0.5</rangestep>
+            <rangesamp>4</rangesamp>
+            <slicedata date="2013-01-09" time="10:00:00">
+                <rayinfo blobid="0" depth="16" rays="360" refid="startangle"/>
+                <rawdata bins="472" blobid="1" depth="8" max="95.5"
+                    min="-31.5" rays="360" type="dBZ"/>
+            </slicedata>
+        </slice>
+        <slice refid="1">
+            <posangle>0.6756589999999975</posangle>
+            <stoprange>236.0</stoprange>
+            <startangle>0.5</startangle>
+            <stopangle>360</stopangle>
+            <rangestep>0.5</rangestep>
+            <rangesamp>4</rangesamp>
+            <slicedata date="2013-01-09" time="10:00:00">
+                <rayinfo blobid="2" depth="16" rays="360" refid="startangle"/>
+                <rawdata bins="472" blobid="3" depth="8" max="95.5"
+                    min="-31.5" rays="360" type="dBZ"/>
+            </slicedata>
+        </slice>
+        <slice refid="2">
+            <posangle>0.9887318013888821</posangle>
+            <stoprange>236.0</stoprange>
+            <startangle>0.5</startangle>
+            <stopangle>360</stopangle>
+            <rangestep>0.5</rangestep>
+            <rangesamp>4</rangesamp>
+            <slicedata date="2013-01-09" time="10:00:00">
+                <rayinfo blobid="4" depth="16" rays="360" refid="startangle"/>
+                <rawdata bins="472" blobid="5" depth="8" max="95.5"
+                    min="-31.5" rays="360" type="dBZ"/>
+            </slicedata>
+        </slice>
+        <slice refid="3">
+            <posangle>1.4990124444444566</posangle>
+            <stoprange>236.0</stoprange>
+            <startangle>0.5</startangle>
+            <stopangle>360</stopangle>
+            <rangestep>0.5</rangestep>
+            <rangesamp>4</rangesamp>
+            <slicedata date="2013-01-09" time="10:00:00">
+                <rayinfo blobid="6" depth="16" rays="360" refid="startangle"/>
+                <rawdata bins="472" blobid="7" depth="8" max="95.5"
+                    min="-31.5" rays="360" type="dBZ"/>
+            </slicedata>
+        </slice>
+        <slice refid="4">
+            <posangle>2.399785722222241</posangle>
+            <stoprange>236.0</stoprange>
+            <startangle>0.5</startangle>
+            <stopangle>360</stopangle>
+            <rangestep>0.5</rangestep>
+            <rangesamp>4</rangesamp>
+            <slicedata date="2013-01-09" time="10:00:00">
+                <rayinfo blobid="8" depth="16" rays="360" refid="startangle"/>
+                <rawdata bins="472" blobid="9" depth="8" max="95.5"
+                    min="-31.5" rays="360" type="dBZ"/>
+            </slicedata>
+        </slice>
+        <slice refid="5">
+            <posangle>4.476930000000024</posangle>
+            <stoprange>236.0</stoprange>
+            <startangle>0.5</startangle>
+            <stopangle>360</stopangle>
+            <rangestep>0.5</rangestep>
+            <rangesamp>4</rangesamp>
+            <slicedata date="2013-01-09" time="10:00:00">
+                <rayinfo blobid="10" depth="16" rays="360" refid="startangle"/>
+                <rawdata bins="472" blobid="11" depth="8" max="95.5"
+                    min="-31.5" rays="360" type="dBZ"/>
+            </slicedata>
+        </slice>
+        <slice refid="6">
+            <posangle>8.486680444444374</posangle>
+            <stoprange>236.0</stoprange>
+            <startangle>0.5</startangle>
+            <stopangle>360</stopangle>
+            <rangestep>0.5</rangestep>
+            <rangesamp>4</rangesamp>
+            <slicedata date="2013-01-09" time="10:00:00">
+                <rayinfo blobid="12" depth="16" rays="360" refid="startangle"/>
+                <rawdata bins="472" blobid="13" depth="8" max="95.5"
+                    min="-31.5" rays="360" type="dBZ"/>
+            </slicedata>
+        </slice>
+        <slice refid="7">
+            <posangle>12.980300000000076</posangle>
+            <stoprange>236.0</stoprange>
+            <startangle>0.5</startangle>
+            <stopangle>360</stopangle>
+            <rangestep>0.5</rangestep>
+            <rangesamp>4</rangesamp>
+            <slicedata date="2013-01-09" time="10:00:00">
+                <rayinfo blobid="14" depth="16" rays="360" refid="startangle"/>
+                <rawdata bins="472" blobid="15" depth="8" max="95.5"
+                    min="-31.5" rays="360" type="dBZ"/>
+            </slicedata>
+        </slice>
+        <slice refid="8">
+            <posangle>14.979900000000006</posangle>
+            <stoprange>236.0</stoprange>
+            <startangle>0.5</startangle>
+            <stopangle>360</stopangle>
+            <rangestep>0.5</rangestep>
+            <rangesamp>4</rangesamp>
+            <slicedata date="2013-01-09" time="10:00:00">
+                <rayinfo blobid="16" depth="16" rays="360" refid="startangle"/>
+                <rawdata bins="472" blobid="17" depth="8" max="95.5"
+                    min="-31.5" rays="360" type="dBZ"/>
+            </slicedata>
+        </slice>
+    </scan>
+</volume>

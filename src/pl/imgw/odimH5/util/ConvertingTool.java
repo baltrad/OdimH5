@@ -12,6 +12,7 @@ import java.util.Map;
 
 import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
+import pl.imgw.odimH5.model.rainbow.Rainbow2HDFVVOL;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
 
 /**
@@ -38,7 +39,7 @@ public class ConvertingTool {
 
     }
 
-    public boolean convertRb5ToHdf5(File file) {
+    public boolean convertDBZRb5ToHdf5(File file) {
 
         int file_len = (int) file.length();
         byte[] file_buf = new byte[file_len];
@@ -52,10 +53,39 @@ public class ConvertingTool {
             return false;
         }
 
-        Rainbow2HDFPVOL vol = new Rainbow2HDFPVOL("", file_buf, verbose, rb, true);
-        vol.makeH5();
-        String radarID = vol.getRadarID();
-        String toBeSentFileName = vol.getOutputFileName();
+        Rainbow2HDFPVOL dbzvol = new Rainbow2HDFPVOL("", file_buf, verbose, rb, true);
+        dbzvol.makeH5();
+        String radarID = dbzvol.getRadarID();
+        String toBeSentFileName = dbzvol.getOutputFileName();
+        File toBeSentFile = new File(toBeSentFileName);
+//        String radarName = vol.getRadarName();
+        
+        LogsHandler.saveRecentInputFile(file.getName(), radarID);
+        
+        ftp.sendFile(toBeSentFile, radarID);
+
+        toBeSentFile.delete();
+        
+        return true;
+    }
+    
+    public boolean convertVRb5ToHdf5(File file) {
+        int file_len = (int) file.length();
+        byte[] file_buf = new byte[file_len];
+
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            fis.read(file_buf, 0, file_len);
+            fis.close();
+
+        } catch (IOException e) {
+            return false;
+        }
+        
+        Rainbow2HDFVVOL dbzvol = new Rainbow2HDFVVOL("", file_buf, verbose, rb, true);
+        dbzvol.makeH5();
+        String radarID = dbzvol.getRadarID();
+        String toBeSentFileName = dbzvol.getOutputFileName();
         File toBeSentFile = new File(toBeSentFileName);
 //        String radarName = vol.getRadarName();
         
@@ -76,12 +106,11 @@ public class ConvertingTool {
         String toBeSentFileName = hdf.getOutputFileName();
         File toBeSentFile = new File(toBeSentFileName);
         
-        String radarName = hdf.getRadarName();
+        String radarId = hdf.getRadarID();
         
-        LogsHandler.saveRecentInputFile(file.getName(), radarName);
+        LogsHandler.saveRecentInputFile(file.getName(), radarId);
         
-        ftp.sendFile(toBeSentFile, radarName);
-               
+        ftp.sendFile(toBeSentFile, radarId);
         
         toBeSentFile.delete();
         

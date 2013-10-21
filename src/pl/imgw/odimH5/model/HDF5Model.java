@@ -464,10 +464,12 @@ public class HDF5Model {
                     attr_value);
         } catch (NullPointerException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+//            e.printStackTrace();
         } catch (HDF5Exception e) {
             // TODO Auto-generated catch block
+//            msgl.showMessage(e.getMessage(), verbose);
             e.printStackTrace();
+            System.exit(0);
         }
 
         H5Aclose_wrap(attribute_id, verbose);

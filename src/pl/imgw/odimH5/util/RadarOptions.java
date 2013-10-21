@@ -20,6 +20,8 @@ public class RadarOptions {
     private String dir = "";
     private String nrays = "";
     private String format = "";
+    private String originator = "";
+    private String product_id = "";
     
     private String simulated = "False";
     private String pulsewidth = "";
@@ -384,6 +386,34 @@ public class RadarOptions {
     }
 
     /**
+     * @return the originator
+     */
+    public String getOriginator() {
+        return originator;
+    }
+
+    /**
+     * @param originator the originator to set
+     */
+    public void setOriginator(String originator) {
+        this.originator = originator;
+    }
+    
+    /**
+     * @return the product_id
+     */
+    public String getProductId() {
+        return product_id;
+    }
+
+    /**
+     * @param product_id the product_id to set
+     */
+    public void setProductId(String product_id) {
+        this.product_id = product_id;
+    }
+
+    /**
      * 
      * Returns true if any of obligated fields is empty
      * 
@@ -398,4 +428,5 @@ public class RadarOptions {
             return true;
         return false;
     }
+
 }
