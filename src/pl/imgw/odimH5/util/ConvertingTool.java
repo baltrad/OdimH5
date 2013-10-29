@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import pl.imgw.odimH5.model.rainbow.HDF2RainbowPVOL;
+import pl.imgw.odimH5.model.rainbow.Rainbow2HDF;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFPVOL;
 import pl.imgw.odimH5.model.rainbow.Rainbow2HDFVVOL;
 import pl.imgw.odimH5.model.rainbow.RainbowModel;
@@ -53,7 +54,7 @@ public class ConvertingTool {
             return false;
         }
 
-        Rainbow2HDFPVOL dbzvol = new Rainbow2HDFPVOL("", file_buf, verbose, rb, true);
+        Rainbow2HDF dbzvol = new Rainbow2HDFPVOL("", file_buf, verbose, rb, true);
         dbzvol.makeH5();
         String radarID = dbzvol.getRadarID();
         String toBeSentFileName = dbzvol.getOutputFileName();
@@ -82,7 +83,7 @@ public class ConvertingTool {
             return false;
         }
         
-        Rainbow2HDFVVOL dbzvol = new Rainbow2HDFVVOL("", file_buf, verbose, rb, true);
+        Rainbow2HDF dbzvol = new Rainbow2HDFVVOL("", file_buf, verbose, rb, true);
         dbzvol.makeH5();
         String radarID = dbzvol.getRadarID();
         String toBeSentFileName = dbzvol.getOutputFileName();

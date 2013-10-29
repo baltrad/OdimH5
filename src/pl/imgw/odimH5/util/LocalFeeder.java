@@ -120,6 +120,9 @@ public class LocalFeeder implements Runnable {
                 || filePath.contains("HV") || filePath.contains("ZDR")) {
 
             // System.out.println("kasuje: " + filePath.path);
+            /*
+             * the application is actually ready to convert dual-pol data, 
+             */
 
             file.delete();
             return;
