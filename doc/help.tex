@@ -1,0 +1,801 @@
+\documentclass[11p]{article}
+\usepackage{eng}
+
+\begin{document}
+
+\setlength{\fboxrule}{1pt}
+\setlength{\fboxsep}{9pt}
+\begin{flushleft}
+
+\small
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW\\
+\vspace{.5cm}
+
+\huge
+\framebox[\textwidth][l]{OdimH5 User's Guide}
+\end{flushleft}
+
+\begin{center}
+Software version: 2.16 \\
+Last update of this manual: \today \\
+Authors: Maciej Szewczykowski, Łukasz Wojtas\\
+\end{center}
+
+\begin{flushleft}
+
+This document is a user's guide on how to use OdimH5.
+\end{flushleft}
+
+\vspace{1cm}
+\small \noindent OdimH5 is a console HDF5 exchange software designed to work on
+radar data files. It provides XML descriptor handler, HDF5 converter, FTP and
+Baltrad feeder mode. \normalsize
+
+\section{Introduction}
+
+\subsection{License}
+
+OdimH5 is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+OdimH5 is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with OdimH5.  If not, see \href{http://www.gnu.org/licenses/}
+{http://www.gnu.org/licenses/}.
+
+\subsection{Overview}
+
+The OdimH5 is a Java-based tool working on meteorological radar data. It allows
+users to create an XML descriptor which contains all major information require to
+create a HDF5 file. The application also allows users to convert specific radar
+data to HDF5 format based on the descriptor. For \texttt{Baltrad} users it
+provides automatic online mode which feeds \texttt{BaltradDex} with actual
+data.
+
+The application was implemented using the Java\textsuperscript{TM}~2 Platform,
+which is machine-independent.
+
+\subsubsection*{HDF libraries} 
+
+  This release was built and tested with HDF5-1.8.4 Patch 1 with HDF5~1.6
+  compatibility flag. For information on new features in HDF5 Release 1.8.0 and
+  format compatibility considerations, please visit\\
+  \href{http://www.hdfgroup.org/HDF5/doc/ADGuide/CompatFormat180.html}
+  {http://www.hdfgroup.org/HDF5/doc/ADGuide/CompatFormat180.html}.
+
+\subsubsection*{Apache libraires}
+
+This software was built using Apache Commons libraries 
+\href{http://commons.apache.org/}{http://commons.apache.org/}.
+
+\subsubsection*{jpathwatch library}
+
+This software was built using jpathwatch 0.94 
+\href{http://jpathwatch.wordpress.com/}{http://jpathwatch.wordpress.com/}.
+
+\subsubsection*{Platforms}
+
+This version is available for following operating systems:
+\begin{itemize}
+
+  \item 32-bit distribution -- runs on 32-bit or 64-bit systems with 32-bit JRE
+  \begin{itemize}
+      \item Windows (OdimH5\_win32)
+      \item Linux (OdimH5\_linux32)
+      
+	\end{itemize}
+	\item 64-bit distribution -- runs on 64-bit systems with 64-bit JRE
+
+      \begin{itemize}
+      \item Windows (OdimH5\_win64)
+      \item Linux (OdimH5\_linux64)
+      
+	\end{itemize}
+   
+\end{itemize}
+
+\subsection{Supported radar systems}
+
+This version can work with limited radar systems and products listed below.
+
+\subsubsection*{Platforms}
+\begin{itemize}
+  \item Gematronik RAINBOW
+\end{itemize}
+
+\subsubsection*{Type of product}
+\begin{itemize}
+  \item Polar Volume Scan (ver. 5.2x and 5.3x)
+  \begin{itemize}
+    \item dBZ - Reflectivity
+%    \item uPhiDP - Differential Phase Shift
+%    \item KDP - Specific Differential Phase Shift
+%    \item RhoHV - Correlation Coefficient
+    \item V - Radial Velocity
+  \end{itemize}
+  \item Cartesian image and composite (ver. 5.2x)
+  \begin{itemize}
+    \item PPI - Plan Position Indicator
+    \item CAPPI - Constant Altitude PPI
+    \item MAX - Maximum Display
+    \item EHT - Echo Height
+    \item SRI - Surface Rainfall Intensity
+    \item PAC - Precipitation Accumulation
+    \item VIL - Vertical Integrated Liquid
+    \item HSHEAR - Horizontal Shear 
+  \end{itemize} 
+%   \item Vertical profile (Not implemented)
+  \item Range-height indicator
+  \begin{itemize}
+    \item RHI - Range Height Indicator
+  \end{itemize} 
+\end{itemize} 
+
+\subsection{Features}
+
+\begin{itemize}
+    \item Convert a single file to HDF5.
+    \item Convert a file from HDF5 to Rainbow format.
+    \item Convert and send files via FTP in continueus mode.
+    \item Convert and send files to Baltrad Dex in continueus mode.
+    
+\end{itemize}
+
+\section{Getting Started}
+
+\subsection{Installation and setting}
+
+The newest version of OdimH5 is available on Opera FTP server
+(\texttt{ftppro.knmi.nl}). Download version for your operating system and
+extract. Alternatively (for Baltrad users only) use \texttt{Git} a distributed
+revision control system and clone project from baltrad server. To do this use following command
+\begin{kod}
+git clone gitosis@git.baltrad.eu:OdimH5.git
+\end{kod}
+
+Installation of OdimH5 software is driven by \texttt{Apache Ant} and requires
+several options passed to the build script. The following options are required:
+\begin{itemize}
+    \item \texttt{prefix} -- installation prefix / target directory 
+    \item \texttt{hostname} -- name of the host on which the installation is
+performed, preferably a domain name  
+    \item \texttt{system} -- operating system type, possible choices are 'linux'
+or 'win' 
+    \item \texttt{arch} -- system architecture, possible choices are '32' and
+'64'
+\end{itemize}
+
+Example of installation command:
+\begin{kod} 
+ant -Dprefix=/home/odim -Dhostname=myhost.org -Dsystem=linux -Darch=64 install
+\end{kod}
+
+In this case the software will be installed in linux/unix-type system under 
+\texttt{/home/odim} directory using a set of 64-bit native libraries.
+
+There is also an alternative installation procedure which install the
+application only for converting purposes:
+\begin{kod} 
+ant -f buildcnvt.xml -Dprefix=/opt -Dsystem=linux -Darch=64 install
+\end{kod}
+
+The application reads options from \texttt{options.xml} file stored in
+\texttt{conf} folder. The following options can be provided:
+
+\begin{longtable}{|l|p{9cm}|}
+
+\hline
+
+\texttt{<radar>}&Every radar is represented by this element. The attribute
+\texttt{name} should be 3-letter radar name, same as one stored in raw volume
+file e.g. \texttt{name="SWI"}. This section contains one obligated tag:
+\texttt{WMO\_id}, and following extra tags: \texttt{originator}, \texttt{product\_id} (or \texttt{file\_name}),
+\texttt{directory} and \texttt{nrays}\\ \hline 
+\texttt{<WMO\_id>}& WMO block and station number, other indicators like NOD,
+PLC can be also added here seperated with comma\\
+\hline \texttt{<product\_id>}&File name prefix compliant with ODIM file naming
+convention: \texttt{pflag\_productidentifier\_oflag\_originator\_}. For details
+see Opera document WD-2010-02. \\ \hline
+\texttt{<originator>}&File name prefix compliant with ODIM file naming
+convention: \texttt{pflag\_productidentifier\_oflag\_originator\_}. For details
+see Opera document WD-2010-02. \\ \hline
+\texttt{<file\_name>}&File name prefix compliant with ODIM file naming
+convention: \texttt{pflag\_productidentifier\_oflag\_originator\_}. For details
+see Opera document WD-2010-02. \\ \hline
+\texttt{<directory>}& Path of the directory where radar volume data are stored.
+This directory will be watched in feeder mode by application, and every new
+file in the directory will awake the process of conversion. \\ \hline
+\texttt{<nrays>}&Number of rays that are allowed, if volume contains more then
+that number, extra rays are discard. \\ \hline \hline
+%\texttt{<location>}& Full radar name for BALTRAD DEX. If not provided Odim will
+%use name from RAINBOW volume file.\\ \hline
+\texttt{<baltrad>}& Section containing BALTRAD options for
+\texttt{server}. \\ \hline \texttt{<server>}& Address of HTTP server.\\ \hline
+\hline
+%\texttt{<sender>}& Sender name.\\ \hline
+\texttt{<ftp>}& Section containing FTP settings, obligatory are radar names,
+address, login and password, optional are remote directory, subfolders\\
+\hline \texttt{<radars>}& List of radars to be sent using FTP. Use radar names 
+separeted by space (names should be same as provided in \texttt{<radar
+name=XXX>}).\\
+\hline \texttt{<address>}& Address of FTP server. Use localhost for local
+copies.\\
+\hline \texttt{<login>}& Login to FTP server. \\ 
+\hline \texttt{<password>}& Password to FTP server. \\
+\hline \texttt{<directory>}& Remote directory. \\
+\hline \texttt{<subfolders>}& Provide this option if subfolders for different
+radars and date should be created on remote server. Available options are: 0 -
+no subfolders, 1 - subfolders for different radars (eg. \texttt{POZ/}), radars
+name are the same as provided in radar section, 2 - subfolders for different radars and
+date (\texttt{POZ/2013-04-03})
+\\
+\hline
+
+\end{longtable}
+
+Example \texttt{options.xml} file:
+
+\begin{kod}
+<?xml version="1.0" ?>\\
+<!-- options -->\\
+<options>\\
+\hspace*{0.5cm}<radar name="BRZ">\\
+\hspace*{1cm}<WMO\_id>WMO:12568,NOD:plbrz,PLC:Brzuchania</WMO\_id>\\
+\hspace*{1cm}<originator>SOWR</originator>\\
+\hspace*{1cm}<product\_id>48</product\_id>\\
+\hspace*{1cm}<directory>/home/volumes/BRZ\_250\_Z.vol</directory>\\
+\hspace*{1cm}<nrays>360</nrays>\\
+\hspace*{0.5cm}</radar>\\
+\hspace*{0.5cm}<baltrad>\\
+\hspace*{1cm}<server>http://172.30.9.34:8084/BaltradDex/dispatch.htm</server>\\
+% \hspace*{1cm}<sender>Baltrad.IMGW.pl</sender>\\
+\hspace*{0.5cm}</baltrad>\\
+\end{kod}
+\begin{kod}
+\hspace*{0.5cm}<ftp>\\
+\hspace*{1cm}<radars>BRZ POZ LEG</address>\\
+\hspace*{1cm}<address>ftp.address</address>\\
+\hspace*{1cm}<login>login</login>\\
+\hspace*{1cm}<password>secret</password>\\
+\hspace*{1cm}<directory>/radars</directory>\\
+\hspace*{1cm}<subfolders>1</subfolders>\\
+\hspace*{0.5cm}</ftp>\\
+</options>
+\end{kod}
+
+\section{Using OdimH5}
+
+OdimH5 converter software provides a set of scripts for convenient data 
+processing. The scripts are located in \texttt{bin} directory.
+\begin{uwaga}
+NOTE: It is not recommended to run odimH5.jar executable directly, unless there
+is a good reason to do so. Otherwise use only wrapper scripts.
+\end{uwaga}
+
+\subsubsection*{odimH5}
+This script start the appliacation, see next section (advenced usage) for
+details. Adding \texttt{bin} to the system \texttt{PATH} will make the
+application run from any location.
+
+\subsubsection*{createDescriptor.sh} 
+Creates descriptor and dataset files
+corresponding to a given data file  
+
+\begin{kod}
+createDescriptor.sh file descriptor platform object mode
+\end{kod}
+\begin{itemize}
+    \item\texttt{file} -- input file name, either rawdata or product
+    \item\texttt{descriptor} -- output descriptor file name
+    \item\texttt{platform}  -- type of processing software.
+%RAINBOW: Gematronik Rainbow\\
+    \item\texttt{object} -- ODIMH5 file object type.
+%PVOL: polar volume\\
+%CVOL: carthesian volume
+%SCAN polar scan\\
+%RAY: single polar ray
+%AZIM: azimuthal object
+%IMAGE: 2-D cartesian image\\
+% COMP: cartesian composite image(s)
+% XSEC: 2-D vertical cross section(s)
+% VP: 1-D vertical profile
+% PIC: embedded graphical image
+    \item\texttt{mode} -- use v option for verbose mode
+\end{itemize}
+
+\subsubsection*{convertFromDescriptor.sh}  
+Converts given native data file into hdf5 file using the descriptor
+
+\begin{kod}
+convertDescriptor.sh descriptor file mode
+\end{kod}
+\begin{itemize}
+    \item \texttt{descriptor} -- input descriptor file name
+    \item \texttt{file} -- output data file name (hdf5 format)
+    \item \texttt{mode} -- use v option for verbose mode
+\end{itemize}
+\subsubsection*{convertNative.sh}
+Converts given native data file directly into hdf5 file
+
+\begin{kod}
+convertNative.sh file mode
+\end{kod}
+\begin{itemize}
+    \item \texttt{descriptor} -- input descriptor file name
+    \item \texttt{file} -- output data file name (hdf5 format)
+    \item \texttt{mode} -- use v option for verbose mode
+\end{itemize}
+\subsubsection*{feedToBaltrad.sh}
+Sends given file to BALTRAD node
+
+\begin{kod}
+feedToBaltrad.sh input\_file node\_address mode
+\end{kod}
+\begin{itemize}
+    \item \texttt{input\_file} -- input file name (hdf5 format)
+    \item \texttt{node\_address} -- BALTRAD node address\\
+                        e.g. http://127.0.0.1:8084/BaltradDex/dispatch.htm
+    \item \texttt{mode} -- use v option for verbose mode
+\end{itemize}
+
+\subsubsection*{startFeeder.sh} 
+
+Runs BALTRAD feeder. BALTRAD feeder watches a given
+directory specified in conf/options.xml file. Once a new file is stored
+                  in this directory, it is sent to a BALTRAD node with a given
+                  address specified on conf/options.xml file. Refer to OdimH5
+                  manual for more information.
+
+\begin{kod}
+startFeeder.sh mode
+\end{kod}
+\begin{itemize}
+    \item \texttt{mode} -- use v option for verbose mode
+\end{itemize}
+
+\section{Advenced usage}
+
+\subsection{Convertion mode}
+
+\texttt{OdimH5} provides two conversion modes. First one creates XML descriptor,
+that can be used later to create HDF file. Second mode converts raw data
+directly to HDF5.
+
+\subsubsection*{Prepare descriptor}
+
+Descriptor is an XML file, which structure corresponds to HDF5 file. To prepare
+descriptor use the following parameters:
+\begin{itemize}
+  \renewcommand{\labelitemi}{ }
+  \item \texttt{-i}\hspace{0.5cm}Input file's path.\\Program can work with
+  only one file simultaneously.
+  \item \texttt{-o}\hspace{0.5cm}Output file's path.\\It is suggested to use
+  \texttt{.xml} filename extension.
+  \item \texttt{-p}\hspace{0.5cm}Radar platform's name.\\At the moment only
+  Gematronik's RAINBOW software is supported.
+  \item \texttt{-f}\hspace{0.5cm}Product format.\\Use one of the formats
+  listed above according to input data type.
+  \item \texttt{-v}\hspace{0.5cm}Verbose mode.\\It is optional and displays
+  status of progress of program work.
+\end{itemize}
+
+Example of use:
+
+\begin{kod}
+\$ odim -i input.ppi -o ppi.xml -p RAINBOW -f IMAGE -v
+\end{kod}
+
+\subsubsection*{Prepare HDF5 file from descriptor}
+
+It requires XML descriptor as an input file. To prepare HDF5 use the following
+parameters:
+
+\begin{itemize}
+  \renewcommand{\labelitemi}{ }
+  \item \texttt{-i}\hspace{0.5cm}Input file's path.\\Program can work with
+  only one file simultaneously.
+  \item \texttt{-o}\hspace{0.5cm}Output file's path.\\It is suggested to use
+  \texttt{.h5} filename extension. If no output file name provided program will
+  generate one using ODIM convention, or if no prefix in options.xml were set
+  program will use input file name with \texttt{.h5} filename extension.
+  \item \texttt{-v}\hspace{0.5cm}Verbose mode.\\It is optional and displays
+  status of progress of program work.
+\end{itemize}
+
+Example of use:
+
+\begin{kod}
+\$ odim -i ppi.xml -o output.h5
+\end{kod}
+
+\subsubsection*{Example of descriptor file}
+
+Header:
+\begin{kod}
+<?xml version="1.0" encoding="UTF-8"?>\\
+<!--ODIM\_H5 descriptor file, platform: RAINBOW, file object: PVOL-->\\
+\end{kod}
+Root group:
+\begin{kod}
+<group name="/">\\
+\end{kod}
+What group:
+\begin{kod}
+    <group name="what">\\
+\hspace*{0.5cm}<attribute class="string" name="object">PVOL</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="version">H5rad 2.0</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="date">20101022</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="time">123044</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="source">WMO:12374</attribute>\\
+    </group>\\
+\end{kod}
+Where group:
+\begin{kod}
+    <group name="where">\\
+\hspace*{0.5cm}<attribute class="double" name="lon">20.960630</attribute>\\
+\hspace*{0.5cm}<attribute class="double" name="lat">52.405220</attribute>\\
+\hspace*{0.5cm}<attribute class="double" name="height">119.000000</attribute>\\
+    </group>\\
+\end{kod}
+How group:
+\begin{kod}
+    <group name="how">\\
+\hspace*{0.5cm}<attribute class="long" name="startepochs">1287743444000</attribute>\\
+\hspace*{0.5cm}<attribute class="long" name="endepochs">1287743444000</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="system">GEMA</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="software">RAINBOW</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="sw\_version">5.29.5</attribute>\\
+\hspace*{0.5cm}<attribute class="double" name="beamwidth">1</attribute>\\
+\hspace*{0.5cm}<attribute class="double" name="wavelength">0.0531</attribute>\\
+    </group>\\
+\end{kod}
+Dataset group:
+\begin{kod}
+<group name="dataset1">\\
+\end{kod}
+Dataset children:
+\begin{kod}
+        <group name="what">\\
+\hspace*{0.5cm}<attribute class="string" name="product">SCAN</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="startdate">20101022</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="starttime">123044</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="enddate">20101022</attribute>\\
+\hspace*{0.5cm}<attribute class="string" name="endtime">123059</attribute>\\
+        </group>\\
+\end{kod}
+\begin{kod}
+        <group name="where">\\
+\hspace*{0.5cm}<attribute class="double" name="elangle">0.5</attribute>\\
+\hspace*{0.5cm}<attribute class="long" name="nbins">250</attribute>\\
+\hspace*{0.5cm}<attribute class="double" name="rstart">0</attribute>\\
+\hspace*{0.5cm}<attribute class="double" name="rscale">1000.0</attribute>\\
+\hspace*{0.5cm}<attribute class="long" name="nrays">360</attribute>\\
+\hspace*{0.5cm}<attribute class="long" name="a1gate">0</attribute>\\
+        </group>\\
+\end{kod}
+\begin{kod}
+        <group name="data1">\\
+\hspace*{0.5cm}<group name="what">\\
+\hspace*{1cm}<attribute class="string" name="quantity">DBZH</attribute>\\
+\hspace*{1cm}<attribute class="double" name="gain">0.5</attribute>\\
+\hspace*{1cm}<attribute class="double" name="offset">-32.0</attribute>\\
+\hspace*{1cm}<attribute class="double" name="nodata">255.0</attribute>\\
+\hspace*{1cm}<attribute class="double" name="undetect">0.0</attribute>\\
+\hspace*{0.5cm}</group>\\
+\hspace*{0.5cm}<dataset CLASS="IMAGE" IMAGE\_VERSION="1.2" chunk="20x20"\\
+\hspace*{0.5cm}data\_size="8" data\_type="integer" dimensions="360x250"\\
+\hspace*{0.5cm}gzip\_level="6" name="data">data/data1.dat</dataset>\\
+\hspace*{0.5cm}</group>\\
+    </group>\\
+\end{kod}
+
+\subsubsection*{Prepare HDF5 file directly from raw file}
+
+It has the same parameters as descriptor preparation mode, but output file name
+has to end with \texttt{.h5}. For volumes \texttt{-o} parameter can be skipped,
+application will convert file directly to HDF5 using default name, which will be
+ODIM name when proper parameter will be provided in \texttt{options.xml} file or
+standard date-format name otherwise.
+
+Examples of use:
+\begin{kod}
+\$ odim -i input.ppi -o ppi.h5 -p RAINBOW -f IMAGE\\ \\
+\$ odim -i input.vol -p RAINBOW -f PVOL
+\end{kod}
+
+\subsubsection*{Prepare Rainbow volume file from HDF5 file}
+
+Input filename has to have a \texttt{.h5} or \texttt{.hdf} extension, and output
+filename has to have \texttt{.vol} extension.
+
+For example:
+\begin{kod}
+\$ odim -i input.h5 -o output.vol -p RAINBOW -f PVOL
+
+\end{kod}
+
+\subsection{Baltrad Feeder}
+
+\texttt{OdimH5} allows users to send HDF5 files into \texttt{BaltradDex} system.
+To send a file use following command:
+\begin{kod}
+\$ odim -i input.h5 -r Brzuchania -s IMGW.pl
+-a~http://172.30.9.34:8084/BaltradDex/dispatch.htm
+\end{kod}
+
+It sends a single HDF5 file to the server but it can work as a continuous
+\texttt{Baltrad} feeder as well with online conversion to HDF5 format. It works
+automatically with specific options provided by user.
+
+To run feeder use \texttt{-c} option and provide \texttt{Baltrad} details in
+\texttt{options.xml} in \texttt{<baltrad>} section.
+
+Example of use:
+
+\begin{kod}
+\$ odim -c
+\end{kod}
+
+\begin{kod}
+<?xml version="1.0" ?>\\
+<!-- ODIMH5 options -->\\
+<options>\\
+\hspace*{0.5cm}<radar name="SWI">\\
+\hspace*{1cm}<WMO\_id>WMO:12220,NOD:plswi,PLC:Swidwin</WMO\_id>\\
+\hspace*{1cm}<file\_name>T\_PAGZ46\_C\_SOWR\_</file\_name>\\
+\hspace*{1cm}<directory>rb5input/SWI</directory>\\
+\hspace*{0.5cm}</radar>\\
+\hspace*{0.5cm}<baltrad>\\
+\hspace*{1cm}<server>http://172.31.50.150:8084/BaltradDex/dispatch.htm</server>\\
+\hspace*{1cm}<sender>rainbow.imgw.pl</sender>\\
+\hspace*{0.5cm}</baltrad>\\
+</options>\\
+\end{kod}
+\subsection{Sending file by FTP}
+
+\texttt{OdimH5} allows users to send HDF5 file using FTP. It works similar to
+\texttt{Baltrad} feeder. To run FTP feeder use \texttt{-c} option and provide
+\texttt{FTP} details in \texttt{options.xml} in \texttt{<ftp>} section.
+
+\begin{kod} 
+\hspace*{0.5cm}<ftp>\\
+\hspace*{1cm}<radars>SWI POZ</radars>\\
+\hspace*{1cm}<address>ftpops.metoffice.gov.uk</address>\\
+\hspace*{1cm}<login>***</login>\\
+\hspace*{1cm}<password>***</password>\\
+\hspace*{1cm}<directory></directory>\\
+\hspace*{1cm}<subfolders>0</subfolders>\\
+\hspace*{0.5cm}</ftp>\\
+\end{kod}
+
+\subsection{Help}
+
+To display help menu in program use following parameter:
+\begin{kod}
+\$ odim -h
+\end{kod}
+
+\section{Development support and guidelines}
+
+This section of document provides information of particular interest to
+developers of OdimH5 application.
+
+To use OdimH5 API for creating HDF5 file the following classes have to be
+imported:
+\begin{kod}
+import ncsa.hdf.hdf5lib.HDF5Constants;\\
+import pl.imgw.odimH5.model.HDF5Model;
+\end{kod}
+
+\subsection{Creating new HDF5 file}
+
+To create new file use {\bf H5Fcreate\_wrap} method from {\bf HDF5Model} class:
+\begin{kod}
+public {\bf int H5Fcreate\_wrap}({\bf String} filename, {\bf int}
+access\_mode,\\ \hspace*{0.5cm}{\bf int} create\_id, {\bf int} access\_id, {\bf boolean}
+verbose)
+\end{kod}
+This is helper method creating new HDF5 file.\\
+Parameters:\\
+\hspace*{0.5cm}{\bf filename} File name\\
+\hspace*{0.5cm}{\bf access\_mode} File create mode\\
+\hspace*{0.5cm}{\bf create\_id} Create identifier\\
+\hspace*{0.5cm}{\bf access\_id} Access identifier\\
+\hspace*{0.5cm}{\bf verbose} Verbose mode toggle\\
+Returns:\\
+\hspace*{0.5cm}File identifier\\
+
+Example of use:
+\begin{kod}
+{\bf HDF5Model} proc = new HDF5Model();\\
+{\bf int} file\_id = proc.H5Fcreate\_wrap(outputFileName,\\
+\hspace*{0.5cm}HDF5Constants.H5F\_ACC\_TRUNC, HDF5Constants.H5P\_DEFAULT,\\
+\hspace*{0.5cm}HDF5Constants.H5P\_DEFAULT, {\bf true});
+\end{kod}
+
+\subsection{Creating new HDF5 group}
+
+To create new group use {\bf H5Gcreate\_wrap} method from {\bf HDF5Model} class:
+\begin{kod}
+public {\bf int} H5Gcreate\_wrap({\bf int} file\_id, {\bf String} name, {\bf
+int} size\_h{\bf int},\\
+\hspace*{0.5cm} {\bf boolean} verbose)
+\end{kod}
+This is helper method creating new HDF5 group.\\
+Parameters:\\
+\hspace*{0.5cm}{\bf file\_id} File identifier\\
+\hspace*{0.5cm}{\bf name} Group name\\
+\hspace*{0.5cm}{\bf size\_hint} Size hint\\
+\hspace*{0.5cm}{\bf verbose} Verbose mode toggle\\
+Returns:\\
+\hspace*{0.5cm}Group identifier\\
+
+Example of use:
+\begin{kod}
+{\bf HDF5Model} proc = new HDF5Model();\\
+{\bf int} child\_group\_id = proc.H5Gcreate\_wrap(file\_id, "/what", 0,\\
+\hspace*{0.5cm} {\bf true});
+\end{kod}
+
+\subsection{Creating new HDF5 attribute}
+
+To create new attribute use {\bf H5Acreate\_any\_wrap} method from {\bf
+HDF5Model} class:
+\begin{kod}
+public {\bf void H5Acreate\_any\_wrap}({\bf int} group\_id, {\bf String} attr\_name,\\
+\hspace*{0.5cm}{\bf String} attr\_class, {\bf String} attr\_value, {\bf boolean}
+            verbose)
+\end{kod}
+This is helper method for creating and writing HDF5 attribute of given type.\\
+Parameters:\\
+\hspace*{0.5cm}{\bf group\_id} Group identifier\\
+\hspace*{0.5cm}{\bf attr\_name} HDF5 attribute name\\
+\hspace*{0.5cm}{\bf attr\_class} HDF5 attribute data type\\
+\hspace*{0.5cm}{\bf attr\_value} Access identifier\\
+\hspace*{0.5cm}{\bf verbose} Verbose mode toggle\\
+
+Example of use:
+\begin{kod}
+{\bf HDF5Model} proc = new HDF5Model();\\
+proc.H5Acreate\_any\_wrap(child\_group\_id, "object", "string",\\
+\hspace*{0.5cm}"PVOL", {\bf true});\\
+proc.H5Acreate\_any\_wrap(child\_group\_id, "nrays", "long",\\
+\hspace*{0.5cm} "360", {\bf true});
+\end{kod}
+
+\subsection{Creating new HDF5 simple dataspace}
+
+To create new simple dataspace use {\bf H5Screate\_simple\_wrap} method from
+{\bf HDF5Model} class:
+\begin{kod}
+public {\bf int} H5Screate\_simple\_wrap({\bf int} rank, {\bf int} dim\_x, {\bf int} dim\_y,\\
+\hspace*{0.5cm} {\bf long} maxdims[], {\bf boolean} verbose)
+\end{kod}
+This is helper method creating new HDF5 simple dataspace.\\
+Parameters:\\
+\hspace*{0.5cm}{\bf rank} Rank\\
+\hspace*{0.5cm}{\bf dims} Dataspace dimensions\\
+\hspace*{0.5cm}{\bf maxdims} Maximum dataspace dimensions\\
+\hspace*{0.5cm}{\bf dim\_x} Dataspace x dimension\\
+\hspace*{0.5cm}{\bf dim\_y} Dataspace y dimension\\
+\hspace*{0.5cm}{\bf verbose} Verbose mode toggle\\
+Returns:\\
+\hspace*{0.5cm}Dataspace identifier\\
+
+Example of use:
+\begin{kod}
+{\bf HDF5Model} proc = new HDF5Model();\\
+{\bf int} dataspace\_id = proc.H5Screate\_simple\_wrap(2, 360, 250, {\bf null},
+\hspace*{0.5cm}{\bf true});
+\end{kod}
+
+\subsection{Creating new HDF5 dataset}
+
+To create new dataset use {\bf H5Dcreate\_wrap} method from {\bf
+HDF5Model} class:
+\begin{kod}
+public {\bf int} H5Dcreate\_wrap({\bf int} file\_id, {\bf String} group\_name,\\
+\hspace*{0.5cm}{\bf int} datatype\_id, {\bf int} dataspace\_id, {\bf long[]}
+chunk, {\bf int} gZipLevel,\\
+\hspace*{0.5cm}{\bf boolean} verbose)
+\end{kod}
+This is helper method creating new HDF5 simple dataset.\\
+Parameters:\\
+\hspace*{0.5cm}{\bf file\_id} File identifier\\
+\hspace*{0.5cm}{\bf group\_name} Group name\\
+\hspace*{0.5cm}{\bf datatype\_id} Datatype identifier\\
+\hspace*{0.5cm}{\bf dataspace\_id} Dataspace identifier\\
+\hspace*{0.5cm}{\bf chunk} A 2-D array containing the size of each chunk\\
+\hspace*{0.5cm}{\bf gZipLevel} Gzip compression level\\
+\hspace*{0.5cm}{\bf verbose} Verbose mode toggle\\
+Returns:\\
+\hspace*{0.5cm}Dataset identifier\\
+
+Example of use:
+\begin{kod}
+{\bf HDF5Model} proc = new HDF5Model();\\
+{\bf long}chunk[] = new long[2];\\
+chunk[0] = rays;\\
+chunk[1] = bins;\\
+{\bf int} grandgrandchild\_group\_id =
+proc.H5Dcreate\_wrap(grandchild\_group\_id,\\ "data",
+HDF5Constants.H5T\_STD\_U8BE, dataspace\_id, chunk, 6, verbose);
+\end{kod}
+
+\subsection{Writing HDF5 dataset}
+
+To write HDF5 dataset use following method:
+
+\begin{kod}
+{\bf public int} H5Dwrite\_wrap({\bf int} dataset\_id, {\bf int}
+mem\_type\_id,\\
+\hspace*{0.5cm}{\bf int} mem\_space\_id, {\bf int} file\_space\_id, {\bf int}
+xfer\_plist\_id, {\bf Object} buf,\\
+\hspace*{0.5cm}{\bf boolean} verbose)
+\end{kod}
+Helper method for writing HDF5 dataset.\\
+Parameters:\\
+	\hspace*{0.5cm}{\bf dataset\_id} Dataset identifier\\
+    \hspace*{0.5cm}{\bf mem\_type\_id} Memory type identifier\\
+    \hspace*{0.5cm}{\bf mem\_space\_id} Memory space identifier\\
+    \hspace*{0.5cm}{\bf file\_space\_id} File space identifier\\
+    \hspace*{0.5cm}{\bf xfer\_plist\_id} \\
+    \hspace*{0.5cm}{\bf buf} Data buffer\\
+    \hspace*{0.5cm}{\bf verbose} Verbose mode toggle\\
+Returns:\\
+    \hspace*{0.5cm}Operation status\\
+
+Example of use:
+\begin{kod}
+{\bf HDF5Model} proc = new HDF5Model();\\
+proc.H5Dwrite\_wrap(grandgrandchild\_group\_id,\\
+\hspace*{0.5cm}HDF5Constants.H5T\_NATIVE\_INT, HDF5Constants.H5S\_ALL,\\
+\hspace*{0.5cm}HDF5Constants.H5S\_ALL, HDF5Constants.H5P\_DEFAULT,\\
+\hspace*{0.5cm}infDataBuff, verbose);\\
+\end{kod}
+
+\section{Troubleshooting}
+
+To report a bug please send information to
+\href{mailto:lukasz.wojtas@imgw.pl}{maciej.szewczykowski@imgw.pl}
+
+\section{Major Improvements and bug fixes}
+ 
+Version 2.6 (Release date: 2010-06-10)
+\begin{itemize}
+    \item Added Baltrad feeder.
+    \item Added direct HDF5 converter.
+\end{itemize}
+Version 2.11 (Release date: 2010-11-15)
+\begin{itemize}
+    \item Sending files by FTP.
+    \item RAINBOW 5.31.1 format supported.
+\end{itemize}
+Version 2.12 (Release date: 2010-12-29)
+\begin{itemize}
+    \item HDF5 to Rainbow format conversion.
+\end{itemize}
+Version 2.14 (Release date: 2011-02-09)
+\begin{itemize}
+    \item Reading Quality Index from Rainbow volume files supported.
+\end{itemize}
+Version 2.14a (Release date: 2011-04-26)
+\begin{itemize}
+    \item New manual.
+    \item Missing ``/Conventions'' tag added.
+    \item File compression optimized.
+\end{itemize}
+Version 2.14b (Release date: 2011-06-07)
+\begin{itemize}
+    \item 32- and 64-bit platform bug fixed.
+\end{itemize}
+Version 2.16 (Release date: 2013-10-29)
+\begin{itemize}
+    \item velocity polar volumes conversion added
+\end{itemize}
+\end{document}

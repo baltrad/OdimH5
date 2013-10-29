@@ -29,6 +29,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     <property name="share.dir" value="share"/>
     <property name="bin.dir" value="bin"/>
     <property name="doc.dir" value="doc" />
+    <property name="doc.file" value="help.pdf" />
     <property name="javadocs.dir" value="javadocs"/>
     <property name="javadocs.src.dir" value="${src.dir}/pl/imgw/odimH5"/>
     <property name="script.dir" value="script"/>
@@ -135,7 +136,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     </target>
         
     <!-- Installs OdimH5 -->
-    <target name="install" depends="jar, gen-keystore"> 
+    <target name="install" depends="jar, gen-keystore, doc"> 
         <mkdir dir="${prefix}/${app.name}"/>
         <mkdir dir="${prefix}/${app.name}/${lib.dir}"/>
         <mkdir dir="${prefix}/${app.name}/${bin.dir}"/>
@@ -143,6 +144,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
         <mkdir dir="${prefix}/${app.name}/${conf.dir}"/>
         <mkdir dir="${prefix}/${app.name}/${log.dir}"/>
     	<mkdir dir="${prefix}/${app.name}/${tmp.dir}"/>
+        <mkdir dir="${prefix}/${app.name}/${doc.dir}"/> 
         <copy todir="${prefix}/${app.name}/${share.dir}" flatten="true">
             <fileset dir="${dist.dir}">
                 <include name="**/*.jar" />
@@ -154,6 +156,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
                 <include name="**/*"/>
             </fileset>
         </copy>
+        <copy todir="${prefix}/${app.name}/${doc.dir}" file="${doc.dir}/${doc.file}"/>
         <copy todir="${prefix}/${app.name}/${conf.dir}" file="${etc.dir}/${options.file}"/>
         <!-- Copy wrapper scripts -->
         <copy todir="${prefix}/${app.name}/${bin.dir}" file="${script.dir}/createDescriptor.sh"/>
@@ -188,4 +191,11 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
             </fileset> 
          </javadoc>
     </target>
+    <target name="doc">
+	<exec executable="bash" newenvironment="false" dir="${doc.dir}">
+        	<arg value="compiledoc.sh"/>
+	</exec>
+
+    </target>
+
 </project>

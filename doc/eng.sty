@@ -1,0 +1,44 @@
+\usepackage[pdftex]{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{natbib, multicol}
+\usepackage[editors, miniindex]{authorindex}
+\usepackage{wrapfig}
+\usepackage{lipsum,framed,color}
+\usepackage{hyperref}
+
+\definecolor{gray}{RGB}{238,233,233}
+
+\usepackage{longtable}
+\def\theaipage{\string\hyperpage{\thepage}}
+\DeclareGraphicsExtensions{.png}
+\def\figurename{Fig.}
+\def\tablename{Table}
+
+\usepackage[labelfont=sc, font=small,format=hang,indention=-.5cm]{caption}
+\usepackage{lipsum,framed,color}
+\newlength{\boxwidth}
+\newsavebox{\boxcontainer}
+
+\newenvironment{uwaga}
+{\begin{center}
+    \small
+    \begin{tabular}[h!]{|p{0.8\textwidth}|}
+    \hline}
+    {
+    \\\hline
+    \end{tabular}
+\end{center}}
+
+\newenvironment{kod}%
+  {\setlength{\boxwidth}{\textwidth}
+   \addtolength{\boxwidth}{-2\fboxsep}
+   \addtolength{\boxwidth}{-2\fboxrule}
+   \color{black}
+   \ttfamily
+   \small
+   \begin{lrbox}{\boxcontainer}%
+     \begin{minipage}{\boxwidth}}%
+  {\end{minipage}\end{lrbox}%
+   \begin{center}%
+     \colorbox{gray}{\usebox{\boxcontainer}}
+   \end{center}}
