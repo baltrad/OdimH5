@@ -37,6 +37,7 @@ along with the OdimH5 software.  If not, see http://www.gnu.org/licenses.
     <property name="util.pkg" value="pl/imgw/odimH5/util"/>
     <property name="log.dir" value="log"/>
     <property name="etc.dir" value="etc"/>
+    <property name="tmp.dir" value="tmp"/>
     <property name="options.file" value="options.xml"/>
     <property name="keystore.dir" value=".keystore"/>
     <property name="properties.file" value="odim.properties"/>
