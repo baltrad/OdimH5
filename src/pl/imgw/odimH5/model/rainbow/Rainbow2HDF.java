@@ -6,6 +6,7 @@ package pl.imgw.odimH5.model.rainbow;
 import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER51X;
 import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER52X;
 import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER53X;
+import static pl.imgw.odimH5.model.rainbow.RainbowModel.VER54X;
 
 import java.io.File;
 import java.util.HashMap;
@@ -805,7 +806,6 @@ public class Rainbow2HDF {
         NodeList nodeList = null;
         HashMap<String, String> what = new HashMap<String, String>();
 
-        
         if (version.substring(0, 3).matches(VER51X)
                 || version.substring(0, 3).matches(VER52X)) {
 
@@ -814,7 +814,7 @@ public class Rainbow2HDF {
             radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
                     verbose);
 
-        } else if (version.substring(0, 3).matches(VER53X)) {
+        } else if (version.substring(0, 3).matches(VER53X) || version.substring(0, 3).matches(VER54X)) {
 
             nodeList = rb
                     .getRAINBOWNodesByName(inputDoc, "sensorinfo", verbose);
@@ -1337,7 +1337,7 @@ public class Rainbow2HDF {
 
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "radarinfo", verbose);
             height = (rb.getRAINBOWMetadataElement(nodeList, "alt", verbose));
-        } else if (version.substring(0, 3).matches(rb.VER53X)) {
+        } else if (version.substring(0, 3).matches(rb.VER53X) || version.substring(0, 3).matches(rb.VER54X)) {
             nodeList = rb.getRAINBOWNodesByName(inputDoc, "lon", verbose);
             lon = (rb.getRAINBOWMetadataElement(nodeList, "", verbose));
 

@@ -119,6 +119,7 @@ public class RainbowModel {
     public static final String VER51X = "5.1";
     public static final String VER52X = "5.2";
     public static final String VER53X = "5.3";
+    public static final String VER54X = "5.4";
 
     // public static final String BRZ = "WMO:12568";
     // public static final String GDA = "WMO:12151";

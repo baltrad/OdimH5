@@ -17,7 +17,7 @@ public class AplicationConstans {
     public static final String LOG = "@LOG@";
     public static final String CONF = "@CONF@";
     public static final String TMP = "@TMP@";
-    public final static String VERSION = "2.16"; 
-    public static final String REL_DATE = "2013-10-29";
+    public final static String VERSION = "2.17"; 
+    public static final String REL_DATE = "2016-06-01";
 
 }

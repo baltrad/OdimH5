@@ -69,7 +69,7 @@ public class ModelImage {
             // radarFullName = rb.getRAINBOWMetadataElement(nodeList, "name",
             // verbose);
 
-        } else if (version.substring(0, 3).matches(rb.VER53X)) {
+        } else if (version.substring(0, 3).matches(rb.VER53X) || version.substring(0, 3).matches(rb.VER54X)) {
 
             nodeList = rb
                     .getRAINBOWNodesByName(inputDoc, "sensorinfo", verbose);

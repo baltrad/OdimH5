@@ -50,7 +50,6 @@ public class Rainbow2HDFPVOL extends Rainbow2HDF{
         if (whatG == null)
             return;
 
-        
         // before making 'how', 'what' has to be done
         howG = makeHowGroup(inputDoc);
 
@@ -83,14 +82,13 @@ public class Rainbow2HDFPVOL extends Rainbow2HDF{
         }
 
         slices = makeSlices(sliceList);
-
+        
         // ============ set output file name ==================
 
         if (outputFileName.isEmpty()) {
             setOutputFileName();
         } else
             this.outputFileName = outputFileName;
-
         correct = true;
 
     }
